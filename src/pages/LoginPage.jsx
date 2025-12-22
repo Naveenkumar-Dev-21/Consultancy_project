@@ -2,6 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { GoogleLogin } from '@react-oauth/google';
+const decodeJWT = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    return null;
+  }
+};
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -13,15 +26,28 @@ const LoginPage = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post('/api/auth/login', { email, password });
+            const { data } = await axios.post('http://localhost:5000/api/auth/login', { email, password });
             localStorage.setItem('userInfo', JSON.stringify(data));
-            if (data.role === 'admin') {
-                navigate('/admin');
-            } else {
-                navigate('/');
-            }
+            navigate('/');
         } catch (err) {
-            setError(err.response?.data?.message || 'Invalid email or password');
+            setError(err.response?.data?.error || 'Invalid email or password');
+        }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            const decoded = decodeJWT(credentialResponse.credential);
+            const profile = {
+                id: decoded.sub,
+                displayName: decoded.name,
+                emails: [{ value: decoded.email }],
+                photos: decoded.picture ? [{ value: decoded.picture }] : []
+            };
+            const { data } = await axios.post('http://localhost:5000/api/auth/google', profile);
+            localStorage.setItem('userInfo', JSON.stringify(data));
+            navigate('/');
+        } catch (err) {
+            setError('Google login failed');
         }
     };
 
@@ -67,11 +93,9 @@ const LoginPage = () => {
                     </div>
                 
                 <GoogleLogin
-                    onSuccess={credentialResponse => {
-                        console.log(credentialResponse);
-                        }}
+                    onSuccess={handleGoogleSuccess}
                     onError={() => {
-                        console.log('Login Failed');
+                        setError('Google login failed');
                          }}
                 />
                     

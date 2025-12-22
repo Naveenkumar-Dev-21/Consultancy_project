@@ -1,12 +1,57 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { ShoppingCart, Search, Filter, X, ChevronRight, Star, Heart } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
+
+function checkuser(navigate) {
+    const userInfo = localStorage.getItem('userInfo');
+        if (!userInfo) {
+            navigate('/login');
+            return false;
+        }
+        return true;
+}
 
 const HomePage = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [products] = useState([
+        {
+            _id: 1,
+            name: "Soft Baby Blanket",
+            category: "Blankets",
+            price: 599,
+            image: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&q=80&w=500",
+            ageGroup: "0-6 Months",
+            description: "Ultra-soft blanket perfect for newborns."
+        },
+        {
+            _id: 2,
+            name: "Cute Teddy Bear",
+            category: "Toys",
+            price: 299,
+            image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&q=80&w=500",
+            ageGroup: "1-2 Years",
+            description: "Adorable teddy bear for cuddling."
+        },
+        {
+            _id: 3,
+            name: "Baby Onesie",
+            category: "Clothing",
+            price: 399,
+            image: "https://images.unsplash.com/photo-1522771930-78848d9293e8?auto=format&fit=crop&q=80&w=500",
+            ageGroup: "0-6 Months",
+            description: "Comfortable onesie for daily wear."
+        },
+        {
+            _id: 4,
+            name: "Baby Bottle Set",
+            category: "Feeding",
+            price: 499,
+            image: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?auto=format&fit=crop&q=80&w=500",
+            ageGroup: "0-6 Months",
+            description: "Essential bottle set for feeding."
+        }
+    ]);
+    const [loading] = useState(false);
+    const [filteredProducts, setFilteredProducts] = useState(products);
 
     // Filter States
     const [searchTerm, setSearchTerm] = useState('');
@@ -20,22 +65,10 @@ const HomePage = () => {
     // Cart Animation
     const [addedIds, setAddedIds] = useState({});
 
-    // Fetch Data
+    // Initialize filtered products
     useEffect(() => {
-        const fetchProducts = async () => {
-            setLoading(true);
-            try {
-                const { data } = await axios.get('/api/products');
-                setProducts(data);
-                setFilteredProducts(data);
-            } catch (error) {
-                console.error("Error fetching products", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProducts();
-    }, []);
+        setFilteredProducts(products);
+    }, [products]);
 
     // Filter Logic
     useEffect(() => {
@@ -64,6 +97,10 @@ const HomePage = () => {
     const ageGroups = ['All', '0-6 Months', '6-12 Months', '1-2 Years', '2-4 Years', '4+ Years'];
 
     const addToCartHandler = (product, e) => {
+
+        if (!checkuser(navigate)) return;
+    
+
         e.stopPropagation(); // Prevent modal opening
         setAddedIds(prev => ({ ...prev, [product._id]: true }));
         setTimeout(() => {
@@ -102,7 +139,7 @@ const HomePage = () => {
                         <p className="text-xl text-gray-600 mb-8 max-w-lg mx-auto md:mx-0">
                             Discover the softest, safest, and most adorable essentials for your little bundle of joy.
                         </p>
-                        <button className="px-8 py-4 bg-[#fca5a5] text-white rounded-full font-bold text-lg shadow-lg hover:bg-[#f87171] transition-all transform hover:-translate-y-1">
+                        <button className="px-8 py-4 bg-[#fca5a5] text-white rounded-full font-bold text-lg shadow-lg hover:bg-[#f87171] transition-all transform hover:-translate-y-1" onClick={() => checkuser(navigate)}>
                             Shop Now
                         </button>
                     </div>
