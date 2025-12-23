@@ -6,6 +6,7 @@
     - should be done within two days (15.12.25 - 17.12.25) 
   
 **Updates Done**
+
     - Made the UI and the server backend with user details storing in database
     - Localhost only 
     - upto cart page is completed 
