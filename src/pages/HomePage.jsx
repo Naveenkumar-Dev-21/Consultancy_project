@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ShoppingCart, Search, Filter, X, ChevronRight, Star, Heart } from 'lucide-react';
 import { Link,useNavigate } from 'react-router-dom';
 
+
 function checkuser(navigate) {
     const userInfo = localStorage.getItem('userInfo');
         if (!userInfo) {
@@ -12,6 +13,15 @@ function checkuser(navigate) {
 }
 
 const HomePage = () => {
+    const navigate = useNavigate();
+
+     useEffect(() => {
+        const userInfo = localStorage.getItem('userInfo');
+        if (!userInfo) {
+            navigate('/login');
+        }
+    }, [navigate]);
+
     const [products] = useState([
         {
             _id: 1,
@@ -139,7 +149,11 @@ const HomePage = () => {
                         <p className="text-xl text-gray-600 mb-8 max-w-lg mx-auto md:mx-0">
                             Discover the softest, safest, and most adorable essentials for your little bundle of joy.
                         </p>
-                        <button className="px-8 py-4 bg-[#fca5a5] text-white rounded-full font-bold text-lg shadow-lg hover:bg-[#f87171] transition-all transform hover:-translate-y-1" onClick={() => checkuser(navigate)}>
+                        <button className="px-8 py-4 bg-[#fca5a5] text-white rounded-full font-bold text-lg shadow-lg hover:bg-[#f87171] transition-all transform hover:-translate-y-1" onClick={() =>{
+                            if(checkuser(navigate)){
+                                window.scrollTo({top:700,behaviour:'smooth'});
+                            }
+                        }}>
                             Shop Now
                         </button>
                     </div>

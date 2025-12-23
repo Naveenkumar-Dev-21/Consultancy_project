@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode'; 
+
 const decodeJWT = (token) => {
   try {
     const base64Url = token.split('.')[1];
@@ -20,8 +22,18 @@ const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
 
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (location.state && location.state.signupSuccess) {
+            setSuccess('Signup successful! Please login.');
+            // Remove the state so the message doesn't persist on refresh
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     const submitHandler = async (e) => {
         e.preventDefault();
@@ -37,13 +49,13 @@ const LoginPage = () => {
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
             const decoded = decodeJWT(credentialResponse.credential);
-            const profile = {
-                id: decoded.sub,
-                displayName: decoded.name,
-                emails: [{ value: decoded.email }],
-                photos: decoded.picture ? [{ value: decoded.picture }] : []
+            const googleUser = {
+                googleId: decoded.sub,
+                email: decoded.email,
+                name: decoded.name,
+                picture: decoded.picture
             };
-            const { data } = await axios.post('http://localhost:5000/api/auth/google', profile);
+            const { data } = await axios.post('http://localhost:5000/api/auth/google', googleUser);
             localStorage.setItem('userInfo', JSON.stringify(data));
             navigate('/');
         } catch (err) {
@@ -55,6 +67,7 @@ const LoginPage = () => {
         <div className="flex items-center justify-center min-h-[80vh]">
             <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl glass border border-gray-100">
                 <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">Welcome Back</h2>
+                {success && <div className="bg-green-100 text-green-700 p-3 rounded mb-4 text-sm">{success}</div>}
                 {error && <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-sm">{error}</div>}
 
                 <form onSubmit={submitHandler} className="space-y-4">
@@ -91,14 +104,20 @@ const LoginPage = () => {
                             <span className="px-2 bg-white text-gray-500">Or continue with</span>
                         </div>
                     </div>
-                
-                <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={() => {
-                        setError('Google login failed');
-                         }}
-                />
-                    
+
+                    <div className="mt-8 transform hover:scale-105 transition-transform duration-200">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => {
+                            setError('Google login failed');
+                            }}
+                                theme="filled_blue"
+                                size="large"
+                                shape="pill"
+                                text="signin_with"
+                                width="385"
+                        />
+                    </div>
                 </form>
 
                 <div className="mt-6 text-center text-sm text-gray-500">

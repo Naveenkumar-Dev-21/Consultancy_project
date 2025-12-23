@@ -32,9 +32,8 @@ const Signup = () =>{
             return;
         }
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/signup', { name, email, password });
-            localStorage.setItem('userInfo', JSON.stringify(data));
-            navigate('/');
+            await axios.post('http://localhost:5000/api/auth/signup', { name, email, password });
+            navigate('/login', { state: { signupSuccess: true } });
         } catch (err) {
             setError(err.response?.data?.error || 'Signup failed');
         }
@@ -43,13 +42,13 @@ const Signup = () =>{
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
             const decoded = decodeJWT(credentialResponse.credential);
-            const profile = {
-                id: decoded.sub,
-                displayName: decoded.name,
-                emails: [{ value: decoded.email }],
-                photos: decoded.picture ? [{ value: decoded.picture }] : []
+            const googleUser = {
+                googleId: decoded.sub,
+                email: decoded.email,
+                name: decoded.name,
+                picture: decoded.picture
             };
-            const { data } = await axios.post('http://localhost:5000/api/auth/google', profile);
+            const { data } = await axios.post('http://localhost:5000/api/auth/google', googleUser);
             localStorage.setItem('userInfo', JSON.stringify(data));
             navigate('/');
         } catch (err) {
@@ -117,12 +116,19 @@ const Signup = () =>{
                         </div>
                     </div>
 
-                    <GoogleLogin
-                        onSuccess={handleGoogleSuccess}
-                        onError={() => {
-                            setError('Google signup failed');
-                        }}
-                    />
+                    <div className="mt-8 transform hover:scale-105 transition-transform duration-200">
+                        <GoogleLogin
+                            onSuccess={handleGoogleSuccess}
+                            onError={() => {
+                            setError('Google login failed');
+                            }}
+                        theme="filled_blue"
+                        size="large"
+                        shape="pill"
+                        text="signin_with"
+                        width="385"
+                        />
+                    </div>
                 </form>
 
                 <div className="mt-6 text-center text-sm text-gray-500">
