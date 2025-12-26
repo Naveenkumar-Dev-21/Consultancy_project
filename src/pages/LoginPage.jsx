@@ -48,19 +48,32 @@ const LoginPage = () => {
 
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
-            const decoded = decodeJWT(credentialResponse.credential);
-            const googleUser = {
-                googleId: decoded.sub,
-                email: decoded.email,
-                name: decoded.name,
-                picture: decoded.picture
-            };
-            const { data } = await axios.post('http://localhost:5000/api/auth/google', googleUser);
-            localStorage.setItem('userInfo', JSON.stringify(data));
-            navigate('/');
-        } catch (err) {
-            setError('Google login failed');
-        }
+  const decoded = decodeJWT(credentialResponse.credential);
+
+  const googleUser = {
+    googleId: decoded.sub,
+    email: decoded.email,
+    name: decoded.name,
+    picture: decoded.picture
+  };
+
+  const { data } = await axios.post(
+    'http://localhost:5000/api/auth/google',
+    googleUser
+  );
+
+  localStorage.setItem('userInfo', JSON.stringify(data));
+  localStorage.setItem('token', data.token); // optional but recommended
+  localStorage.setItem('role', data.role);   // optional
+
+  if (data.role === "admin") {
+    navigate("/admin");
+  } else {
+    navigate("/");
+  }
+} catch (err) {
+  setError('Google login failed');
+}
     };
 
     return (

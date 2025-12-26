@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
+
 const decodeJWT = (token) => {
   try {
     const base64Url = token.split('.')[1];
@@ -14,7 +16,7 @@ const decodeJWT = (token) => {
     return null;
   }
 };
-import axios from 'axios';
+
 
 const Signup = () =>{
     const [name, setName] = useState('');
@@ -50,7 +52,13 @@ const Signup = () =>{
             };
             const { data } = await axios.post('http://localhost:5000/api/auth/google', googleUser);
             localStorage.setItem('userInfo', JSON.stringify(data));
-            navigate('/');
+            localStorage.setItem('token',data.token);
+            localStorage.setItem('role',data.role);
+            if(data.role === 'admin'){
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
         } catch (err) {
             setError('Google signup failed');
         }

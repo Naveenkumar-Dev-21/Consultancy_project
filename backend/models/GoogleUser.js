@@ -18,9 +18,10 @@ const GoogleUserSchema = new mongoose.Schema({
   picture: {
     type: String
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  role:{
+    type:String,
+    enum:['user','admin'],
+    default:'user'
   }
 });
 

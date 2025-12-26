@@ -2,8 +2,8 @@ import User from "../models/User.js";
 import GoogleUser from "../models/GoogleUser.js";
 import jwt from "jsonwebtoken";
 
-const generateToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+const generateToken = (id, role) =>
+  jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 export const signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -50,11 +50,20 @@ export const googleAuth = async (req, res) => {
     });
   }
 
+    if (
+    email === process.env.ADMIN_EMAIL &&
+    user.role !== "admin"
+  ) {
+    user.role = "admin";
+    await user.save();
+  }
+
   res.json({
     _id: user._id,
     name: user.name,
     email: user.email,
     picture: user.picture,
-    token: generateToken(user._id)
+    role: user.role,
+    token: generateToken(user._id, user.role)
   });
 };
