@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import GoogleUser from "../models/GoogleUser.js";
 import jwt from "jsonwebtoken";
+import { application } from "express";
 
 const generateToken = (id, role) =>
   jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
