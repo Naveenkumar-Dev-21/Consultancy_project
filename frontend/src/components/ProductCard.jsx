@@ -1,49 +1,60 @@
-import React from 'react';
-import { ShoppingCart, Star, CheckCircle2, Heart, Package } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingCart, Star, CheckCircle2, Heart, Package, Sparkles, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ product, addToCartHandler, addedToCartId }) => {
     const navigate = useNavigate();
+    const [ripple, setRipple] = useState(false);
 
     // Calculate discount percentage
     const originalPrice = Math.round(product.price * 1.2);
     const discountPercent = Math.round(((originalPrice - product.price) / originalPrice) * 100);
 
+    const handleAddToCart = (e) => {
+        e.stopPropagation();
+        setRipple(true);
+        setTimeout(() => setRipple(false), 600);
+        addToCartHandler(product, e);
+    };
+
     return (
         <div
-            className="group relative bg-white rounded-3xl overflow-hidden border border-zinc-100 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer flex flex-col h-full"
+            className="group relative bg-white rounded-[24px] overflow-hidden border-2 border-pink-100 hover:border-pink-200 shadow-sm hover:shadow-lg transition-all duration-500 cursor-pointer flex flex-col h-full"
             onClick={() => navigate(`/product/${product._id}`)}
         >
-            {/* Image Container */}
-            <div className="relative aspect-square bg-gradient-to-br from-zinc-50 to-pink-50/30 overflow-hidden">
+            {/* Image Container with Soft Pink Background */}
+            <div className="relative aspect-square bg-gradient-to-br from-pink-50/80 via-rose-50/50 to-pink-100/30 overflow-hidden">
                 <img
                     src={product.image || "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&q=80&w=500"}
                     alt={product.name}
-                    className="w-full h-full object-contain mix-blend-multiply p-8 group-hover:scale-110 group-hover:rotate-2 transition-all duration-700 ease-out"
+                    className="w-full h-full object-contain mix-blend-multiply p-4 group-hover:scale-[1.08] transition-all duration-700 ease-out"
                 />
 
-                {/* Gradient Overlay on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Subtle Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-pink-50/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                {/* Top Badges */}
-                <div className="absolute top-4 left-4 right-4 flex items-start justify-between">
-                    <div className="flex flex-col gap-2">
+                {/* Top Section - Badges & Wishlist */}
+                <div className="absolute top-2 left-2 right-2 flex items-start justify-between z-10">
+                    <div className="flex flex-col gap-1.5">
                         {product.stock <= 0 ? (
-                            <span className="bg-gradient-to-r from-zinc-800 to-zinc-900 text-white text-[10px] font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
+                            <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-600 text-[9px] font-bold px-2 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                <Package size={9} />
                                 Sold Out
                             </span>
                         ) : product.stock <= 5 ? (
-                            <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white text-[10px] font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg animate-pulse">
-                                Only {product.stock} Left
+                            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-orange-100 to-peach-100 text-orange-600 text-[9px] font-bold px-2 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                <TrendingUp size={9} />
+                                {product.stock} Left
                             </span>
                         ) : (
-                            <span className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-[10px] font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
-                                In Stock
+                            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-green-50 to-emerald-50 text-emerald-600 text-[9px] font-bold px-2 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                <Sparkles size={9} />
+                                Available
                             </span>
                         )}
                         {discountPercent > 0 && (
-                            <span className="bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[10px] font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg">
-                                {discountPercent}% Off
+                            <span className="inline-flex items-center gap-0.5 bg-gradient-to-r from-pink-100 to-rose-100 text-pink-600 text-[9px] font-bold px-2 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                                💝 {discountPercent}% OFF
                             </span>
                         )}
                     </div>
@@ -52,112 +63,103 @@ const ProductCard = ({ product, addToCartHandler, addedToCartId }) => {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            // Add wishlist functionality here
                         }}
-                        className="bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-lg hover:bg-pink-50 hover:scale-110 transition-all duration-300 group/heart"
+                        className="bg-white/95 backdrop-blur-sm p-2 rounded-full shadow-sm hover:bg-pink-50 hover:scale-105 transition-all duration-300 group/heart border border-pink-100"
                     >
-                        <Heart size={16} className="text-zinc-400 group-hover/heart:text-pink-500 group-hover/heart:fill-pink-500 transition-all" />
+                        <Heart size={13} className="text-pink-300 group-hover/heart:text-pink-500 group-hover/heart:fill-pink-500 transition-all" />
                     </button>
                 </div>
 
-                {/* Desktop Add to Cart Button - Always Visible on Hover */}
-                <div className="absolute inset-x-4 bottom-4 translate-y-full group-hover:translate-y-0 transition-all duration-500 opacity-0 group-hover:opacity-100 hidden md:block">
-                    <button
-                        onClick={(e) => addToCartHandler(product, e)}
-                        disabled={product.stock === 0}
-                        className={`w-full py-4 rounded-2xl font-bold text-sm shadow-2xl flex items-center justify-center gap-3 transition-all duration-300 transform hover:scale-[1.02] active:scale-95
-                            ${product.stock === 0
-                                ? 'bg-zinc-300 text-zinc-500 cursor-not-allowed'
-                                : addedToCartId === product._id
-                                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-green-500/50'
-                                    : 'bg-gradient-to-r from-zinc-900 to-zinc-800 text-white hover:from-zinc-800 hover:to-zinc-700 shadow-zinc-900/50'
-                            }`}
-                    >
-                        {addedToCartId === product._id ? (
-                            <>
-                                <CheckCircle2 size={18} className="animate-bounce" />
-                                <span>Added to Cart!</span>
-                            </>
-                        ) : (
-                            <>
-                                <ShoppingCart size={18} />
-                                <span>Add to Cart</span>
-                            </>
-                        )}
-                    </button>
+                {/* Rating Badge - Floating */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm border border-pink-100 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                    <Star size={10} className="fill-yellow-400 text-yellow-400" />
+                    <span className="text-[10px] font-bold text-gray-700">{product.rating ? product.rating.toFixed(1) : '5.0'}</span>
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="p-6 flex flex-col flex-grow bg-gradient-to-b from-white to-zinc-50/30">
-                {/* Category & Rating */}
-                <div className="mb-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Package size={12} className="text-zinc-400" />
-                        <p className="text-[10px] font-extrabold text-zinc-500 uppercase tracking-widest">{product.category}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-yellow-50 px-2.5 py-1 rounded-full">
-                        <Star size={13} className="fill-yellow-400 text-yellow-400" />
-                        <span className="text-xs font-bold text-yellow-700">{product.rating ? product.rating.toFixed(1) : '5.0'}</span>
-                    </div>
+            {/* Content Section */}
+            <div className="p-4 flex flex-col flex-grow relative bg-gradient-to-b from-white to-pink-50/20">
+                {/* Category */}
+                <div className="mb-1.5 flex items-center gap-1">
+                    <div className="w-1 h-1 rounded-full bg-pink-400"></div>
+                    <p className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.12em]">{product.category}</p>
                 </div>
 
                 {/* Product Name */}
-                <h3 className="text-base font-bold text-zinc-900 leading-snug mb-3 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-500 group-hover:to-rose-500 transition-all duration-300">
+                <h3 className="text-[13px] font-bold text-gray-800 leading-tight mb-2 line-clamp-2 min-h-[34px]">
                     {product.name}
                 </h3>
 
-                {/* Stock Indicator */}
+                {/* Stock Progress Bar */}
                 {product.stock > 0 && product.stock <= 10 && (
-                    <div className="mb-3 flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                    <div className="mb-2 flex items-center gap-1.5">
+                        <div className="flex-1 h-1.5 bg-pink-50 rounded-full overflow-hidden">
                             <div
-                                className={`h-full rounded-full transition-all duration-500 ${product.stock <= 3 ? 'bg-gradient-to-r from-red-500 to-orange-500' :
-                                        product.stock <= 5 ? 'bg-gradient-to-r from-orange-500 to-yellow-500' :
-                                            'bg-gradient-to-r from-green-500 to-emerald-500'
+                                className={`h-full rounded-full transition-all duration-700 ${product.stock <= 3 ? 'bg-gradient-to-r from-orange-300 to-orange-400' :
+                                    product.stock <= 5 ? 'bg-gradient-to-r from-yellow-300 to-orange-300' :
+                                        'bg-gradient-to-r from-green-300 to-emerald-400'
                                     }`}
                                 style={{ width: `${(product.stock / 10) * 100}%` }}
                             />
                         </div>
-                        <span className="text-[10px] font-bold text-zinc-400">{product.stock}/10</span>
+                        <span className="text-[8px] font-bold text-gray-400 uppercase">{product.stock}/10</span>
                     </div>
                 )}
 
-                {/* Price & Mobile Add Button */}
-                <div className="mt-auto flex items-end justify-between pt-4 border-t-2 border-zinc-100">
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs text-zinc-400 font-semibold line-through">₹{originalPrice}</span>
-                            {discountPercent > 0 && (
-                                <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                    Save {discountPercent}%
-                                </span>
-                            )}
-                        </div>
-                        <span className="text-2xl font-extrabold bg-gradient-to-r from-zinc-900 to-zinc-700 bg-clip-text text-transparent">
+                {/* Price Section */}
+                <div className="mt-auto pt-2">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="text-[10px] text-gray-400 font-semibold line-through">₹{originalPrice}</span>
+                        {discountPercent > 0 && (
+                            <span className="text-[8px] font-bold text-pink-600 bg-pink-50 px-1.5 py-0.5 rounded-md uppercase tracking-wide">
+                                Save ₹{originalPrice - product.price}
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-end justify-between">
+                        <span className="text-[22px] font-black text-gray-800 leading-none">
                             ₹{product.price}
                         </span>
                     </div>
-
-                    {/* Mobile Only Add Button - Enhanced */}
-                    <button
-                        onClick={(e) => addToCartHandler(product, e)}
-                        disabled={product.stock === 0}
-                        className={`md:hidden w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-300 active:scale-90 transform hover:scale-110
-                             ${product.stock === 0
-                                ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
-                                : addedToCartId === product._id
-                                    ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-green-500/50 animate-pulse'
-                                    : 'bg-gradient-to-br from-pink-400 to-rose-500 text-white shadow-pink-500/50 hover:shadow-pink-500/70'
-                            }`}
-                    >
-                        {addedToCartId === product._id ? (
-                            <CheckCircle2 size={20} className="animate-bounce" />
-                        ) : (
-                            <ShoppingCart size={20} />
-                        )}
-                    </button>
                 </div>
+
+                {/* Always Visible Add to Cart Button - Compact */}
+                <button
+                    onClick={handleAddToCart}
+                    disabled={product.stock === 0}
+                    className={`relative mt-3 w-full py-2.5 rounded-xl font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all duration-300 overflow-hidden
+                        ${product.stock === 0
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : addedToCartId === product._id
+                                ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white shadow-green-300/40 scale-[0.98]'
+                                : 'bg-gradient-to-r from-pink-400 to-rose-400 text-white hover:from-pink-500 hover:to-rose-500 shadow-pink-300/40 hover:shadow-pink-400/50 hover:scale-[1.02] active:scale-95'
+                        }`}
+                >
+                    {/* Ripple Effect */}
+                    {ripple && (
+                        <span className="absolute inset-0 bg-white/30 rounded-xl animate-ping" />
+                    )}
+
+                    {/* Button Content */}
+                    <div className="relative z-10 flex items-center gap-2">
+                        {addedToCartId === product._id ? (
+                            <>
+                                <CheckCircle2 size={15} className="animate-bounce" />
+                                <span className="font-black tracking-wide">Added!</span>
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingCart size={15} strokeWidth={2.5} />
+                                <span className="font-black tracking-wide">Add to Cart</span>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Shine Effect */}
+                    {!addedToCartId && product.stock > 0 && (
+                        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                    )}
+                </button>
             </div>
         </div>
     );
