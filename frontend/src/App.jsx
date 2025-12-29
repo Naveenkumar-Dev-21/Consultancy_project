@@ -19,9 +19,9 @@ import PublicRoute from './components/PublicRoute';
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/owner-dashboard');
-
+  const id = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={id}>
       <CartProvider>
         <div className="min-h-screen text-apple-text font-sans selection:bg-beelittle-coral/20 bg-[#f5f5f7]">
           {!isAdminRoute && <Header />}
