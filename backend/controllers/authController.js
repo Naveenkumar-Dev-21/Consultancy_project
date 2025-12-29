@@ -14,11 +14,18 @@ export const signup = async (req, res) => {
 
   const user = await User.create({ name, email, password });
 
+  // Check if admin email
+  if (email === process.env.ADMIN_EMAIL && user.role !== "admin") {
+    user.role = "admin";
+    await user.save();
+  }
+
   res.json({
     _id: user._id,
     name: user.name,
     email: user.email,
-    token: generateToken(user._id)
+    role: user.role,
+    token: generateToken(user._id, user.role)
   });
 };
 
@@ -33,7 +40,8 @@ export const login = async (req, res) => {
     _id: user._id,
     name: user.name,
     email: user.email,
-    token: generateToken(user._id)
+    role: user.role,
+    token: generateToken(user._id, user.role)
   });
 };
 
@@ -51,7 +59,7 @@ export const googleAuth = async (req, res) => {
     });
   }
 
-    if (
+  if (
     email === process.env.ADMIN_EMAIL &&
     user.role !== "admin"
   ) {
