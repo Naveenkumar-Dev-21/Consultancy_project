@@ -6,7 +6,21 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String },
   googleId: { type: String },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' }
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  address: {
+    street: { type: String, default: '' },
+    city: { type: String, default: '' },
+    postalCode: { type: String, default: '' },
+    country: { type: String, default: '' },
+    phone: { type: String, default: '' }
+  },
+  babyDetails: {
+    name: { type: String, default: '' },
+    gender: { type: String, default: '' },
+    age: { type: String, default: '' },
+    weight: { type: String, default: '' },
+    size: { type: String, default: '' }
+  }
 }, { timestamps: true });
 
 userSchema.pre("save", async function (next) {
