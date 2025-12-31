@@ -1,4 +1,5 @@
 import Order from '../models/Order.js';
+import Product from '../models/Product.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -18,6 +19,27 @@ export const createOrder = async (req, res) => {
         if (orderItems && orderItems.length === 0) {
             res.status(400).json({ message: 'No order items' });
             return;
+        }
+
+        // Check stock availability and decrement stock
+        for (const item of orderItems) {
+            const product = await Product.findById(item.product);
+
+            if (!product) {
+                res.status(404).json({ message: `Product ${item.name} not found` });
+                return;
+            }
+
+            if (product.stock < item.qty) {
+                res.status(400).json({
+                    message: `Insufficient stock for ${item.name}. Only ${product.stock} available.`
+                });
+                return;
+            }
+
+            // Decrement stock
+            product.stock -= item.qty;
+            await product.save();
         }
 
         const order = new Order({
