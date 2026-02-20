@@ -8,6 +8,8 @@ import {
     packOrder,
     shipOrder,
     getInvoices,
+    deleteOrder,
+    cancelOrder,
 } from '../controllers/orderController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -16,7 +18,8 @@ const router = express.Router();
 router.route('/').post(protect, createOrder).get(protect, admin, getOrders);
 router.route('/myorders').get(protect, getMyOrders);
 router.route('/invoices').get(protect, admin, getInvoices);
-router.route('/:id').get(protect, getOrderById);
+router.route('/:id').get(protect, getOrderById).delete(protect, admin, deleteOrder);
+router.route('/:id/cancel').put(protect, cancelOrder);
 router.route('/:id/confirm').put(protect, admin, confirmOrder);
 router.route('/:id/pack').put(protect, admin, packOrder);
 router.route('/:id/ship').put(protect, admin, shipOrder);

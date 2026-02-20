@@ -15,6 +15,16 @@ const productSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        descriptionImages: {
+            type: [String],
+            default: [],
+            validate: {
+                validator: function(arr) {
+                    return arr.length <= 3;
+                },
+                message: 'Maximum 3 description images allowed'
+            }
+        },
         brand: {
             type: String,
             required: true,
@@ -40,6 +50,10 @@ const productSchema = mongoose.Schema(
         price: {
             type: Number,
             required: true,
+            default: 0,
+        },
+        originalPrice: {
+            type: Number,
             default: 0,
         },
         stock: {

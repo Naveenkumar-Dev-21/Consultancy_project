@@ -96,3 +96,69 @@ export const verifyPayment = async (req, res) => {
 export const getRazorpayKey = async (req, res) => {
     res.json({ key: process.env.RAZORPAY_KEY_ID });
 };
+
+// @desc    Initiate refund for a cancelled order
+// @route   POST /api/payment/refund
+// @access  Private/Admin
+export const refundPayment = async (req, res) => {
+    try {
+        const { orderId } = req.body;
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        if (order.status !== 'Cancelled') {
+            return res.status(400).json({ message: 'Refund can only be initiated for cancelled orders' });
+        }
+
+        if (!order.isPaid || !order.paymentResult?.id) {
+            return res.status(400).json({ message: 'No online payment found for this order. Refund not applicable.' });
+        }
+
+        if (order.refundStatus === 'initiated' || order.refundStatus === 'completed') {
+            return res.status(400).json({ message: `Refund already ${order.refundStatus}` });
+        }
+
+        // Initiate refund via Razorpay
+        const refund = await razorpay.payments.refund(order.paymentResult.id, {
+            amount: order.totalPrice * 100, // amount in paise
+            speed: 'normal',
+            notes: {
+                orderId: order._id.toString(),
+                reason: order.cancellationReason || 'Order cancelled'
+            }
+        });
+
+        order.refundStatus = 'initiated';
+        order.refundId = refund.id;
+        await order.save();
+
+        res.json({
+            success: true,
+            message: 'Refund initiated successfully',
+            refundId: refund.id,
+            refundStatus: 'initiated'
+        });
+    } catch (error) {
+        console.error('Refund error:', error);
+
+        // Update order to reflect failed refund attempt
+        try {
+            const order = await Order.findById(req.body.orderId);
+            if (order) {
+                order.refundStatus = 'failed';
+                await order.save();
+            }
+        } catch (e) {
+            console.error('Failed to update order refund status:', e);
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Refund failed',
+            error: error.message
+        });
+    }
+};

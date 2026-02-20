@@ -11,7 +11,7 @@
 }
 
 .dashboard-body {
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f8f9fa;
     color: var(--text-dark);
 }

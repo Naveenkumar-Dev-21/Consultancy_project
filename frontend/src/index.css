@@ -1,11 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
 
 :root {
-  --apple-bg: #fff0f5;
+  --apple-bg: #fff5f7;
   --apple-text: #1d1d1f;
-  --apple-blue: #0066cc;
-  --beelittle-coral: #fca5a5;
+  --beelittle-coral: #f87171;
   --beelittle-peach: #fff1f2;
+  --beelittle-pink: #fda4af;
+  --beelittle-blush: #ffe4e6;
   --radius-apple: 18px;
   --radius-lg: 24px;
 }
@@ -15,55 +16,156 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+  }
+
+  /* Responsive font scaling */
+  @media (max-width: 640px) {
+    html { font-size: 14px; }
+  }
+  @media (min-width: 1280px) {
+    html { font-size: 17px; }
+  }
+  @media (min-width: 1536px) {
+    html { font-size: 18px; }
+  }
+
   body {
     @apply antialiased text-gray-900;
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--apple-bg);
+    font-family:
+      "Poppins",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Helvetica,
+      Arial,
+      sans-serif;
+    background: linear-gradient(180deg, #fff5f7 0%, #fef2f2 50%, #fff5f7 100%);
+    min-height: 100vh;
   }
+
+  /* Bigger input/button text */
+  input, textarea, select, button {
+    font-size: inherit;
+    font-family: inherit;
+  }
+
+  h1 { @apply text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight; }
+  h2 { @apply text-2xl sm:text-3xl font-bold tracking-tight; }
+  h3 { @apply text-xl sm:text-2xl font-semibold; }
 }
 
-/* Apple-style smooth transitions */
+/* Smooth transitions (exclude color/transform for perf) */
 * {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 
+/* ─── Cards ─── */
 .apple-card {
-  @apply bg-white shadow-sm border border-black/5;
-  border-radius: var(--radius-apple);
+  @apply bg-white shadow-card border border-rose-100/60 rounded-2xl;
 }
-
 .apple-card:hover {
-  @apply shadow-xl -translate-y-1;
-  border-color: rgba(0, 0, 0, 0.1);
+  @apply shadow-soft -translate-y-1;
+  border-color: rgba(248, 113, 113, 0.15);
 }
 
+/* ─── Layout ─── */
 .section-container {
-  @apply max-w-[1200px] mx-auto px-6;
+  @apply max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+/* ─── Buttons ─── */
 .premium-btn {
-  @apply px-6 py-2.5 rounded-full font-semibold transition-all active:scale-95 text-sm;
+  @apply px-7 py-3 rounded-full font-bold transition-all active:scale-95 text-base;
 }
-
 .btn-primary {
-  @apply bg-zinc-900 text-white hover:bg-zinc-800;
+  @apply bg-gradient-to-r from-rose-400 to-pink-500 text-white hover:from-rose-500 hover:to-pink-600 shadow-lg shadow-rose-500/20;
 }
-
 .btn-coral {
-  @apply bg-[#fca5a5] text-white hover:bg-[#f87171];
+  @apply bg-beelittle-coral text-white hover:bg-rose-500 shadow-lg shadow-rose-400/20;
+}
+.btn-outline {
+  @apply bg-transparent text-rose-500 border-2 border-rose-300 hover:bg-rose-50;
 }
 
-/* Glassmorphism utility */
+/* ─── Glassmorphism ─── */
 .glass {
-  @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  @apply bg-white/80 backdrop-blur-xl border border-white/40 shadow-lg;
 }
 
-/* Hide scrollbar but allow scrolling */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+/* ─── Pink Glow ─── */
+.pink-glow {
+  box-shadow: 0 0 30px rgba(251, 113, 133, 0.1),
+              0 0 60px rgba(251, 113, 133, 0.05);
 }
 
+/* ─── Gradient text ─── */
+.gradient-text-pink {
+  background: linear-gradient(135deg, #f43f5e, #fb7185, #f43f5e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Decorative blobs ─── */
+.blob-1 {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(251,113,133,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(40px);
+  pointer-events: none;
+}
+.blob-2 {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(196,181,253,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+/* ─── Hide scrollbar ─── */
+.hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ─── Custom scrollbar for order panels ─── */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #fda4af;
+  border-radius: 20px;
+}
+
+/* ─── Responsive image helpers ─── */
+.img-cover {
+  @apply w-full h-full object-cover;
+}
+.img-contain {
+  @apply w-full h-full object-contain;
+}
+
+/* ─── Range slider pink ─── */
+input[type="range"] {
+  @apply appearance-none h-2 rounded-lg cursor-pointer;
+  background: #fce7f3;
+}
+input[type="range"]::-webkit-slider-thumb {
+  @apply appearance-none w-5 h-5 rounded-full;
+  background: linear-gradient(135deg, #f43f5e, #fb7185);
+  box-shadow: 0 2px 8px rgba(244,63,94,0.3);
+}
+input[type="range"]::-moz-range-thumb {
+  @apply w-5 h-5 rounded-full border-0;
+  background: linear-gradient(135deg, #f43f5e, #fb7185);
 }

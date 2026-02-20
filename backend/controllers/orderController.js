@@ -1,5 +1,6 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import Coupon from '../models/Coupon.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -14,6 +15,8 @@ export const createOrder = async (req, res) => {
             taxPrice,
             shippingPrice,
             totalPrice,
+            couponCode,
+            discountAmount,
         } = req.body;
 
         if (orderItems && orderItems.length === 0) {
@@ -42,6 +45,14 @@ export const createOrder = async (req, res) => {
             await product.save();
         }
 
+        // If coupon code was used, increment its usedCount
+        if (couponCode) {
+            await Coupon.findOneAndUpdate(
+                { code: couponCode.toUpperCase() },
+                { $inc: { usedCount: 1 } }
+            );
+        }
+
         const order = new Order({
             orderItems,
             user: req.user._id,
@@ -51,6 +62,8 @@ export const createOrder = async (req, res) => {
             taxPrice,
             shippingPrice,
             totalPrice,
+            couponCode: couponCode || undefined,
+            discountAmount: discountAmount || 0,
         });
 
         const createdOrder = await order.save();
@@ -65,7 +78,7 @@ export const createOrder = async (req, res) => {
 // @access  Private/Admin
 export const getOrders = async (req, res) => {
     try {
-        const orders = await Order.find({}).populate('user', 'id name email');
+        const orders = await Order.find({}).populate('user', 'id name email').populate('courier');
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -89,10 +102,9 @@ export const getMyOrders = async (req, res) => {
 // @access  Private
 export const getOrderById = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id).populate(
-            'user',
-            'name email'
-        );
+        const order = await Order.findById(req.params.id)
+            .populate('user', 'name email')
+            .populate('courier');
 
         if (order) {
             res.json(order);
@@ -112,7 +124,7 @@ export const confirmOrder = async (req, res) => {
         const order = await Order.findById(req.params.id);
 
         if (order) {
-            order.status = 'confirmed';
+            order.status = 'Confirmed';
             const updatedOrder = await order.save();
             res.json(updatedOrder);
         } else {
@@ -131,7 +143,7 @@ export const packOrder = async (req, res) => {
         const order = await Order.findById(req.params.id);
 
         if (order) {
-            order.status = 'packed';
+            order.status = 'Packed';
             const updatedOrder = await order.save();
             res.json(updatedOrder);
         } else {
@@ -149,28 +161,51 @@ export const shipOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
 
-        if (order) {
-            order.status = 'Shipped';
-
-            // Add delivery details if provided
-            if (req.body.deliveryMan) {
-                order.deliveryDetails = {
-                    name: req.body.deliveryMan.name,
-                    phone: req.body.deliveryMan.phone,
-                    vehicleNumber: req.body.deliveryMan.vehicleNumber,
-                    otp: Math.floor(1000 + Math.random() * 9000).toString() // Generate 4-digit OTP
-                };
-            }
-
-            if (req.body.estimatedDeliveryTime) {
-                order.estimatedDeliveryTime = req.body.estimatedDeliveryTime;
-            }
-
-            const updatedOrder = await order.save();
-            res.json(updatedOrder);
-        } else {
+        if (!order) {
             res.status(404).json({ message: 'Order not found' });
+            return;
         }
+
+        const { courierId, trackingId, estimatedDeliveryTime } = req.body;
+
+        // Validate courier exists and is serviceable
+        if (courierId) {
+            const Courier = (await import('../models/Courier.js')).default;
+            const courier = await Courier.findById(courierId);
+            
+            if (!courier) {
+                res.status(404).json({ message: 'Courier not found' });
+                return;
+            }
+            
+            if (!courier.serviceable) {
+                res.status(400).json({ message: 'Selected courier is not currently serviceable' });
+                return;
+            }
+
+            order.courier = courierId;
+        }
+
+        if (trackingId) {
+            order.trackingId = trackingId;
+        }
+
+        if (estimatedDeliveryTime) {
+            order.estimatedDeliveryTime = estimatedDeliveryTime;
+        }
+
+        // Generate OTP for delivery verification
+        order.deliveryDetails = {
+            otp: Math.floor(1000 + Math.random() * 9000).toString() // Generate 4-digit OTP
+        };
+
+        order.status = 'Shipped';
+        const updatedOrder = await order.save();
+        
+        // Populate courier information before returning
+        await updatedOrder.populate('courier');
+        
+        res.json(updatedOrder);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -193,6 +228,73 @@ export const getInvoices = async (req, res) => {
         }));
 
         res.json(invoices);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete order
+// @route   DELETE /api/orders/:id
+// @access  Private/Admin
+export const deleteOrder = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Restore stock for each item
+        for (const item of order.orderItems) {
+            const product = await Product.findById(item.product);
+            if (product) {
+                product.stock += item.qty;
+                await product.save();
+            }
+        }
+
+        await Order.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Order deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Cancel order (user)
+// @route   PUT /api/orders/:id/cancel
+// @access  Private
+export const cancelOrder = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Verify the user owns this order
+        if (order.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: 'Not authorized to cancel this order' });
+        }
+
+        // Only allow cancellation if order is still Processing
+        if (order.status !== 'Processing') {
+            return res.status(400).json({ message: `Cannot cancel order with status '${order.status}'` });
+        }
+
+        // Restore stock for each item
+        for (const item of order.orderItems) {
+            const product = await Product.findById(item.product);
+            if (product) {
+                product.stock += item.qty;
+                await product.save();
+            }
+        }
+
+        const { cancellationReason } = req.body;
+        order.status = 'Cancelled';
+        order.cancellationReason = cancellationReason || 'No reason provided';
+        const updatedOrder = await order.save();
+        res.json(updatedOrder);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
