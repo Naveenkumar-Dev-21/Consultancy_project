@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useWishlist } from '../context/WishlistContext';
+import { useWishlist } from '../../context/WishlistContext';
 
 const ProductCard = ({ product, addToCartHandler }) => {
     const navigate = useNavigate();

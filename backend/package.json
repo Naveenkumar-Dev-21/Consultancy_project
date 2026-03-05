@@ -1,10 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "keywords": [],
-  "author": "",
+  "description": "Aadhiran Baby Products - E-Commerce Backend API",
+  "main": "server.js",
+  "keywords": ["ecommerce", "baby-products", "api"],
+  "author": "Aadhiran Baby Products",
   "license": "ISC",
   "type": "module",
   "scripts": {

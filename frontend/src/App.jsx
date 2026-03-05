@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -9,21 +9,16 @@ import CartPage from './pages/CartPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import ProfilePage from './pages/ProfilePage';
 import OwnerDashboard from './pages/OwnerDashboard';
-import CottonPage from './pages/CottonPage';
-import NightWearPage from './pages/NightWearPage';
-import CasualPage from './pages/CasualPage';
-import FrockPage from './pages/FrockPage';
-import MixedPage from './pages/MixedPage';
-import InfantClothingsPage from './pages/InfantClothingsPage';
+import CategoryPage from './pages/CategoryPage';
 import CategoryProductDetailPage from './pages/CategoryProductDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 import WishlistPage from './pages/WishlistPage';
 import { CartProvider } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
 import { WishlistProvider } from './context/WishlistContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminRoute from './components/AdminRoute';
-import PublicRoute from './components/PublicRoute';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
+import PublicRoute from './components/auth/PublicRoute';
 
 function App() {
   const location = useLocation();
@@ -40,13 +35,8 @@ function App() {
             {/* Public Store Routes */}
             <Route path="/" element={<HomePage />} />
 
-            {/* Category Routes */}
-            <Route path="/category/cotton" element={<CottonPage />} />
-            <Route path="/category/nightwear" element={<NightWearPage />} />
-            <Route path="/category/casual" element={<CasualPage />} />
-            <Route path="/category/frock" element={<FrockPage />} />
-            <Route path="/category/mixed" element={<MixedPage />} />
-            <Route path="/category/infant-clothings" element={<InfantClothingsPage />} />
+            {/* Category Routes — single dynamic route */}
+            <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/category/product/:id" element={<CategoryProductDetailPage />} />
 
             {/* Auth Routes (Restricted for logged-in users) */}

@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.local
 .env.production
+.env*.local
 
 # Build output
 frontend/dist/
@@ -22,3 +23,13 @@ Thumbs.db
 
 # Vercel
 .vercel/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Generated files
+*.pdf
