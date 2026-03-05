@@ -78,7 +78,7 @@ export const createOrder = async (req, res) => {
 // @access  Private/Admin
 export const getOrders = async (req, res) => {
     try {
-        const orders = await Order.find({}).populate('user', 'id name email').populate('courier');
+        const orders = await Order.find({}).populate('user', 'id name email');
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -103,8 +103,7 @@ export const getMyOrders = async (req, res) => {
 export const getOrderById = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id)
-            .populate('user', 'name email')
-            .populate('courier');
+            .populate('user', 'name email');
 
         if (order) {
             res.json(order);
@@ -116,100 +115,52 @@ export const getOrderById = async (req, res) => {
     }
 };
 
-// @desc    Confirm order
-// @route   PUT /api/orders/:id/confirm
+// @desc    Update order status (manual admin update)
+// @route   PUT /api/orders/:id/status
 // @access  Private/Admin
-export const confirmOrder = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id);
-
-        if (order) {
-            order.status = 'Confirmed';
-            const updatedOrder = await order.save();
-            res.json(updatedOrder);
-        } else {
-            res.status(404).json({ message: 'Order not found' });
-        }
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-// @desc    Pack order
-// @route   PUT /api/orders/:id/pack
-// @access  Private/Admin
-export const packOrder = async (req, res) => {
-    try {
-        const order = await Order.findById(req.params.id);
-
-        if (order) {
-            order.status = 'Packed';
-            const updatedOrder = await order.save();
-            res.json(updatedOrder);
-        } else {
-            res.status(404).json({ message: 'Order not found' });
-        }
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-// @desc    Ship order
-// @route   PUT /api/orders/:id/ship
-// @access  Private/Admin
-export const shipOrder = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
 
         if (!order) {
-            res.status(404).json({ message: 'Order not found' });
-            return;
+            return res.status(404).json({ message: 'Order not found' });
         }
 
-        const { courierId, trackingId, estimatedDeliveryTime } = req.body;
+        const { status } = req.body;
+        const validStatuses = ['Processing', 'Confirmed', 'Packed', 'Shipped', 'Delivered', 'Cancelled'];
 
-        // Validate courier exists and is serviceable
-        if (courierId) {
-            const Courier = (await import('../models/Courier.js')).default;
-            const courier = await Courier.findById(courierId);
-            
-            if (!courier) {
-                res.status(404).json({ message: 'Courier not found' });
-                return;
+        if (!status || !validStatuses.includes(status)) {
+            return res.status(400).json({ message: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
+        }
+
+        // Save old status before overwriting (needed for stock restore check)
+        const oldStatus = order.status;
+        order.status = status;
+
+        // Auto-set delivery fields when marked as delivered
+        if (status === 'Delivered') {
+            order.isDelivered = true;
+            order.deliveredAt = new Date();
+        }
+
+        // If cancelling (and wasn't already cancelled), restore stock
+        if (status === 'Cancelled' && oldStatus !== 'Cancelled') {
+            for (const item of order.orderItems) {
+                const product = await Product.findById(item.product);
+                if (product) {
+                    product.stock += item.qty;
+                    await product.save();
+                }
             }
-            
-            if (!courier.serviceable) {
-                res.status(400).json({ message: 'Selected courier is not currently serviceable' });
-                return;
-            }
-
-            order.courier = courierId;
         }
 
-        if (trackingId) {
-            order.trackingId = trackingId;
-        }
-
-        if (estimatedDeliveryTime) {
-            order.estimatedDeliveryTime = estimatedDeliveryTime;
-        }
-
-        // Generate OTP for delivery verification
-        order.deliveryDetails = {
-            otp: Math.floor(1000 + Math.random() * 9000).toString() // Generate 4-digit OTP
-        };
-
-        order.status = 'Shipped';
         const updatedOrder = await order.save();
-        
-        // Populate courier information before returning
-        await updatedOrder.populate('courier');
-        
         res.json(updatedOrder);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
+
 
 // @desc    Get all invoices (orders)
 // @route   GET /api/orders/invoices

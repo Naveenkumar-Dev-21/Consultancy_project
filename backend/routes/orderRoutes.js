@@ -4,9 +4,7 @@ import {
     getOrders,
     getMyOrders,
     getOrderById,
-    confirmOrder,
-    packOrder,
-    shipOrder,
+    updateOrderStatus,
     getInvoices,
     deleteOrder,
     cancelOrder,
@@ -20,8 +18,6 @@ router.route('/myorders').get(protect, getMyOrders);
 router.route('/invoices').get(protect, admin, getInvoices);
 router.route('/:id').get(protect, getOrderById).delete(protect, admin, deleteOrder);
 router.route('/:id/cancel').put(protect, cancelOrder);
-router.route('/:id/confirm').put(protect, admin, confirmOrder);
-router.route('/:id/pack').put(protect, admin, packOrder);
-router.route('/:id/ship').put(protect, admin, shipOrder);
+router.route('/:id/status').put(protect, admin, updateOrderStatus);
 
 export default router;

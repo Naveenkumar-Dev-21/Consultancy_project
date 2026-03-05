@@ -1,25 +1,28 @@
 import Product from '../models/Product.js';
 import { encrypt, decrypt } from '../utils/encryption.js';
 
+/**
+ * Decrypts encrypted image fields on a product object.
+ * Shared helper to eliminate duplication across all product endpoints.
+ * @param {Object} product - Mongoose document or plain object
+ * @returns {Object} Plain object with decrypted image fields
+ */
+export const decryptProduct = (product) => {
+    const obj = product.toObject ? product.toObject() : { ...product };
+    obj.image = decrypt(obj.image);
+    if (obj.descriptionImages?.length > 0) {
+        obj.descriptionImages = obj.descriptionImages.map(img => decrypt(img));
+    }
+    return obj;
+};
+
 // @desc    Get all products
 // @route   GET /api/products
 // @access  Public
 export const getProducts = async (req, res) => {
     try {
         const products = await Product.find({});
-        
-        // Decrypt images before sending to frontend
-        const decryptedProducts = products.map(product => {
-            const productObj = product.toObject();
-            productObj.image = decrypt(productObj.image);
-            // Decrypt description images if they exist
-            if (productObj.descriptionImages && productObj.descriptionImages.length > 0) {
-                productObj.descriptionImages = productObj.descriptionImages.map(img => decrypt(img));
-            }
-            return productObj;
-        });
-        
-        res.json(decryptedProducts);
+        res.json(products.map(decryptProduct));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -33,13 +36,7 @@ export const getProductById = async (req, res) => {
         const product = await Product.findById(req.params.id);
 
         if (product) {
-            const productObj = product.toObject();
-            productObj.image = decrypt(productObj.image);
-            // Decrypt description images if they exist
-            if (productObj.descriptionImages && productObj.descriptionImages.length > 0) {
-                productObj.descriptionImages = productObj.descriptionImages.map(img => decrypt(img));
-            }
-            res.json(productObj);
+            res.json(decryptProduct(product));
         } else {
             res.status(404).json({ message: 'Product not found' });
         }
@@ -53,15 +50,13 @@ export const getProductById = async (req, res) => {
 // @access  Private/Admin
 export const createProduct = async (req, res) => {
     try {
-        // Encrypt the image before saving
         const encryptedImage = encrypt(req.body.image);
-        
-        // Encrypt description images if provided
+
         let encryptedDescImages = [];
-        if (req.body.descriptionImages && req.body.descriptionImages.length > 0) {
+        if (req.body.descriptionImages?.length > 0) {
             encryptedDescImages = req.body.descriptionImages.map(img => encrypt(img));
         }
-        
+
         const product = new Product({
             name: req.body.name,
             price: req.body.price,
@@ -77,15 +72,7 @@ export const createProduct = async (req, res) => {
         });
 
         const createdProduct = await product.save();
-        
-        // Decrypt image before sending response
-        const productObj = createdProduct.toObject();
-        productObj.image = decrypt(productObj.image);
-        if (productObj.descriptionImages && productObj.descriptionImages.length > 0) {
-            productObj.descriptionImages = productObj.descriptionImages.map(img => decrypt(img));
-        }
-        
-        res.status(201).json(productObj);
+        res.status(201).json(decryptProduct(createdProduct));
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -98,41 +85,30 @@ export const updateProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
 
-        if (product) {
-            product.name = req.body.name || product.name;
-            product.price = req.body.price || product.price;
-            product.description = req.body.description || product.description;
-            
-            // Encrypt image if it's being updated
-            if (req.body.image) {
-                product.image = encrypt(req.body.image);
-            }
-            
-            // Encrypt description images if provided
-            if (req.body.descriptionImages) {
-                product.descriptionImages = req.body.descriptionImages.map(img => encrypt(img));
-            }
-            
-            product.brand = req.body.brand || product.brand;
-            product.category = req.body.category || product.category;
-            product.stock = req.body.stock !== undefined ? req.body.stock : product.stock;
-            product.ageGroup = req.body.ageGroup || product.ageGroup;
-            product.size = req.body.size || product.size;
-
-            const updatedProduct = await product.save();
-            
-            // Decrypt image before sending response
-            const productObj = updatedProduct.toObject();
-            productObj.image = decrypt(productObj.image);
-            // Decrypt description images
-            if (productObj.descriptionImages && productObj.descriptionImages.length > 0) {
-                productObj.descriptionImages = productObj.descriptionImages.map(img => decrypt(img));
-            }
-            
-            res.json(productObj);
-        } else {
-            res.status(404).json({ message: 'Product not found' });
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
         }
+
+        product.name = req.body.name || product.name;
+        product.price = req.body.price || product.price;
+        product.description = req.body.description || product.description;
+
+        if (req.body.image) {
+            product.image = encrypt(req.body.image);
+        }
+
+        if (req.body.descriptionImages) {
+            product.descriptionImages = req.body.descriptionImages.map(img => encrypt(img));
+        }
+
+        product.brand = req.body.brand || product.brand;
+        product.category = req.body.category || product.category;
+        product.stock = req.body.stock !== undefined ? req.body.stock : product.stock;
+        product.ageGroup = req.body.ageGroup || product.ageGroup;
+        product.size = req.body.size || product.size;
+
+        const updatedProduct = await product.save();
+        res.json(decryptProduct(updatedProduct));
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -184,17 +160,7 @@ export const searchProducts = async (req, res) => {
         }
 
         const products = await Product.find(filter);
-
-        const decryptedProducts = products.map(product => {
-            const productObj = product.toObject();
-            productObj.image = decrypt(productObj.image);
-            if (productObj.descriptionImages && productObj.descriptionImages.length > 0) {
-                productObj.descriptionImages = productObj.descriptionImages.map(img => decrypt(img));
-            }
-            return productObj;
-        });
-
-        res.json(decryptedProducts);
+        res.json(products.map(decryptProduct));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -233,7 +199,6 @@ export const getRecommendations = async (req, res) => {
         let recommendations = [];
 
         if (orderedCategories.length > 0) {
-            // Recommend products from same categories user has ordered, excluding already ordered
             recommendations = await Product.find({
                 category: { $in: orderedCategories },
                 _id: { $nin: orderedProductIds },
@@ -251,17 +216,7 @@ export const getRecommendations = async (req, res) => {
             recommendations = [...recommendations, ...filler];
         }
 
-        // Decrypt images
-        const decryptedProducts = recommendations.map(product => {
-            const productObj = product.toObject();
-            productObj.image = decrypt(productObj.image);
-            if (productObj.descriptionImages && productObj.descriptionImages.length > 0) {
-                productObj.descriptionImages = productObj.descriptionImages.map(img => decrypt(img));
-            }
-            return productObj;
-        });
-
-        res.json(decryptedProducts);
+        res.json(recommendations.map(decryptProduct));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -283,18 +238,8 @@ export const getSimilarProducts = async (req, res) => {
             _id: { $ne: product._id },
         }).limit(5);
 
-        const decryptedProducts = similarProducts.map(p => {
-            const productObj = p.toObject();
-            productObj.image = decrypt(productObj.image);
-            if (productObj.descriptionImages && productObj.descriptionImages.length > 0) {
-                productObj.descriptionImages = productObj.descriptionImages.map(img => decrypt(img));
-            }
-            return productObj;
-        });
-
-        res.json(decryptedProducts);
+        res.json(similarProducts.map(decryptProduct));
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-

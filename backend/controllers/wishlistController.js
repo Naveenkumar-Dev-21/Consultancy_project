@@ -1,5 +1,5 @@
 import Wishlist from '../models/Wishlist.js';
-import { decrypt } from '../utils/encryption.js';
+import { decryptProduct } from './productController.js';
 
 // @desc    Get user's wishlist
 // @route   GET /api/wishlist
@@ -12,17 +12,7 @@ export const getWishlist = async (req, res) => {
             return res.json({ products: [] });
         }
 
-        // Decrypt product images before sending
-        const decryptedProducts = wishlist.products.map(product => {
-            const productObj = product.toObject();
-            productObj.image = decrypt(productObj.image);
-            if (productObj.descriptionImages && productObj.descriptionImages.length > 0) {
-                productObj.descriptionImages = productObj.descriptionImages.map(img => decrypt(img));
-            }
-            return productObj;
-        });
-
-        res.json({ products: decryptedProducts });
+        res.json({ products: wishlist.products.map(decryptProduct) });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -46,12 +36,10 @@ export const toggleWishlistItem = async (req, res) => {
         const index = wishlist.products.indexOf(productId);
 
         if (index > -1) {
-            // Remove from wishlist
             wishlist.products.splice(index, 1);
             await wishlist.save();
             return res.json({ message: 'Removed from wishlist', action: 'removed' });
         } else {
-            // Add to wishlist
             wishlist.products.push(productId);
             await wishlist.save();
             return res.json({ message: 'Added to wishlist', action: 'added' });

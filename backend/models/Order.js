@@ -77,20 +77,7 @@ const orderSchema = mongoose.Schema(
       enum: ["Processing", "Confirmed", "Packed", "Shipped", "Delivered", "Cancelled"],
       default: "Processing",
     },
-    courier: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Courier",
-    },
-    trackingId: {
-      type: String,
-      trim: true,
-    },
-    deliveryDetails: {
-      otp: { type: String },
-    },
-    estimatedDeliveryTime: {
-      type: Date,
-    },
+
     cancellationReason: {
       type: String,
       trim: true,

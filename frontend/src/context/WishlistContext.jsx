@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 const WishlistContext = createContext();
 
@@ -31,7 +31,7 @@ export const WishlistProvider = ({ children }) => {
 
         try {
             setLoading(true);
-            const { data } = await axios.get('/api/wishlist', config);
+            const { data } = await api.get('/api/wishlist', config);
             setWishlistProducts(data.products);
             setWishlistIds(data.products.map(p => p._id));
         } catch (error) {
@@ -50,7 +50,7 @@ export const WishlistProvider = ({ children }) => {
         if (!config) return;
 
         try {
-            const { data } = await axios.post(`/api/wishlist/${productId}`, {}, config);
+            const { data } = await api.post(`/api/wishlist/${productId}`, {}, config);
 
             if (data.action === 'added') {
                 setWishlistIds(prev => [...prev, productId]);
