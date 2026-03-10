@@ -16,35 +16,40 @@ const CATEGORIES = {
         subtitle: 'Soft, breathable, and gentle on delicate skin',
         gradient: 'from-pink-50 to-rose-50',
     },
-    nightwear: {
-        displayName: 'Night Wear Collection',
-        filter: ['Night Wear', 'NightWear'],
-        subtitle: 'Cozy sleepwear for peaceful nights',
-        gradient: 'from-pink-50 to-rose-50',
-    },
-    casual: {
-        displayName: 'Casual Collection',
-        filter: ['Casual'],
-        subtitle: 'Everyday comfortable wear for your little one',
-        gradient: 'from-rose-50 to-pink-50',
-    },
-    frock: {
-        displayName: 'Frock Collection',
-        filter: ['Frock'],
-        subtitle: 'Adorable frocks and dresses for your princess',
-        gradient: 'from-rose-50 to-pink-50',
-    },
     mixed: {
         displayName: 'Mixed Collection',
         filter: ['Mixed'],
         subtitle: 'A variety of styles and materials for every occasion',
         gradient: 'from-rose-50 to-pink-50',
+        Image: '/Images/pampers/01.jpg'
     },
     'infant-clothings': {
         displayName: 'Infant Clothings',
         filter: ['Infant Clothings'],
         subtitle: 'Gentle and soft clothing for newborns and infants',
         gradient: 'from-pink-50 to-rose-50',
+        Image: '/Images/pampers/10.jpg'
+    },
+    nightwear: {
+        displayName: 'Night Wear Collection',
+        filter: ['Night Wear', 'NightWear'],
+        subtitle: 'Cozy sleepwear for peaceful nights',
+        gradient: 'from-pink-50 to-rose-50',
+        Image: '/Images/nightdresses /11.jpg'
+    },
+    casual: {
+        displayName: 'Casual Collection',
+        filter: ['Casual'],
+        subtitle: 'Everyday comfortable wear for your little one',
+        gradient: 'from-rose-50 to-pink-50',
+        Image: '/Images/Casuals/07.jpg'
+    },
+    frock: {
+        displayName: 'Frock Collection',
+        filter: ['Frock'],
+        subtitle: 'Adorable frocks and dresses for your princess',
+        gradient: 'from-rose-50 to-pink-50',
+        Image: '/Images/frocks/01.jpg'
     },
 };
 
@@ -90,8 +95,17 @@ const CategoryPage = () => {
 
     return (
         <div className="min-h-screen">
-            <div className={`bg-gradient-to-r ${category.gradient} py-8 sm:py-10 md:py-12`}>
-                <div className="section-container">
+            <div className={`relative bg-gradient-to-r ${category.gradient} py-8 sm:py-10 md:py-12 overflow-hidden`}>
+                {category.Image && (
+                    <div className="absolute inset-0 opacity-10">
+                        <img 
+                            src={category.Image} 
+                            alt="" 
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                )}
+                <div className="section-container relative z-10">
                     <button onClick={() => navigate('/')} className="flex items-center gap-2 text-gray-500 hover:text-rose-500 mb-4 md:mb-6 transition-colors font-medium text-base">
                         <ArrowLeft size={20} />
                         <span className="font-semibold">Back to Home</span>

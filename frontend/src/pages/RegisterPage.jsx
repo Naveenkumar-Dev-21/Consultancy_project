@@ -20,7 +20,7 @@ const RegisterPage = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await api.post('/api/auth/register', { name, email, password });
+            const { data } = await api.post('/api/auth/signup', { name, email, password });
             localStorage.setItem('userInfo', JSON.stringify(data));
             if (data.role === 'admin') {
                 navigate('/admin');
@@ -28,7 +28,7 @@ const RegisterPage = () => {
                 navigate('/');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            setError(err.response?.data?.error || 'Registration failed');
         }
     };
 
