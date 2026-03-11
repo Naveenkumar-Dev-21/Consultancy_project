@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Aadhiran Baby Products - E-Commerce Backend API",
   "main": "server.js",
-  "keywords": ["ecommerce", "baby-products", "api"],
+  "keywords": [
+    "ecommerce",
+    "baby-products",
+    "api"
+  ],
   "author": "Aadhiran Baby Products",
   "license": "ISC",
   "type": "module",
@@ -13,12 +17,14 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5",
     "multer": "^2.0.2",
+    "multer-storage-cloudinary": "^2.2.1",
     "razorpay": "^2.9.6"
   },
   "devDependencies": {
