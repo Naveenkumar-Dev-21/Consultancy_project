@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, CreditCard, ChevronLeft, Package, MapPin, Phone, CheckCircle2, FileText, ArrowRight, Plus, Minus } from 'lucide-react';
+import { Trash2, CreditCard, ChevronLeft, Package, MapPin, Phone, CheckCircle2, FileText, ArrowRight, Plus, Minus, Tag, X } from 'lucide-react';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { generateInvoice } from '../utils/pdfGenerator';
@@ -18,6 +18,12 @@ const CartPage = () => {
             address: '', city: '', postalCode: '', country: 'India', phone: ''
         };
     });
+
+    // Coupon state
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [couponLoading, setCouponLoading] = useState(false);
+    const [couponError, setCouponError] = useState('');
 
     const handleInputChange = (e) => {
         const { id, value } = e.target;
@@ -52,6 +58,48 @@ const CartPage = () => {
         }
     };
 
+    const applyCoupon = async () => {
+        if (!couponCode.trim()) return;
+        
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        if (!userInfo) {
+            toast.error('Please login to apply coupon');
+            return;
+        }
+
+        setCouponLoading(true);
+        setCouponError('');
+
+        try {
+            const config = {
+                headers: { Authorization: `Bearer ${userInfo.token}` },
+            };
+            const { data } = await api.post('/api/coupons/validate', {
+                code: couponCode,
+                cartTotal,
+            }, config);
+
+            setAppliedCoupon(data);
+            toast.success(`Coupon applied! You save ₹${data.discount}`);
+        } catch (error) {
+            const msg = error.response?.data?.message || 'Invalid coupon';
+            setCouponError(msg);
+            setAppliedCoupon(null);
+            toast.error(msg);
+        } finally {
+            setCouponLoading(false);
+        }
+    };
+
+    const removeCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponCode('');
+        setCouponError('');
+    };
+
+    const discountAmount = appliedCoupon ? appliedCoupon.discount : 0;
+    const finalTotal = cartTotal - discountAmount;
+
     const checkoutHandler = async () => {
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         if (!userInfo) {
@@ -71,7 +119,7 @@ const CartPage = () => {
             const { data: razorpayData } = await api.post(
                 '/api/payment/create-order',
                 {
-                    amount: cartTotal,
+                    amount: finalTotal,
                     currency: 'INR',
                     receipt: `receipt_${Date.now()}`,
                 },
@@ -100,7 +148,9 @@ const CartPage = () => {
                             itemsPrice: cartTotal,
                             taxPrice: 0,
                             shippingPrice: 0,
-                            totalPrice: cartTotal,
+                            totalPrice: finalTotal,
+                            couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+                            discountAmount: discountAmount,
                         };
 
                         const { data: order } = await api.post('/api/orders', orderData, config);
@@ -251,65 +301,130 @@ const CartPage = () => {
                             <h2 className="text-lg sm:text-xl font-bold mb-5 sm:mb-6 text-gray-900">Shipping Details</h2>
 
                             {/* Use Profile Address Button */}
-                            <button
-                                type="button"
-                                onClick={useProfileAddress}
-                                className="w-full mb-4 px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-500 text-sm font-bold rounded-xl transition-colors flex items-center justify-center gap-2 border border-rose-200"
-                            >
-                                <MapPin size={16} /> Use My Profile Address
-                            </button>
+                            <form onSubmit={(e) => { e.preventDefault(); checkoutHandler(); }} className="space-y-6">
+                                <div className="space-y-4">
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-4 text-rose-300 group-focus-within:text-rose-500 transition-colors">
+                                            <MapPin size={18} />
+                                        </div>
+                                        <textarea
+                                            required id="address"
+                                            value={shippingDetails.address}
+                                            onChange={handleInputChange}
+                                            className="w-full pl-11 pr-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400 resize-none"
+                                            placeholder="Street Address" rows="2"
+                                        ></textarea>
+                                    </div>
 
-                            <form onSubmit={(e) => { e.preventDefault(); checkoutHandler(); }} className="space-y-4">
-                                <div className="space-y-3">
-                                    <textarea
-                                        required id="address"
-                                        value={shippingDetails.address}
-                                        onChange={handleInputChange}
-                                        className="w-full px-4 py-3 bg-rose-50/50 border border-rose-200 rounded-xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
-                                        placeholder="Street Address" rows="2"
-                                    ></textarea>
-                                    <div className="grid grid-cols-2 gap-2.5">
+                                    <div className="grid grid-cols-2 gap-4">
                                         <input
                                             required id="city" type="text" placeholder="City"
                                             value={shippingDetails.city} onChange={handleInputChange}
-                                            className="w-full px-4 py-3 bg-rose-50/50 border border-rose-200 rounded-xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                            className="w-full px-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
                                         />
                                         <input
                                             required id="postalCode" type="text" placeholder="Zip Code"
                                             value={shippingDetails.postalCode} onChange={handleInputChange}
-                                            className="w-full px-4 py-3 bg-rose-50/50 border border-rose-200 rounded-xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                            className="w-full px-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
                                         />
                                     </div>
+
                                     <input
                                         required id="country" type="text" placeholder="Country"
                                         value={shippingDetails.country} onChange={handleInputChange}
-                                        className="w-full px-4 py-3 bg-rose-50/50 border border-rose-200 rounded-xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                        className="w-full px-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
                                     />
-                                    <input
-                                        required id="phone" type="tel" placeholder="Phone Number"
-                                        value={shippingDetails.phone} onChange={handleInputChange}
-                                        className="w-full px-4 py-3 bg-rose-50/50 border border-rose-200 rounded-xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
-                                    />
+
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-300 group-focus-within:text-rose-500 transition-colors">
+                                            <Phone size={18} />
+                                        </div>
+                                        <input
+                                            required id="phone" type="tel" placeholder="Phone Number"
+                                            value={shippingDetails.phone} onChange={handleInputChange}
+                                            className="w-full pl-11 pr-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                        />
+                                    </div>
                                 </div>
 
-                                <div className="border-t border-rose-100 pt-4 mt-6">
-                                    <div className="flex justify-between text-gray-500 text-base mb-2 font-medium">
+                                {/* Coupon Code Section */}
+                                <div className="mt-8 border-t border-rose-100 pt-6">
+                                    <label className="text-sm font-bold text-gray-700 mb-3 block flex items-center gap-2">
+                                        <Tag size={14} className="text-rose-400" /> Promo Code
+                                    </label>
+                                    {appliedCoupon ? (
+                                        <div className="flex items-center justify-between bg-green-50/50 px-4 py-3 rounded-2xl border border-green-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                    <Tag size={14} className="text-green-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-green-700 text-xs leading-none uppercase">{appliedCoupon.code}</p>
+                                                    <p className="text-green-600 text-[10px] font-medium mt-1">Discount Applied</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className="font-bold text-green-700 text-sm">-₹{appliedCoupon.discount}</span>
+                                                <button type="button" onClick={removeCoupon} className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-green-500 hover:text-red-500 hover:bg-red-50 transition-all border border-green-100 hover:border-red-100 shadow-sm">
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="relative group flex items-center">
+                                            <input
+                                                type="text"
+                                                placeholder="ENTER CODE"
+                                                value={couponCode}
+                                                onChange={(e) => { setCouponCode(e.target.value); setCouponError(''); }}
+                                                className="w-full pl-4 pr-24 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-sm font-bold transition-all placeholder:text-gray-300 uppercase tracking-widest"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={applyCoupon}
+                                                disabled={couponLoading || !couponCode.trim()}
+                                                className="absolute right-1.5 top-1.5 bottom-1.5 px-5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:from-rose-500 hover:to-pink-600 transition-all disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed shadow-md shadow-rose-500/10 active:scale-95 z-10"
+                                            >
+                                                {couponLoading ? '...' : 'Apply'}
+                                            </button>
+                                        </div>
+                                    )}
+                                    {couponError && (
+                                        <p className="text-red-500 text-[11px] mt-2.5 ml-1 font-bold flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1">
+                                            <span className="w-1 h-1 bg-red-400 rounded-full"></span> {couponError}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="border-t border-rose-100 pt-6 mt-8 space-y-4">
+                                    <div className="flex justify-between text-gray-500 text-sm sm:text-base font-medium">
                                         <span>Subtotal</span>
-                                        <span>₹{cartTotal.toFixed(2)}</span>
+                                        <span className="text-gray-900">₹{cartTotal.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex justify-between text-gray-500 text-base mb-4 font-medium">
+                                    {discountAmount > 0 && (
+                                        <div className="flex justify-between text-green-600 text-sm sm:text-base font-bold bg-green-50/50 p-3 rounded-xl border border-green-100/50">
+                                            <span className="flex items-center gap-2">
+                                                <Tag size={14} /> Discount
+                                            </span>
+                                            <span>-₹{discountAmount.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between text-gray-500 text-sm sm:text-base font-medium">
                                         <span>Shipping</span>
-                                        <span className="text-green-500 font-bold text-sm uppercase tracking-wider">Free</span>
+                                        <span className="text-green-500 font-bold text-xs uppercase tracking-widest">Free</span>
                                     </div>
-                                    <div className="flex justify-between font-bold text-xl sm:text-2xl text-gray-900 mb-6 sm:mb-8 tracking-tight">
+                                    <div className="flex justify-between font-bold text-2xl sm:text-3xl text-gray-900 mt-2 tracking-tight">
                                         <span>Total</span>
-                                        <span>₹{cartTotal.toFixed(2)}</span>
+                                        <span>₹{finalTotal.toFixed(2)}</span>
                                     </div>
                                     <button
                                         type="submit"
-                                        className="w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:from-rose-500 hover:to-pink-600 transition-all shadow-lg shadow-rose-500/20 active:scale-95 text-base"
+                                        className="w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white py-4.5 rounded-[22px] font-bold flex items-center justify-center gap-3 hover:from-rose-500 hover:to-pink-600 transition-all shadow-xl shadow-rose-500/25 active:scale-95 text-base sm:text-lg mt-4 group"
                                     >
-                                        <CreditCard size={18} /> Pay Now
+                                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
+                                            <CreditCard size={18} />
+                                        </div>
+                                        Pay Securely
                                     </button>
                                 </div>
                             </form>

@@ -229,57 +229,70 @@ const CheckoutPage = () => {
                             </div>
 
                             {/* Coupon Code Section */}
-                            <div className="mb-6 border-t border-rose-100 pt-5">
-                                <label className="text-sm font-bold text-gray-700 mb-2 block flex items-center gap-2">
+                            <div className="mb-8 border-t border-rose-100 pt-6">
+                                <label className="text-sm font-bold text-gray-700 mb-3 block flex items-center gap-2">
                                     <Tag size={14} className="text-rose-400" /> Promo Code
                                 </label>
                                 {appliedCoupon ? (
-                                    <div className="flex items-center justify-between bg-green-50 px-4 py-3 rounded-xl border border-green-200">
-                                        <div>
-                                            <span className="font-bold text-green-700 text-sm">{appliedCoupon.code}</span>
-                                            <span className="text-green-600 text-xs ml-2">-₹{appliedCoupon.discount}</span>
+                                    <div className="flex items-center justify-between bg-green-50/50 px-4 py-3 rounded-2xl border border-green-100 animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                <Tag size={14} className="text-green-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-green-700 text-xs leading-none uppercase">{appliedCoupon.code}</p>
+                                                <p className="text-green-600 text-[10px] font-medium mt-1">Discount Applied</p>
+                                            </div>
                                         </div>
-                                        <button onClick={removeCoupon} className="text-green-500 hover:text-red-500 transition-colors">
-                                            <X size={16} />
-                                        </button>
+                                        <div className="flex items-center gap-3">
+                                            <span className="font-bold text-green-700 text-sm">-₹{appliedCoupon.discount}</span>
+                                            <button type="button" onClick={removeCoupon} className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-green-500 hover:text-red-500 hover:bg-red-50 transition-all border border-green-100 hover:border-red-100 shadow-sm">
+                                                <X size={14} />
+                                            </button>
+                                        </div>
                                     </div>
                                 ) : (
-                                    <div className="flex gap-2">
+                                    <div className="relative group flex items-center">
                                         <input
                                             type="text"
-                                            placeholder="Enter code"
+                                            placeholder="ENTER CODE"
                                             value={couponCode}
                                             onChange={(e) => { setCouponCode(e.target.value); setCouponError(''); }}
-                                            className="flex-1 px-4 py-3 bg-rose-50/50 border border-rose-200 rounded-xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-sm transition-all placeholder:text-gray-400 uppercase"
+                                            className="w-full pl-4 pr-24 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-sm font-bold transition-all placeholder:text-gray-300 uppercase tracking-widest"
                                         />
                                         <button
+                                            type="button"
                                             onClick={applyCoupon}
                                             disabled={couponLoading || !couponCode.trim()}
-                                            className="px-5 py-3 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-xl text-sm font-bold hover:from-rose-500 hover:to-pink-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="absolute right-1.5 top-1.5 bottom-1.5 px-5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:from-rose-500 hover:to-pink-600 transition-all disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed shadow-md shadow-rose-500/10 active:scale-95 z-10"
                                         >
                                             {couponLoading ? '...' : 'Apply'}
                                         </button>
                                     </div>
                                 )}
                                 {couponError && (
-                                    <p className="text-red-500 text-xs mt-2 font-medium">{couponError}</p>
+                                    <p className="text-red-500 text-[11px] mt-2.5 ml-1 font-bold flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1">
+                                        <span className="w-1 h-1 bg-red-400 rounded-full"></span> {couponError}
+                                    </p>
                                 )}
                             </div>
 
                             <div className="border-t border-rose-100 pt-6 space-y-4">
-                                <div className="flex justify-between text-gray-500 text-base font-medium">
+                                <div className="flex justify-between text-gray-500 text-sm sm:text-base font-medium">
                                     <span>Subtotal</span>
-                                    <span>₹{cartTotal.toFixed(2)}</span>
+                                    <span className="text-gray-900">₹{cartTotal.toFixed(2)}</span>
                                 </div>
                                 {discountAmount > 0 && (
-                                    <div className="flex justify-between text-green-600 text-base font-medium">
-                                        <span>Discount</span>
+                                    <div className="flex justify-between text-green-600 text-sm sm:text-base font-bold bg-green-50/50 p-3 rounded-xl border border-green-100/50">
+                                        <span className="flex items-center gap-2">
+                                            <Tag size={14} /> Discount
+                                        </span>
                                         <span>-₹{discountAmount.toFixed(2)}</span>
                                     </div>
                                 )}
-                                <div className="flex justify-between text-gray-500 text-base font-medium">
+                                <div className="flex justify-between text-gray-500 text-sm sm:text-base font-medium">
                                     <span>Shipping</span>
-                                    <span className="text-green-500 font-bold bg-green-50 px-2 py-1 rounded text-xs tracking-wider uppercase">Free</span>
+                                    <span className="text-green-500 font-bold text-xs uppercase tracking-widest px-2 py-0.5 bg-green-50 rounded">Free</span>
                                 </div>
                                 <div className="flex justify-between font-bold text-2xl sm:text-3xl text-gray-900 pt-2 tracking-tight">
                                     <span>Total</span>
@@ -289,9 +302,12 @@ const CheckoutPage = () => {
                                 <button
                                     form="checkout-form"
                                     type="submit"
-                                    className="w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white py-4 sm:py-5 rounded-2xl sm:rounded-[20px] font-bold text-base sm:text-lg flex items-center justify-center gap-3 hover:from-rose-500 hover:to-pink-600 shadow-lg shadow-rose-500/20 hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+                                    className="w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white py-4.5 rounded-[22px] font-bold text-base sm:text-lg flex items-center justify-center gap-3 hover:from-rose-500 hover:to-pink-600 shadow-xl shadow-rose-500/25 hover:shadow-2xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 group"
                                 >
-                                    <CreditCard size={22} /> <span className="mt-0.5">Pay Securely</span>
+                                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
+                                        <CreditCard size={18} />
+                                    </div>
+                                    <span className="mt-0.5">Pay Securely</span>
                                 </button>
 
                                 <p className="text-center text-xs sm:text-sm text-gray-400 font-medium flex items-center justify-center gap-2">
