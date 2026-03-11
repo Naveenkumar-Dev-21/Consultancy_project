@@ -1,8 +1,10 @@
 import express from 'express';
 import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import pkg from 'multer-storage-cloudinary';
 import cloudinary from 'cloudinary';
 import dotenv from 'dotenv';
+
+const { CloudinaryStorage } = pkg;
 
 dotenv.config();
 
