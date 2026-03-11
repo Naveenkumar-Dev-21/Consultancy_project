@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: aadhiran-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGO_URI
+        scope: build,runtime
+      - key: JWT_SECRET
+        scope: build,runtime
+      - key: PORT
+        value: 10000
+      - key: ADMIN_EMAIL
+        scope: build,runtime
+      - key: RAZORPAY_KEY_ID
+        scope: build,runtime
+      - key: RAZORPAY_KEY_SECRET
+        scope: build,runtime
+      - key: ENCRYPTION_KEY
+        scope: build,runtime
+      - key: CLOUDINARY_CLOUD_NAME
+        scope: build,runtime
+      - key: CLOUDINARY_API_KEY
+        scope: build,runtime
+      - key: CLOUDINARY_API_SECRET
+        scope: build,runtime
+      - key: NODE_ENV
+        value: production
