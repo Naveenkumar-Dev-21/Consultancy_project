@@ -217,7 +217,7 @@ const HomePage = () => {
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
                     {[
-                        { name: 'Night Wear', img: '/Images/nightdresses /11.jpg' },
+                        { name: 'Night Wear', img: '/Images/nightdresses/11.jpg' },
                         { name: 'Casual', img: '/Images/Casuals/07.jpg' },
                         { name: 'Frock', img: '/Images/frocks/01.jpg' },
                         { name: 'Mixed', img: '/Images/pampers/01.jpg' },

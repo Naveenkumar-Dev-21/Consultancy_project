@@ -35,7 +35,7 @@ const CATEGORIES = {
         filter: ['Night Wear', 'NightWear'],
         subtitle: 'Cozy sleepwear for peaceful nights',
         gradient: 'from-pink-50 to-rose-50',
-        Image: '/Images/nightdresses /11.jpg'
+        Image: '/Images/nightdresses/11.jpg'
     },
     casual: {
         displayName: 'Casual Collection',

@@ -6,24 +6,24 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const slides = [
     {
         id: 1,
-        image: "/Images/01.png",
-        title: "Summer Collection",
-        subtitle: "New arrivals for your little sunshine.",
-        position: "70% center"
+        image: "/Images/Carousel/boy_linen_1.png",
+        title: "The Linen Edit",
+        subtitle: "Timeless, breathable linen for your little gentleman.",
+        position: "center 20%"
     },
     {
         id: 2,
-        image: "/Images/02.png",
-        title: "Cozy Comfort",
-        subtitle: "Softest fabrics for sensitive skin.",
-        position: "65% center"
+        image: "/Images/Carousel/boy_linen_2.png",
+        title: "Garden Adventures",
+        subtitle: "Soft-as-air sage linen rompers for outdoor play.",
+        position: "75% 15%"
     },
     {
         id: 3,
-        image: "/Images/03.png",
-        title: "Playtime Essentials",
-        subtitle: "Durable and stylish for every adventure.",
-        position: "60% center"
+        image: "/Images/Carousel/boy_linen_3.png",
+        title: "Pure Comfort",
+        subtitle: "Minimalist cream linen sets for cozy moments.",
+        position: "center 25%"
     }
 ];
 

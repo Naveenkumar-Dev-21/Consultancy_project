@@ -341,7 +341,6 @@ const OwnerDashboard = () => {
                 try {
                     const uploadConfig = {
                         headers: {
-                            'Content-Type': 'multipart/form-data',
                             ...config.headers
                         }
                     };
@@ -365,7 +364,6 @@ const OwnerDashboard = () => {
                 try {
                     const uploadConfig = {
                         headers: {
-                            'Content-Type': 'multipart/form-data',
                             ...config.headers
                         }
                     };
@@ -1076,6 +1074,14 @@ const OwnerDashboard = () => {
                                             <input type="file" className="form-control" accept="image/*" multiple
                                                 onChange={(e) => {
                                                     const files = Array.from(e.target.files);
+                                                    
+                                                    // Check for file size (e.g., 100MB limit)
+                                                    const oversized = files.find(f => f.size > 100 * 1024 * 1024);
+                                                    if (oversized) {
+                                                        toast.error(`File "${oversized.name}" is too large (Max 100MB)`);
+                                                        return;
+                                                    }
+
                                                     const remaining = 3 - (productForm.descriptionImages?.length || 0) - (productForm.descriptionImageFiles?.length || 0);
                                                     const toAdd = files.slice(0, remaining);
                                                     setProductForm({ 

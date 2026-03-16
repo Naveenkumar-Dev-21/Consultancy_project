@@ -139,7 +139,7 @@ const LoginPage = () => {
                                 size="large"
                                 text="signin_with"
                                 shape="pill"
-                                width="100%"
+                                width="350"
                             />
                         </div>
                     </form>
