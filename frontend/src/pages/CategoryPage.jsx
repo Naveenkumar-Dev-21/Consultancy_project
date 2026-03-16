@@ -32,7 +32,7 @@ const CATEGORIES = {
     },
     nightwear: {
         displayName: 'Night Wear Collection',
-        filter: ['Night Wear', 'NightWear'],
+        filter: ['Night Wear', 'NightWear', 'Night Dress'],
         subtitle: 'Cozy sleepwear for peaceful nights',
         gradient: 'from-pink-50 to-rose-50',
         Image: '/Images/nightdresses/11.jpg'
@@ -94,8 +94,13 @@ const CategoryPage = () => {
     };
 
     return (
-        <div className="min-h-screen">
-            <div className={`relative bg-gradient-to-r ${category.gradient} py-8 sm:py-10 md:py-12 overflow-hidden`}>
+        <div className="min-h-screen relative overflow-hidden">
+            {/* Background Blobs */}
+            <div className="blob-1 -top-20 -left-20 opacity-40" />
+            <div className="blob-2 bottom-0 right-0 opacity-20" />
+
+            <div className={`relative bg-gradient-to-r ${category.gradient} py-12 sm:py-16 md:py-20 overflow-hidden`}>
+                <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px]" />
                 {category.Image && (
                     <div className="absolute inset-0 opacity-10">
                         <img 
@@ -105,17 +110,19 @@ const CategoryPage = () => {
                         />
                     </div>
                 )}
-                <div className="section-container relative z-10">
-                    <button onClick={() => navigate('/')} className="flex items-center gap-2 text-gray-500 hover:text-rose-500 mb-4 md:mb-6 transition-colors font-medium text-base">
-                        <ArrowLeft size={20} />
-                        <span className="font-semibold">Back to Home</span>
+                <div className="section-container relative z-10 animate-scale-in">
+                    <button onClick={() => navigate('/')} className="flex items-center gap-2 text-gray-500 hover:text-rose-500 mb-6 md:mb-8 transition-colors font-bold text-sm uppercase tracking-widest">
+                        <ArrowLeft size={18} />
+                        <span>Back to Home</span>
                     </button>
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-2 md:mb-3">{category.displayName}</h1>
-                    <p className="text-base sm:text-lg text-gray-500">{category.subtitle}</p>
+                    <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-gray-900 mb-3 md:mb-4 tracking-tight">
+                        {category.displayName.split(' ')[0]} <span className="gradient-text-pink">{category.displayName.split(' ').slice(1).join(' ')}</span>
+                    </h1>
+                    <p className="text-lg sm:text-xl text-gray-600 max-w-2xl font-medium leading-relaxed">{category.subtitle}</p>
                 </div>
             </div>
 
-            <div className="section-container py-8 sm:py-10 md:py-12">
+            <div className="section-container py-12 sm:py-16 md:py-20 relative z-10 animate-fade-in">
                 {loading ? (
                     <div className="flex justify-center py-12">
                         <div className="animate-spin rounded-full h-12 w-12 border-4 border-rose-400 border-t-transparent"></div>

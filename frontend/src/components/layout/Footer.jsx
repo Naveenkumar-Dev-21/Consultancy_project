@@ -12,12 +12,14 @@ const Footer = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-12 mb-12 sm:mb-16">
                     {/* Brand */}
                     <div className="space-y-5 sm:col-span-2 lg:col-span-1">
-                        <Link to="/" className="flex items-center gap-2.5 group">
-                            <div className="w-10 h-10 bg-gradient-to-br from-rose-400 to-pink-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-rose-400/20">
-                                <Package className="text-white" size={20} />
-                            </div>
+                        <Link to="/" className="flex items-center gap-3 group">
+                            <img 
+                                src="/logo-removebg-preview.png" 
+                                alt="Aadhiran Logo" 
+                                className="h-16 w-auto object-contain group-hover:scale-105 transition-transform"
+                            />
                             <span className="text-xl font-bold tracking-tight text-gray-900">
-                                Aadhiran<span className="gradient-text-pink">Baby</span>
+                                Aadhiran <span className="gradient-text-pink">Kids Collections</span>
                             </span>
                         </Link>
                         <p className="text-gray-500 text-base leading-relaxed max-w-xs">
@@ -77,7 +79,7 @@ const Footer = () => {
 
                 <div className="pt-8 border-t border-rose-100 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <p className="text-xs sm:text-sm font-medium text-gray-400 flex items-center gap-1.5">
-                        © 2025 Aadhiran Kids Collection. Made with <Heart size={12} className="text-rose-400 fill-rose-400" /> for little ones.
+                        © 2025 Aadhiran Kids Collections. Made with <Heart size={12} className="text-rose-400 fill-rose-400" /> for little ones.
                     </p>
                 </div>
             </div>

@@ -46,11 +46,13 @@ const Header = () => {
                         {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
                     </button>
 
-                    <Link to="/" className="flex items-center gap-2.5 group">
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-rose-400 to-pink-500 rounded-xl flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-rose-400/20">
-                            <Package className="text-white" size={20} />
-                        </div>
-                        <span className="text-lg sm:text-xl font-bold tracking-tight text-gray-900 hidden xs:block">
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <img 
+                            src="/logo-removebg-preview.png" 
+                            alt="Aadhiran Logo" 
+                            className="h-12 sm:h-16 w-auto object-contain group-hover:scale-105 transition-transform"
+                        />
+                        <span className="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 hidden xs:block">
                             Aadhiran <span className="gradient-text-pink">Kids Collections</span>
                         </span>
                     </Link>

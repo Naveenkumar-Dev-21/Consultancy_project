@@ -13,6 +13,10 @@ import wishlistRoutes from "./routes/wishlistRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import path from 'path';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
+import hpp from 'hpp';
 
 dotenv.config();
 connectDB();
@@ -30,7 +34,7 @@ app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -39,7 +43,37 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(express.json());
+// Set security HTTP headers
+app.use(helmet());
+
+// Limit requests from same API
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again after 15 minutes'
+});
+app.use('/api', limiter);
+
+// Specifically limit auth routes more strictly
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // Limit each IP to 20 requests per hour for auth
+  message: 'Too many login/signup attempts, please try again after an hour'
+});
+app.use('/api/auth', authLimiter);
+
+app.use(express.json({ limit: '10kb' })); // Body limit
+
+// Data sanitization against NoSQL query injection
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body);
+  if (req.query) mongoSanitize.sanitize(req.query);
+  if (req.params) mongoSanitize.sanitize(req.params);
+  next();
+});
+
+// Prevent parameter pollution
+app.use(hpp());
 
 // Request logger — development only
 if (process.env.NODE_ENV !== 'production') {
@@ -56,7 +90,6 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
-
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/coupons", couponRoutes);
 

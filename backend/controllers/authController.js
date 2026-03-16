@@ -10,11 +10,17 @@ const generateToken = (id, role) =>
 export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    console.log(`[AUTH] Signup attempt for: ${email}`);
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "Please provide all required fields (name, email, password)" });
+    }
 
     // Check if user exists
     let user = await User.findOne({ email });
     
     if (user) {
+      console.log(`[AUTH] User already exists: ${email}`);
       // User exists - check if they only have Google auth
       if (user.authProvider === 'google' && !user.password) {
         // Google user wants to add password - link account
@@ -51,6 +57,7 @@ export const signup = async (req, res) => {
       await user.save();
     }
 
+    console.log(`[AUTH] Signup successful for: ${email}`);
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -60,8 +67,8 @@ export const signup = async (req, res) => {
       token: generateToken(user._id, user.role)
     });
   } catch (error) {
-    console.error("Signup error:", error);
-    res.status(500).json({ error: "Error creating user" });
+    console.error("Signup error details:", error);
+    res.status(500).json({ error: `Error creating user: ${error.message}` });
   }
 };
 
@@ -71,15 +78,22 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(`[AUTH] Login attempt for: ${email}`);
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "Please provide both email and password" });
+    }
 
     const user = await User.findOne({ email });
     
     if (!user) {
+      console.log(`[AUTH] User not found: ${email}`);
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
     // Check if user has a password (might be Google-only user)
     if (!user.password) {
+      console.log(`[AUTH] Google-only account attempting password login: ${email}`);
       return res.status(400).json({ 
         error: "This account was created with Google. Please login with Google or set a password first.",
         googleOnly: true
@@ -88,10 +102,13 @@ export const login = async (req, res) => {
 
     // Verify password
     const isMatch = await user.matchPassword(password);
+    console.log(`[AUTH] Password match for ${email}: ${isMatch}`);
+    
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
+    console.log(`[AUTH] Login successful for: ${email}`);
     res.json({
       _id: user._id,
       name: user.name,
@@ -102,7 +119,7 @@ export const login = async (req, res) => {
       token: generateToken(user._id, user.role)
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Login error details:", error);
     res.status(500).json({ error: "Error logging in" });
   }
 };

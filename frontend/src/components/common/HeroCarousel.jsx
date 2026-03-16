@@ -71,13 +71,13 @@ const HeroCarousel = () => {
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.3, duration: 0.6 }}
                                 >
-                                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 tracking-tight drop-shadow-lg">
+                                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-white mb-4 sm:mb-8 tracking-tighter drop-shadow-2xl">
                                         {slides[current].title}
                                     </h1>
-                                    <p className="text-base sm:text-lg md:text-xl text-white/90 font-light mb-6 sm:mb-8 tracking-wide max-w-lg mx-auto">
+                                    <p className="text-lg sm:text-xl md:text-2xl text-white/95 font-medium mb-8 sm:mb-12 tracking-wide max-w-2xl mx-auto drop-shadow-md">
                                         {slides[current].subtitle}
                                     </p>
-                                    <button className="bg-gradient-to-r from-rose-400 to-pink-500 text-white px-8 sm:px-10 py-3 sm:py-3.5 rounded-full text-sm sm:text-base font-bold tracking-wide hover:from-rose-500 hover:to-pink-600 transition-all duration-300 shadow-xl shadow-rose-500/30 active:scale-95">
+                                    <button className="btn-primary px-10 sm:px-14 py-4 sm:py-5 rounded-2xl text-sm sm:text-lg font-black uppercase tracking-[0.2em] shadow-2xl">
                                         Shop Collection
                                     </button>
                                 </motion.div>

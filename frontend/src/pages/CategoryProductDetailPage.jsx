@@ -4,6 +4,8 @@ import { ShoppingCart, Star, X, Check, Minus, Plus, ZoomIn, ChevronLeft, Chevron
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import ProductCard from '../components/common/ProductCard';
+import ReviewForm from '../components/reviews/ReviewForm';
+import ReviewList from '../components/reviews/ReviewList';
 import api from '../services/api';
 
 // Image Lightbox Component
@@ -90,6 +92,9 @@ const CategoryProductDetailPage = () => {
     const [addedToCart, setAddedToCart] = useState(false);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [addedToCartId, setAddedToCartId] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [reviewsLoading, setReviewsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('details');
 
     const sizes = ['0-1 Year', '1-2 Years', '2-3 Years', '3-4 Years', '4-5 Years', '5-6 Years', '6-7 Years'];
 
@@ -109,6 +114,24 @@ const CategoryProductDetailPage = () => {
     useEffect(() => {
         fetchProduct();
     }, [fetchProduct]);
+
+    // Fetch product reviews
+    const fetchReviews = useCallback(async () => {
+        if (!id) return;
+        try {
+            setReviewsLoading(true);
+            const { data } = await api.get(`/api/reviews/${id}`);
+            setReviews(data.reviews);
+        } catch (error) {
+            console.error("Error fetching reviews", error);
+        } finally {
+            setReviewsLoading(false);
+        }
+    }, [id]);
+
+    useEffect(() => {
+        fetchReviews();
+    }, [fetchReviews]);
 
     // Fetch similar products
     useEffect(() => {
@@ -458,11 +481,107 @@ const CategoryProductDetailPage = () => {
                 />
             )}
 
+            {/* Product Details & Reviews Tabs */}
+            <div className="max-w-7xl mx-auto px-4 py-12 border-t border-rose-100">
+                <div className="flex gap-8 mb-10 border-b border-rose-100 pb-px">
+                    <button 
+                        onClick={() => setActiveTab('details')}
+                        className={`pb-4 text-base font-bold uppercase tracking-widest transition-all relative ${activeTab === 'details' ? 'text-gray-900 border-b-2 border-rose-400' : 'text-gray-400 hover:text-gray-600'}`}
+                    >
+                        Description
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('reviews')}
+                        className={`pb-4 text-base font-bold uppercase tracking-widest transition-all relative flex items-center gap-2 ${activeTab === 'reviews' ? 'text-gray-900 border-b-2 border-rose-400' : 'text-gray-400 hover:text-gray-600'}`}
+                    >
+                        Reviews
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${activeTab === 'reviews' ? 'bg-rose-500 text-white' : 'bg-rose-50 text-rose-400'}`}>
+                            {reviews.length}
+                        </span>
+                    </button>
+                </div>
+
+                <div className="animate-fade-in">
+                    {activeTab === 'details' ? (
+                        <div className="grid md:grid-cols-2 gap-12">
+                            <div className="space-y-6">
+                                <h3 className="text-2xl font-bold text-gray-900">Product Specifications</h3>
+                                <div className="grid grid-cols-1 gap-4">
+                                    {getSpecifications().map((spec, idx) => (
+                                        <div key={idx} className="flex items-center gap-3 p-4 bg-rose-50/30 rounded-2xl border border-rose-100/60">
+                                            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                                <Check size={16} className="text-green-500" />
+                                            </div>
+                                            <span className="font-medium text-gray-700">{spec.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="space-y-6">
+                                <h3 className="text-2xl font-bold text-gray-900">Care Instructions</h3>
+                                <div className="p-6 bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl border border-rose-100/60 space-y-4">
+                                    <p className="text-gray-600 leading-relaxed">
+                                        To maintain the quality and softness of this garment, we recommend:
+                                    </p>
+                                    <ul className="space-y-3">
+                                        <li className="flex items-start gap-2 text-sm text-gray-600">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 flex-shrink-0" />
+                                            Machine wash cold on gentle cycle with like colors.
+                                        </li>
+                                        <li className="flex items-start gap-2 text-sm text-gray-600">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 flex-shrink-0" />
+                                            Use mild detergent, no bleach.
+                                        </li>
+                                        <li className="flex items-start gap-2 text-sm text-gray-600">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 flex-shrink-0" />
+                                            Tumble dry low or line dry in shade.
+                                        </li>
+                                        <li className="flex items-start gap-2 text-sm text-gray-600">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mt-1.5 flex-shrink-0" />
+                                            Warm iron if needed, avoid ironing over prints or embroidery.
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid lg:grid-cols-3 gap-10">
+                            <div className="lg:col-span-2 space-y-8">
+                                <ReviewList reviews={reviews} />
+                            </div>
+                            <div className="lg:col-span-1">
+                                <div className="sticky top-24">
+                                    <ReviewForm 
+                                        productId={id} 
+                                        onReviewAdded={(newReview) => {
+                                            setReviews([newReview, ...reviews]);
+                                            fetchProduct(); // Refresh product rating/count
+                                        }}
+                                        existingReviews={reviews}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
             {/* Similar Products / You May Also Like */}
             {similarProducts.length > 0 && (
-                <div className="max-w-7xl mx-auto px-4 py-10 sm:py-16">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">You May Also Like</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
+                <div className="max-w-7xl mx-auto px-4 py-20 border-t border-rose-100">
+                    <div className="flex items-end justify-between mb-10">
+                        <div>
+                            <span className="text-rose-400 font-bold uppercase tracking-widest text-xs mb-2 block">Curation</span>
+                            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">You May Also Like</h2>
+                        </div>
+                        <button 
+                            className="bg-rose-50 text-rose-500 px-6 py-2.5 rounded-full text-sm font-bold border border-rose-100/60 hover:bg-rose-100 transition-colors"
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        >
+                            Back to Top
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 sm:gap-8">
                         {similarProducts.map((p) => (
                             <ProductCard
                                 key={p._id}

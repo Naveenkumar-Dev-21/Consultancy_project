@@ -5,19 +5,23 @@ import '../styles/OwnerDashboard.css';
 import { generateInvoice } from '../utils/pdfGenerator';
 import { useToast } from '../context/ToastContext';
 
+// New Admin Components
+import DashboardSidebar from '../components/admin/DashboardSidebar';
+import DashboardHeader from '../components/admin/DashboardHeader';
+import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
+
 const OwnerDashboard = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const [user, setUser] = useState(null);
-    const [activeTab, setActiveTab] = useState('orders');
+    const [activeTab, setActiveTab] = useState('analytics');
 
     // Data States
     const [allOrders, setAllOrders] = useState([]);
     const [allProducts, setAllProducts] = useState([]);
-    const [allUsers, setAllUsers] = useState([]); // New User State
+    const [allUsers, setAllUsers] = useState([]);
     const [allInvoices, setAllInvoices] = useState([]);
-
-    const [allCoupons, setAllCoupons] = useState([]); // Coupon State
+    const [allCoupons, setAllCoupons] = useState([]);
 
 
     // Loading States
@@ -25,25 +29,22 @@ const OwnerDashboard = () => {
     const [productsLoading, setProductsLoading] = useState(true);
     const [usersLoading, setUsersLoading] = useState(false);
     const [invoicesLoading, setInvoicesLoading] = useState(false);
-
     const [couponsLoading, setCouponsLoading] = useState(false);
 
     // Filter State
     const [statusFilter, setStatusFilter] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
     // Modal States
     const [showProductModal, setShowProductModal] = useState(false);
     const [showOrderModal, setShowOrderModal] = useState(false);
-    const [showUserModal, setShowUserModal] = useState(false); // User Modal
-
-
-
+    const [showUserModal, setShowUserModal] = useState(false);
 
     // Selection States
     const [selectedOrder, setSelectedOrder] = useState(null);
-    const [selectedUser, setSelectedUser] = useState(null); // Selected User
+    const [selectedUser, setSelectedUser] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
-    const [previewImage, setPreviewImage] = useState(null); // Preview State
+    const [previewImage, setPreviewImage] = useState(null);
 
 
     // Form States
@@ -415,10 +416,41 @@ const OwnerDashboard = () => {
     };
 
     // --- Render Helpers ---
+    const filteredOrders = allOrders.filter(o => {
+        const matchesStatus = statusFilter ? o.status === statusFilter : true;
+        const matchesSearch = searchTerm 
+            ? (o._id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+               o.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+            : true;
+        return matchesStatus && matchesSearch;
+    });
 
-    const filteredOrders = statusFilter
-        ? allOrders.filter(o => o.status === statusFilter)
-        : allOrders;
+    const filteredProducts = allProducts.filter(p => 
+        searchTerm 
+            ? (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+               p.category.toLowerCase().includes(searchTerm.toLowerCase()))
+            : true
+    );
+
+    const filteredUsers = allUsers.filter(u => 
+        searchTerm 
+            ? (u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+               u.email.toLowerCase().includes(searchTerm.toLowerCase()))
+            : true
+    );
+
+    const filteredInvoices = allInvoices.filter(i => 
+        searchTerm 
+            ? (i._id.toLowerCase().includes(searchTerm.toLowerCase()) || 
+               i.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+            : true
+    );
+
+    const filteredCoupons = allCoupons.filter(c => 
+        searchTerm 
+            ? c.code.toLowerCase().includes(searchTerm.toLowerCase())
+            : true
+    );
 
     const stats = {
         products: allProducts.length,
@@ -431,96 +463,38 @@ const OwnerDashboard = () => {
             .reduce((acc, o) => acc + (o.totalPrice || 0), 0)
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('userInfo');
+        navigate('/login');
+    };
+
     return (
-        <div className="dashboard-body min-h-screen">
-            {/* Navbar */}
-            <nav className="navbar navbar-expand-lg navbar-dark dashboard-navbar px-4">
-                <div className="container-fluid">
-                    <span className="navbar-brand"><i className="fas fa-crown me-2"></i>Owner Dashboard</span>
-                    <div className="d-flex align-items-center text-white">
-                        <span className="me-3">Welcome, {user?.name}</span>
-                        <button className="btn btn-outline-light btn-sm" onClick={() => {
-                            localStorage.removeItem('userInfo');
-                            navigate('/login');
-                        }}>
-                            <i className="fas fa-sign-out-alt me-1"></i>Logout
-                        </button>
-                    </div>
-                </div>
-            </nav>
+        <div className="admin-dashboard-layout">
+            <DashboardSidebar 
+                activeTab={activeTab} 
+                setActiveTab={setActiveTab} 
+                onLogout={handleLogout} 
+                userName={user?.name} 
+            />
 
-            {/* Header */}
-            <div className="page-header container mt-4">
-                <div className="row align-items-center px-4">
-                    <div className="col-md-8">
-                        <h1 className="mb-2"><i className="fas fa-baby-carriage me-2"></i>Store Management Dashboard</h1>
-                        <p className="lead mb-0">Manage your baby product inventory and process customer orders</p>
-                    </div>
-                    <div className="col-md-4 text-end">
-                        <button className="btn btn-primary-custom" onClick={() => openProductModal()}>
-                            <i className="fas fa-plus me-2"></i>Add Baby Product
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <main className="admin-main">
+                <DashboardHeader 
+                    title={activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} 
+                    userName={user?.name} 
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                />
 
-            {/* Stats */}
-            <div className="container mb-4">
-                <div className="row">
-                    {[
-                        { icon: 'fa-chess-rook', color: 'text-primary', val: stats.products, label: 'Total Products' },
-                        { icon: 'fa-shopping-bag', color: 'text-success', val: stats.orders, label: 'Total Orders' },
-                        { icon: 'fa-clock', color: 'text-warning', val: stats.pending, label: 'Pending Orders' },
-                        { icon: 'fa-rupee-sign', color: 'text-info', val: `₹${stats.revenue.toLocaleString()}`, label: 'Total Revenue' }
-                    ].map((stat, idx) => (
-                        <div key={idx} className="col-lg-3 col-md-6 mb-4">
-                            <div className="dashboard-card stats-card">
-                                <i className={`fas ${stat.icon} stats-icon ${stat.color}`}></i>
-                                <div className="stats-number">{stat.val}</div>
-                                <div className="stats-label">{stat.label}</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+                <div className="admin-content">
+                    {activeTab === 'analytics' && (
+                        <AnalyticsDashboard 
+                            stats={stats} 
+                            allOrders={allOrders} 
+                            allProducts={allProducts} 
+                        />
+                    )}
 
-            {/* Main Content */}
-            <div className="container">
-                <ul className="nav nav-tabs">
-                    <li className="nav-item">
-                        <button className={`nav-link ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>
-                            <i className="fas fa-shopping-bag me-2"></i>Orders
-                        </button>
-                    </li>
-                    <li className="nav-item">
-                        <button className={`nav-link ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
-                            <i className="fas fa-chess-rook me-2"></i>Products
-                        </button>
-                    </li>
-                    <li className="nav-item">
-                        <button className={`nav-link ${activeTab === 'notifications' ? 'active' : ''}`} onClick={() => setActiveTab('notifications')}>
-                            <i className="fas fa-bell me-2"></i>Notifications
-                        </button>
-                    </li>
-                    <li className="nav-item">
-                        <button className={`nav-link ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
-                            <i className="fas fa-users me-2"></i>Users
-                        </button>
-                    </li>
-                    <li className="nav-item">
-                        <button className={`nav-link ${activeTab === 'verification' ? 'active' : ''}`} onClick={() => setActiveTab('verification')}>
-                            <i className="fas fa-file-invoice me-2"></i>Verification
-                        </button>
-                    </li>
-
-                    <li className="nav-item">
-                        <button className={`nav-link ${activeTab === 'coupons' ? 'active' : ''}`} onClick={() => setActiveTab('coupons')}>
-                            <i className="fas fa-tag me-2"></i>Coupons
-                        </button>
-                    </li>
-                </ul>
-
-                <div className="tab-content">
+                    <div className="tab-content">
                     {/* Orders Tab */}
                     {activeTab === 'orders' && (
                         <div className="dashboard-card fade-in">
@@ -538,8 +512,8 @@ const OwnerDashboard = () => {
                             </div>
 
                             {ordersLoading ? <div className="loading"><i className="fas fa-spinner fa-spin fa-2x"></i></div> : (
-                                <div className="table-responsive table-container">
-                                    <table className="table table-hover mb-0">
+                                <div className="admin-table-container">
+                                    <table className="admin-table">
                                         <thead>
                                             <tr>
                                                 <th>Order ID</th>
@@ -554,28 +528,23 @@ const OwnerDashboard = () => {
                                             {filteredOrders.length === 0 ? (
                                                 <tr><td colSpan="6" className="text-center py-4">No orders found</td></tr>
                                             ) : filteredOrders.map(order => (
-                                                <tr key={order._id} style={order.status === 'Cancelled' ? { backgroundColor: '#fde8e8' } : {}}>
-                                                    <td><strong style={order.status === 'Cancelled' ? { color: '#dc3545', textDecoration: 'line-through' } : {}}>{order._id.substring(0, 8)}...</strong></td>
+                                                <tr key={order._id} style={order.status === 'Cancelled' ? { backgroundColor: '#fef2f2' } : {}}>
+                                                    <td><strong style={order.status === 'Cancelled' ? { color: '#dc3545', textDecoration: 'line-through' } : {}}>{order._id.substring(0, 8)}</strong></td>
                                                     <td style={order.status === 'Cancelled' ? { color: '#dc3545' } : {}}>{order.user?.name || 'Unknown'}</td>
-                                                    <td style={order.status === 'Cancelled' ? { color: '#dc3545', textDecoration: 'line-through' } : {}}>₹{order.totalPrice?.toLocaleString()}</td>
+                                                    <td style={order.status === 'Cancelled' ? { color: '#dc3545', textDecoration: 'line-through' } : {}} className="fw-bold">₹{order.totalPrice?.toLocaleString()}</td>
                                                     <td><span className={`badge-status badge-${order.status?.toLowerCase()}`}>{order.status?.toUpperCase() || 'PENDING'}</span></td>
                                                     <td style={order.status === 'Cancelled' ? { color: '#dc3545' } : {}}>{new Date(order.createdAt).toLocaleDateString()}</td>
                                                     <td>
                                                         <div className="action-buttons">
                                                             <button className="btn btn-sm btn-outline-info" onClick={(e) => { e.stopPropagation(); setSelectedOrder(order); setShowOrderModal(true); }}>
-                                                                View Details
-                                                            </button>
-                                                            <button className="btn btn-sm btn-outline-secondary ms-2" onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                generateInvoice(order, order.user?.name || 'Customer');
-                                                            }}>
-                                                                <i className="fas fa-file-download"></i>
+                                                                <i className="fas fa-eye me-1"></i>View
                                                             </button>
                                                             {order.status !== 'Cancelled' && (
                                                                 <select
-                                                                    className="form-select form-select-sm d-inline-block w-auto ms-1"
+                                                                    className="form-select form-select-sm d-inline-block w-auto ms-2"
                                                                     value={order.status}
                                                                     onChange={(e) => updateOrderStatus(order._id, e.target.value)}
+                                                                    style={{ fontSize: '0.8rem' }}
                                                                 >
                                                                     <option value="Processing">Processing</option>
                                                                     <option value="Confirmed">Confirmed</option>
@@ -583,10 +552,6 @@ const OwnerDashboard = () => {
                                                                     <option value="Shipped">Shipped</option>
                                                                     <option value="Delivered">Delivered</option>
                                                                 </select>
-                                                            )}
-
-                                                            {order.status === 'Cancelled' && (!order.isPaid || !order.paymentResult?.id) && (
-                                                                <span className="badge bg-secondary ms-2" title="Cash on delivery — no online refund needed">COD</span>
                                                             )}
                                                             <button className="btn btn-sm btn-outline-danger ms-2" onClick={(e) => { e.stopPropagation(); deleteOrder(order._id); }} title="Delete order">
                                                                 <i className="fas fa-trash"></i>
@@ -627,9 +592,9 @@ const OwnerDashboard = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {allProducts.length === 0 ? (
-                                                <tr><td colSpan="5" className="text-center py-4">No products found</td></tr>
-                                            ) : allProducts.map(product => (
+                                            {filteredProducts.length === 0 ? (
+                                                <tr><td colSpan="7" className="text-center py-4">No products found</td></tr>
+                                            ) : filteredProducts.map(product => (
                                                 <tr key={product._id}>
                                                     <td>
                                                         <img
@@ -689,9 +654,9 @@ const OwnerDashboard = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {allUsers.length === 0 ? (
-                                                <tr><td colSpan="4" className="text-center py-4">No users found</td></tr>
-                                            ) : allUsers.map(u => (
+                                            {filteredUsers.length === 0 ? (
+                                                <tr><td colSpan="5" className="text-center py-4">No users found</td></tr>
+                                            ) : filteredUsers.map(u => (
                                                 <tr key={u._id}>
                                                     <td>{u.name}</td>
                                                     <td>{u.email}</td>
@@ -760,9 +725,9 @@ const OwnerDashboard = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {allInvoices.length === 0 ? (
+                                            {filteredInvoices.length === 0 ? (
                                                 <tr><td colSpan="6" className="text-center py-4">No invoices found</td></tr>
-                                            ) : allInvoices.map(invoice => (
+                                            ) : filteredInvoices.map(invoice => (
                                                 <tr key={invoice._id}>
                                                     <td><strong>{invoice._id.substring(0, 8)}...</strong></td>
                                                     <td>
@@ -871,9 +836,9 @@ const OwnerDashboard = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {allCoupons.length === 0 ? (
+                                            {filteredCoupons.length === 0 ? (
                                                 <tr><td colSpan="8" className="text-center py-4">No coupons created yet</td></tr>
-                                            ) : allCoupons.map(coupon => (
+                                            ) : filteredCoupons.map(coupon => (
                                                 <tr key={coupon._id}>
                                                     <td><strong className="font-monospace">{coupon.code}</strong></td>
                                                     <td>{coupon.discountType === 'percentage' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}`}</td>
@@ -899,8 +864,7 @@ const OwnerDashboard = () => {
                             )}
                         </div>
                     )}
-                </div>
-            </div>
+
 
             {/* Modals overlay */}
             {(showProductModal || showOrderModal || previewImage || showUserModal) && (
@@ -1207,12 +1171,16 @@ const OwnerDashboard = () => {
                                     </div>
                                 </div>
                             </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn-close-red" onClick={() => setShowOrderModal(false)}>Close</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-
-
+                    </div>
+                </div>
+            </main>
         </div>
     );
 };

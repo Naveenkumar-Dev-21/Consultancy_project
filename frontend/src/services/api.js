@@ -6,6 +6,9 @@ const api = axios.create({
 
 // Automatically attach auth token to every request
 api.interceptors.request.use((config) => {
+  if (import.meta.env.DEV) {
+    console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`, config.data || '');
+  }
   try {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     if (userInfo?.token) {
@@ -19,11 +22,22 @@ api.interceptors.request.use((config) => {
 
 // Centralized error handling — auto-redirect on 401
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (import.meta.env.DEV) {
+      console.log(`[API Response] ${response.status}`, response.data);
+    }
+    return response;
+  },
   (error) => {
+    if (import.meta.env.DEV) {
+      console.error(`[API Error] ${error.response?.status}`, error.response?.data || error.message);
+    }
     if (error.response?.status === 401) {
       localStorage.removeItem('userInfo');
-      window.location.href = '/login';
+      // Only redirect if not already on login page
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

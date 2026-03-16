@@ -66,7 +66,12 @@ const HomePage = () => {
             result = result.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
         }
         if (selectedCategory !== 'All') {
-            result = result.filter(p => p.category === selectedCategory);
+            result = result.filter(p => {
+                if (selectedCategory === 'Night Wear') {
+                    return p.category === 'Night Wear' || p.category === 'Night Dress' || p.category === 'NightWear';
+                }
+                return p.category === selectedCategory;
+            });
         }
         // Filter by price range
         result = result.filter(p => p.price >= minPrice && p.price <= maxPrice);
@@ -92,7 +97,11 @@ const HomePage = () => {
     };
 
     return (
-        <div className="min-h-screen font-sans">
+        <div className="min-h-screen font-sans relative overflow-hidden">
+            {/* Background Blobs */}
+            <div className="blob-1 top-0 right-0 opacity-50" />
+            <div className="blob-2 bottom-0 left-0 opacity-30" />
+            
             <HeroCarousel />
 
             {/* Filter Bar */}
@@ -100,9 +109,9 @@ const HomePage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="section-container mt-8 sm:mt-10 mb-8"
+                className="section-container mt-8 sm:mt-10 mb-8 relative z-10"
             >
-                <div className="bg-white/90 backdrop-blur-xl p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-card border border-rose-100/60 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="bg-white/60 backdrop-blur-2xl p-4 sm:p-6 rounded-[2.5rem] shadow-card border border-rose-100/60 flex flex-col md:flex-row items-center justify-between gap-4">
                     {/* Desktop Category Dropdown */}
                     <div className="hidden md:block">
                         <select
@@ -204,18 +213,20 @@ const HomePage = () => {
 
             {/* Shop by Category Visuals */}
             <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="section-container mb-12"
+                transition={{ duration: 0.6, ease: "circOut" }}
+                className="section-container mb-16 relative z-10"
             >
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Shop by Collections</h2>
-                    <span className="text-sm font-medium text-rose-400 md:hidden">Swipe &rarr;</span>
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <span className="text-rose-400 font-bold uppercase tracking-widest text-xs mb-2 block">Top Categories</span>
+                        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Shop by Collections</h2>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
                     {[
                         { name: 'Night Wear', img: '/Images/nightdresses/11.jpg' },
                         { name: 'Casual', img: '/Images/Casuals/07.jpg' },
@@ -248,9 +259,15 @@ const HomePage = () => {
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="section-container pb-16 sm:pb-24"
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="section-container pb-16 sm:pb-24 relative z-10"
             >
+                <div className="flex items-end justify-between mb-10">
+                    <div>
+                        <span className="text-rose-400 font-bold uppercase tracking-widest text-xs mb-2 block">Handpicked</span>
+                        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Featured Products</h2>
+                    </div>
+                </div>
                 {loading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
                         {[1, 2, 3, 4].map(i => (
