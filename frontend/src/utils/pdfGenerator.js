@@ -79,8 +79,8 @@ export const generateInvoice = (order, userName) => {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(100);
         doc.text('Aadhiran Kids Collections', 20, 65);
-        doc.text('Tiruppur, India', 20, 70);
-        doc.text('Email: info@aadhiran.com', 20, 75);
+        doc.text('21,TVS street,PS park,Erode,Tamilnadu,638001', 20, 70);
+        doc.text('Email: aadhiranbabyproducts@gmail.com', 20, 75);
 
         // Center: Order Info
         doc.setTextColor(...accentColor);

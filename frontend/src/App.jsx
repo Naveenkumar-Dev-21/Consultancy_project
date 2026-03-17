@@ -13,6 +13,7 @@ import CategoryPage from './pages/CategoryPage';
 import CategoryProductDetailPage from './pages/CategoryProductDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 import WishlistPage from './pages/WishlistPage';
+import AboutUsPage from './pages/AboutUsPage';
 import { CartProvider } from './context/CartContext';
 import { ToastProvider } from './context/ToastContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -34,6 +35,7 @@ function App() {
           <Routes>
             {/* Public Store Routes */}
             <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutUsPage />} />
 
             {/* Category Routes — single dynamic route */}
             <Route path="/category/:slug" element={<CategoryPage />} />

@@ -13,7 +13,24 @@ const razorpay = new Razorpay({
 // @access  Private
 export const createRazorpayOrder = async (req, res) => {
     try {
+        // Check if environment variables are set
+        if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+            console.error('Missing Razorpay credentials in environment variables');
+            return res.status(500).json({ 
+                message: 'Failed to create payment order', 
+                error: 'Razorpay credentials not configured' 
+            });
+        }
+
         const { amount, currency = 'INR', receipt } = req.body;
+
+        // Validate amount
+        if (!amount || amount <= 0) {
+            return res.status(400).json({ 
+                message: 'Invalid amount', 
+                error: 'Amount must be greater than 0' 
+            });
+        }
 
         // Razorpay expects amount in smallest currency unit (paise for INR)
         const options = {
@@ -31,8 +48,12 @@ export const createRazorpayOrder = async (req, res) => {
             key: process.env.RAZORPAY_KEY_ID, // Send key ID to frontend
         });
     } catch (error) {
-        console.error('Razorpay order creation error:', error);
-        res.status(500).json({ message: 'Failed to create payment order', error: error.message });
+        console.error('Razorpay order creation error:', error.message);
+        console.error('Error details:', error);
+        res.status(500).json({ 
+            message: 'Failed to create payment order', 
+            error: error.message 
+        });
     }
 };
 
