@@ -117,40 +117,6 @@ const AboutUsPage = () => {
                 </div>
             </div>
 
-            {/* Philosophy Cards */}
-            <div className="section-container py-12">
-                <div className="max-w-6xl mx-auto px-4">
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white p-10 rounded-[2.5rem] shadow-soft border border-slate-100 flex flex-col items-center text-center">
-                            <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mb-6">
-                                <Sparkles className="text-rose-400" size={32} />
-                            </div>
-                            <p className="text-gray-600 leading-relaxed italic">
-                                "Found in the softness of a seam, the breathability of a fabric, and the quiet confidence of a garment made with love."
-                            </p>
-                        </div>
-
-                        <div className="bg-gradient-to-br from-rose-400 to-pink-500 p-1 rounded-[2.5rem] shadow-soft -rotate-1 md:scale-105 z-20">
-                            <div className="bg-white p-10 rounded-[2.4rem] h-full flex flex-col items-center text-center justify-center">
-                                <Quote className="text-rose-200 mb-6" size={48} fill="currentColor" />
-                                <p className="text-xl sm:text-2xl font-bold text-gray-900 leading-relaxed mb-6">
-                                    "When it comes to little buds, there are no compromises."
-                                </p>
-                                <p className="text-rose-500 font-bold uppercase tracking-widest text-xs">Our Universal Rule</p>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-10 rounded-[2.5rem] shadow-soft border border-slate-100 flex flex-col items-center text-center">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
-                                <Leaf className="text-blue-400" size={32} />
-                            </div>
-                            <p className="text-gray-600 leading-relaxed">
-                                A mother’s care—passed gently from our hands to your child.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* Founder Section */}
             <div className="section-container py-24 pb-32">

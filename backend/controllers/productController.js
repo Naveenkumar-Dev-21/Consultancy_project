@@ -68,7 +68,8 @@ export const createProduct = async (req, res) => {
             stock: req.body.stock || 0,
             description: req.body.description,
             ageGroup: req.body.ageGroup,
-            size: req.body.size
+            size: req.body.size,
+            gender: req.body.gender || 'Unisex'
         });
 
         const createdProduct = await product.save();
@@ -106,6 +107,7 @@ export const updateProduct = async (req, res) => {
         product.stock = req.body.stock !== undefined ? req.body.stock : product.stock;
         product.ageGroup = req.body.ageGroup || product.ageGroup;
         product.size = req.body.size || product.size;
+        product.gender = req.body.gender || product.gender;
 
         const updatedProduct = await product.save();
         res.json(decryptProduct(updatedProduct));
@@ -157,6 +159,9 @@ export const searchProducts = async (req, res) => {
         }
         if (ageGroup) {
             filter.ageGroup = ageGroup;
+        }
+        if (req.query.gender) {
+            filter.gender = req.query.gender;
         }
 
         const products = await Product.find(filter);

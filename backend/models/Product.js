@@ -66,6 +66,11 @@ const productSchema = mongoose.Schema(
         },
         size: {
             type: String,
+        },
+        gender: {
+            type: String,
+            enum: ['Boy', 'Girl', 'Unisex'],
+            default: 'Unisex',
         }
     },
     {

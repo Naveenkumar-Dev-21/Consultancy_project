@@ -52,6 +52,7 @@ const OwnerDashboard = () => {
         name: '', price: '', category: '', material: '', size: '', ageGroup: '',
         description: '', height: '', width: '', depth: '', unit: 'cm',
         weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
+        gender: 'Unisex',
         descriptionImages: [], // existing URLs
         descriptionImageFiles: [] // new files to upload
     });
@@ -308,6 +309,7 @@ const OwnerDashboard = () => {
                 stock: product.stock || 0,
                 featured: product.featured || false,
                 imageUrl: product.image || '',
+                gender: product.gender || 'Unisex',
                 descriptionImages: product.descriptionImages || [],
                 descriptionImageFiles: []
             });
@@ -317,6 +319,7 @@ const OwnerDashboard = () => {
                 name: '', price: '', originalPrice: '', category: '', material: 'Cotton', size: 'Medium', ageGroup: '0-6 Months',
                 description: '', height: '', width: '', depth: '', unit: 'cm',
                 weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
+                gender: 'Unisex',
                 descriptionImages: [], descriptionImageFiles: []
             });
         }
@@ -353,6 +356,9 @@ const OwnerDashboard = () => {
                     toast.error('Image upload failed');
                     return;
                 }
+            } else if (editingProduct && !productForm.imageUrl && !productForm.imageFile) {
+                // Keep old image if editing and no new image/URL provided
+                imagePath = editingProduct.image;
             }
 
             // Upload description images if new files selected
@@ -397,7 +403,8 @@ const OwnerDashboard = () => {
                     depth: Number(productForm.depth),
                     unit: productForm.unit
                 },
-                featured: productForm.featured
+                featured: productForm.featured,
+                gender: productForm.gender
             };
 
             if (editingProduct) {
@@ -1001,11 +1008,12 @@ const OwnerDashboard = () => {
                                         </div>
 
                                         {productForm.isUrl ? (
-                                            <input type="url" className="form-control" placeholder="https://..." required={productForm.isUrl}
+                                            <input type="url" className="form-control" placeholder="https://..." required={productForm.isUrl && !editingProduct}
                                                 value={productForm.imageUrl} onChange={e => setProductForm({ ...productForm, imageUrl: e.target.value })} />
                                         ) : (
-                                            <input type="file" className="form-control" onChange={uploadFileHandler} required={!productForm.isUrl} />
+                                            <input type="file" className="form-control" onChange={uploadFileHandler} required={!productForm.isUrl && !editingProduct} />
                                         )}
+                                        {editingProduct && <small className="text-muted">Leave empty to keep existing cover image</small>}
                                         {uploading && <div className="text-info mt-1">Uploading...</div>}
                                     </div>
 
@@ -1073,24 +1081,60 @@ const OwnerDashboard = () => {
                                         )}
                                     </div>
                                     <div className="row">
-                                        <div className="col-md-4 mb-3">
-                                            <label className="form-label">Category</label>
-                                            <input type="text" className="form-control" required
-                                                value={productForm.category} onChange={e => setProductForm({ ...productForm, category: e.target.value })} />
+                                        <div className="col-md-3 mb-3">
+                                            <label className="form-label">Gender</label>
+                                            <select className="form-select" value={productForm.gender} onChange={e => setProductForm({ ...productForm, gender: e.target.value })}>
+                                                <option value="Boy">Boy</option>
+                                                <option value="Girl">Girl</option>
+                                                <option value="Unisex">Unisex</option>
+                                            </select>
                                         </div>
-                                        <div className="col-md-4 mb-3">
+                                        <div className="col-md-3 mb-3">
+                                            <label className="form-label">Category</label>
+                                            <select className="form-select" required value={productForm.category} onChange={e => setProductForm({ ...productForm, category: e.target.value })}>
+                                                <option value="">Select Category</option>
+                                                <option value="Regular wear">Regular wear</option>
+                                                <option value="Infant Clothings">Infant Clothings</option>
+                                                <option value="New born Essentials">New born Essentials</option>
+                                                <option value="Cotton">Cotton</option>
+                                                <option value="Night Wear">Night Wear</option>
+                                                <option value="Casual">Casual</option>
+                                                <option value="Frock">Frock</option>
+                                                <option value="Mixed">Mixed</option>
+                                            </select>
+                                            {productForm.category === 'Regular wear' && <small className="text-info">Subcategory: Unisex</small>}
+                                        </div>
+                                        <div className="col-md-3 mb-3">
                                             <label className="form-label">Age Group</label>
                                             <select className="form-select" value={productForm.ageGroup} onChange={e => setProductForm({ ...productForm, ageGroup: e.target.value })}>
                                                 <option value="0-6 Months">0-6 Months</option>
                                                 <option value="6-12 Months">6-12 Months</option>
                                                 <option value="1-2 Years">1-2 Years</option>
+                                                <option value="2-3 Years">2-3 Years</option>
+                                                <option value="3-4 Years">3-4 Years</option>
+                                                <option value="4-5 Years">4-5 Years</option>
+                                                <option value="5-6 Years">5-6 Years</option>
+                                                <option value="7-8 Years">7-8 Years</option>
+                                                <option value="9-10 Years">9-10 Years</option>
                                                 <option value="2-4 Years">2-4 Years</option>
                                                 <option value="4+ Years">4+ Years</option>
                                             </select>
                                         </div>
-                                        <div className="col-md-4 mb-3">
+                                        <div className="col-md-3 mb-3">
                                             <label className="form-label">Size</label>
                                             <select className="form-select" value={productForm.size} onChange={e => setProductForm({ ...productForm, size: e.target.value })}>
+                                                <option value="XS">XS</option>
+                                                <option value="S">S</option>
+                                                <option value="M">M</option>
+                                                <option value="L">L</option>
+                                                <option value="XL">XL</option>
+                                                <option value="1-2">1-2</option>
+                                                <option value="2-3">2-3</option>
+                                                <option value="3-4">3-4</option>
+                                                <option value="4-5">4-5</option>
+                                                <option value="5-6">5-6</option>
+                                                <option value="7-8">7-8</option>
+                                                <option value="9-10">9-10</option>
                                                 <option value="Small">Small</option>
                                                 <option value="Medium">Medium</option>
                                                 <option value="Large">Large</option>

@@ -20,12 +20,14 @@ export const REFUND_STATUSES = ['none', 'initiated', 'completed', 'failed'];
 
 // ─── Product Categories ────────────────────────────────────────
 export const PRODUCT_CATEGORIES = [
+  'Regular wear',
+  'Infant Clothings',
+  'New born Essentials',
   'Cotton',
   'Night Wear',
   'Casual',
   'Frock',
   'Mixed',
-  'Infant Clothings',
 ];
 
 // ─── User Roles ────────────────────────────────────────────────

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { UserPlus, User, Lock, Mail, ArrowRight } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 const RegisterPage = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
+    const { success } = useToast();
 
     const navigate = useNavigate();
 
@@ -20,13 +22,9 @@ const RegisterPage = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await api.post('/api/auth/signup', { name, email, password });
-            localStorage.setItem('userInfo', JSON.stringify(data));
-            if (data.role === 'admin') {
-                navigate('/admin');
-            } else {
-                navigate('/');
-            }
+            await api.post('/api/auth/signup', { name, email, password });
+            success('Registration successful! Please sign in to continue.');
+            navigate('/login');
         } catch (err) {
             setError(err.response?.data?.error || 'Registration failed');
         }
