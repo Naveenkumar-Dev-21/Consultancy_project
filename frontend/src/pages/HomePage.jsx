@@ -237,11 +237,11 @@ const HomePage = () => {
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
                     {[
-                        { name: 'Regular wear', img: '' },
+                        { name: 'Regular wear', img: '/Images/Casuals/17.jpg' },
                         { name: 'Infant Clothings', img: '/Images/pampers/10.jpg' },
-                        { name: 'New born Essentials', img: '' },
+                        { name: 'New born Essentials', img: '/Images/pampers/16.jpg' },
                         { name: 'Night Wear', img: '/Images/nightdresses/11.jpg' },
-                        { name: 'Towels', img: '' }
+                        { name: 'Towels', img: '/Images/pampers/17.jpg' }
                     ].map((cat) => (
                         <div
                             key={cat.name}
