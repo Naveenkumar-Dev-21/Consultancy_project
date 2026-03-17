@@ -25,6 +25,7 @@ const HomePage = () => {
     const [maxPrice, setMaxPrice] = useState(5000);
     const [selectedSize, setSelectedSize] = useState('');
     const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
+    const [selectedGender, setSelectedGender] = useState('');
 
     // Sync state with URL
     useEffect(() => {
@@ -83,9 +84,13 @@ const HomePage = () => {
         if (selectedAgeGroup) {
             result = result.filter(p => p.ageGroup === selectedAgeGroup);
         }
+        // Filter by gender
+        if (selectedGender) {
+            result = result.filter(p => p.gender === selectedGender);
+        }
 
         setFilteredProducts(result);
-    }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedSize, selectedAgeGroup, products]);
+    }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedSize, selectedAgeGroup, selectedGender, products]);
 
     const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
 
@@ -111,54 +116,45 @@ const HomePage = () => {
                 transition={{ duration: 0.5 }}
                 className="section-container mt-8 sm:mt-10 mb-8 relative z-10"
             >
-                <div className="bg-white/60 backdrop-blur-2xl p-4 sm:p-6 rounded-[2.5rem] shadow-card border border-rose-100/60 flex flex-col md:flex-row items-center justify-between gap-4">
-                    {/* Desktop Category Dropdown */}
-                    <div className="hidden md:block">
-                        <select
-                            className="bg-rose-50 px-5 py-3 rounded-xl border border-rose-200 text-base font-bold text-gray-700 outline-none cursor-pointer focus:ring-2 focus:ring-rose-300 focus:border-rose-400"
-                            value={selectedCategory}
-                            onChange={(e) => handleCategoryChange(e.target.value)}
-                        >
-                            <option value="All">All Categories</option>
-                            <option value="Night Wear">Night Wear</option>
-                            <option value="Mixed">Mixed Fabric</option>
-                            <option value="Infant Clothings">Infant Clothings</option>
-                            <option value="Toddler">Frock</option>
-                            <option value="Casual">Casual</option>
-                        </select>
-                    </div>
-
-                    {/* Mobile horizontal category list */}
-                    <div className="flex md:hidden w-full overflow-x-auto gap-2 hide-scrollbar pb-2">
-                        {categories.map(cat => (
-                            <button
-                                key={cat}
-                                onClick={() => handleCategoryChange(cat)}
-                                className={`px-4 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all ${selectedCategory === cat
-                                    ? 'bg-gradient-to-r from-rose-400 to-pink-500 text-white shadow-lg shadow-rose-500/20'
-                                    : 'bg-rose-50 text-rose-500 border border-rose-200'
-                                    }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="relative w-full md:w-[380px]">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-400" size={18} />
+                <div className="bg-white/80 backdrop-blur-3xl p-4 sm:p-5 rounded-[2rem] shadow-glow border border-rose-100/50 flex flex-wrap items-center justify-center lg:justify-between gap-3 lg:gap-4">
+                    {/* Search Input */}
+                    <div className="relative flex-grow lg:flex-grow-0 min-w-[200px] lg:w-[260px]">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-400/70" size={18} />
                         <input
                             type="text"
-                            placeholder="Search for baby clothes, toys..."
-                            className="w-full pl-12 pr-4 py-3 bg-rose-50 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-300 focus:border-rose-400 outline-none text-base font-medium transition-all placeholder:text-rose-300"
+                            placeholder="Search..."
+                            className="w-full pl-11 pr-4 py-2.5 bg-rose-50/50 border border-rose-100 rounded-xl focus:ring-2 focus:ring-rose-200 outline-none text-sm font-medium transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
-                    {/* Price Range Slider */}
-                    <div className="flex flex-col gap-2 w-full md:w-auto">
-                        <label className="text-sm font-bold text-gray-600 px-1">Price: ₹{minPrice} – ₹{maxPrice}</label>
-                        <div className="flex items-center gap-3">
+                    {/* Category Selector */}
+                    <div className="flex-grow lg:flex-grow-0 min-w-[180px]">
+                        <select
+                            className="w-full bg-rose-50/50 px-4 py-2.5 rounded-xl border border-rose-100 text-sm font-bold text-gray-700 outline-none cursor-pointer focus:ring-2 focus:ring-rose-200 transition-all appearance-none"
+                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fb7185'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
+                            value={selectedCategory}
+                            onChange={(e) => handleCategoryChange(e.target.value)}
+                        >
+                            <option value="All">All Categories</option>
+                            <option value="Regular wear">Regular wear</option>
+                            <option value="Infant Clothings">Infant Clothings</option>
+                            <option value="New born Essentials">New born Essentials</option>
+                            <option value="Towels">Towels</option>
+                            <option value="Night Wear">Night Wear</option>
+                            <option value="Casual">Casual</option>
+                            <option value="Frock">Frock</option>
+                        </select>
+                    </div>
+
+                    {/* Price Slider Section - More Compact */}
+                    <div className="flex items-center gap-3 px-3 py-2 bg-rose-50/30 rounded-xl border border-rose-50 min-w-[220px]">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-rose-400 uppercase leading-none mb-1">Budget</span>
+                            <span className="text-xs font-extrabold text-gray-700 whitespace-nowrap">₹{minPrice}-{maxPrice}</span>
+                        </div>
+                        <div className="flex-grow relative h-4 flex items-center">
                             <input
                                 type="range"
                                 min="0"
@@ -166,7 +162,7 @@ const HomePage = () => {
                                 step="100"
                                 value={minPrice}
                                 onChange={(e) => setMinPrice(Math.min(Number(e.target.value), maxPrice - 100))}
-                                className="w-28 sm:w-32"
+                                className="absolute w-full h-1 bg-rose-100 rounded-lg appearance-none cursor-pointer accent-rose-400"
                             />
                             <input
                                 type="range"
@@ -175,39 +171,52 @@ const HomePage = () => {
                                 step="100"
                                 value={maxPrice}
                                 onChange={(e) => setMaxPrice(Math.max(Number(e.target.value), minPrice + 100))}
-                                className="w-28 sm:w-32"
+                                className="absolute w-full h-1 bg-transparent rounded-lg appearance-none cursor-pointer accent-pink-500"
                             />
                         </div>
                     </div>
 
-                    {/* Size Filter */}
-                    <select
-                        className="bg-rose-50 px-4 py-3 rounded-xl border border-rose-200 text-sm font-bold text-gray-700 outline-none cursor-pointer focus:ring-2 focus:ring-rose-300 focus:border-rose-400"
-                        value={selectedSize}
-                        onChange={(e) => setSelectedSize(e.target.value)}
-                    >
-                        <option value="">All Sizes</option>
-                        <option value="0-1 Year">0-1 Year</option>
-                        <option value="1-2 Years">1-2 Years</option>
-                        <option value="2-3 Years">2-3 Years</option>
-                        <option value="3-4 Years">3-4 Years</option>
-                        <option value="4-5 Years">4-5 Years</option>
-                        <option value="5-6 Years">5-6 Years</option>
-                        <option value="6-7 Years">6-7 Years</option>
-                    </select>
+                    {/* Filter Selects Wrapper - Single Row on Large */}
+                    <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 flex-grow lg:flex-grow-0">
+                        <select
+                            className="flex-grow lg:w-[100px] bg-white px-3 py-2.5 rounded-xl border border-rose-100 text-xs font-bold text-gray-700 shadow-sm outline-none cursor-pointer"
+                            value={selectedSize}
+                            onChange={(e) => setSelectedSize(e.target.value)}
+                        >
+                            <option value="">Size</option>
+                            <option value="XS">XS</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="1-2">1-2</option>
+                            <option value="2-3">2-3</option>
+                            <option value="3-4">3-4</option>
+                        </select>
 
-                    {/* Age Group Filter */}
-                    <select
-                        className="bg-rose-50 px-4 py-3 rounded-xl border border-rose-200 text-sm font-bold text-gray-700 outline-none cursor-pointer focus:ring-2 focus:ring-rose-300 focus:border-rose-400"
-                        value={selectedAgeGroup}
-                        onChange={(e) => setSelectedAgeGroup(e.target.value)}
-                    >
-                        <option value="">All Ages</option>
-                        <option value="Newborn">Newborn</option>
-                        <option value="Infant">Infant</option>
-                        <option value="Toddler">Toddler</option>
-                        <option value="Kids">Kids</option>
-                    </select>
+                        <select
+                            className="flex-grow lg:w-[100px] bg-white px-3 py-2.5 rounded-xl border border-rose-100 text-xs font-bold text-gray-700 shadow-sm outline-none cursor-pointer"
+                            value={selectedGender}
+                            onChange={(e) => setSelectedGender(e.target.value)}
+                        >
+                            <option value="">Gender</option>
+                            <option value="Boy">Boy</option>
+                            <option value="Girl">Girl</option>
+                            <option value="Unisex">Unisex</option>
+                        </select>
+
+                        <select
+                            className="flex-grow lg:w-[110px] bg-white px-3 py-2.5 rounded-xl border border-rose-100 text-xs font-bold text-gray-700 shadow-sm outline-none cursor-pointer"
+                            value={selectedAgeGroup}
+                            onChange={(e) => setSelectedAgeGroup(e.target.value)}
+                        >
+                            <option value="">Age Group</option>
+                            <option value="0-6 Months">0-6M</option>
+                            <option value="6-12 Months">6-12M</option>
+                            <option value="1-2 Years">1-2Y</option>
+                            <option value="2-3 Years">2-3Y</option>
+                        </select>
+                    </div>
                 </div>
             </motion.div>
 
@@ -228,11 +237,11 @@ const HomePage = () => {
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
                     {[
+                        { name: 'Regular wear', img: '' },
+                        { name: 'Infant Clothings', img: '/Images/pampers/10.jpg' },
+                        { name: 'New born Essentials', img: '' },
                         { name: 'Night Wear', img: '/Images/nightdresses/11.jpg' },
-                        { name: 'Casual', img: '/Images/Casuals/07.jpg' },
-                        { name: 'Frock', img: '/Images/frocks/01.jpg' },
-                        { name: 'Mixed', img: '/Images/pampers/01.jpg' },
-                        { name: 'Infant Clothings', img: '/Images/pampers/10.jpg' }
+                        { name: 'Towels', img: '' }
                     ].map((cat) => (
                         <div
                             key={cat.name}
@@ -296,7 +305,7 @@ const HomePage = () => {
                         <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">No items found</h3>
                         <p className="text-gray-400 mb-8 text-base">We couldn't find matches for your search.</p>
                         <button
-                            onClick={() => { setSearchTerm(''); setSelectedCategory('All'); setMinPrice(0); setMaxPrice(5000); setSelectedSize(''); setSelectedAgeGroup(''); }}
+                            onClick={() => { setSearchTerm(''); setSelectedCategory('All'); setMinPrice(0); setMaxPrice(5000); setSelectedSize(''); setSelectedAgeGroup(''); setSelectedGender(''); }}
                             className="px-8 py-3.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-full text-base font-bold shadow-lg shadow-rose-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95"
                         >
                             Clear All Filters

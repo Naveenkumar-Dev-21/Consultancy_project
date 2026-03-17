@@ -23,11 +23,10 @@ export const PRODUCT_CATEGORIES = [
   'Regular wear',
   'Infant Clothings',
   'New born Essentials',
-  'Cotton',
   'Night Wear',
   'Casual',
   'Frock',
-  'Mixed',
+  'Towels',
 ];
 
 // ─── User Roles ────────────────────────────────────────────────

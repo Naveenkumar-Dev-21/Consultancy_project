@@ -54,7 +54,9 @@ const OwnerDashboard = () => {
         weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
         gender: 'Unisex',
         descriptionImages: [], // existing URLs
-        descriptionImageFiles: [] // new files to upload
+        descriptionImageFiles: [], // new files to upload
+        isCustomCategory: false,
+        customCategory: ''
     });
     const [uploading, setUploading] = useState(false);
 
@@ -290,7 +292,9 @@ const OwnerDashboard = () => {
     };
 
     const openProductModal = (product = null) => {
+        const standardCategories = ['Regular wear', 'Infant Clothings', 'New born Essentials', 'Night Wear', 'Casual', 'Frock', 'Towels'];
         if (product) {
+            const isCustom = !standardCategories.includes(product.category);
             setEditingProduct(product);
             setProductForm({
                 name: product.name,
@@ -311,7 +315,9 @@ const OwnerDashboard = () => {
                 imageUrl: product.image || '',
                 gender: product.gender || 'Unisex',
                 descriptionImages: product.descriptionImages || [],
-                descriptionImageFiles: []
+                descriptionImageFiles: [],
+                isCustomCategory: isCustom,
+                customCategory: ''
             });
         } else {
             setEditingProduct(null);
@@ -320,7 +326,9 @@ const OwnerDashboard = () => {
                 description: '', height: '', width: '', depth: '', unit: 'cm',
                 weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
                 gender: 'Unisex',
-                descriptionImages: [], descriptionImageFiles: []
+                descriptionImages: [], descriptionImageFiles: [],
+                isCustomCategory: false,
+                customCategory: ''
             });
         }
         setShowProductModal(true);
@@ -1091,18 +1099,32 @@ const OwnerDashboard = () => {
                                         </div>
                                         <div className="col-md-3 mb-3">
                                             <label className="form-label">Category</label>
-                                            <select className="form-select" required value={productForm.category} onChange={e => setProductForm({ ...productForm, category: e.target.value })}>
-                                                <option value="">Select Category</option>
-                                                <option value="Regular wear">Regular wear</option>
-                                                <option value="Infant Clothings">Infant Clothings</option>
-                                                <option value="New born Essentials">New born Essentials</option>
-                                                <option value="Cotton">Cotton</option>
-                                                <option value="Night Wear">Night Wear</option>
-                                                <option value="Casual">Casual</option>
-                                                <option value="Frock">Frock</option>
-                                                <option value="Mixed">Mixed</option>
-                                            </select>
-                                            {productForm.category === 'Regular wear' && <small className="text-info">Subcategory: Unisex</small>}
+                                            {!productForm.isCustomCategory ? (
+                                                <select className="form-select" required value={productForm.category} 
+                                                    onChange={e => {
+                                                        if (e.target.value === 'NEW_CAT') {
+                                                            setProductForm({ ...productForm, isCustomCategory: true, category: '' });
+                                                        } else {
+                                                            setProductForm({ ...productForm, category: e.target.value });
+                                                        }
+                                                    }}>
+                                                    <option value="">Select Category</option>
+                                                    <option value="Regular wear">Regular wear</option>
+                                                    <option value="Infant Clothings">Infant Clothings</option>
+                                                    <option value="New born Essentials">New born Essentials</option>
+                                                    <option value="Night Wear">Night Wear</option>
+                                                    <option value="Casual">Casual</option>
+                                                    <option value="Frock">Frock</option>
+                                                    <option value="Towels">Towels</option>
+                                                    <option value="NEW_CAT">Add New Category +</option>
+                                                </select>
+                                            ) : (
+                                                <div className="input-group">
+                                                    <input type="text" className="form-control" placeholder="New category name" required
+                                                        value={productForm.category} onChange={e => setProductForm({ ...productForm, category: e.target.value })} />
+                                                    <button className="btn btn-outline-secondary" type="button" onClick={() => setProductForm({ ...productForm, isCustomCategory: false, category: '' })}>×</button>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="col-md-3 mb-3">
                                             <label className="form-label">Age Group</label>

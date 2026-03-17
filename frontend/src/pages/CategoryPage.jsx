@@ -10,18 +10,11 @@ import { useCart } from '../context/CartContext';
  * Each key is the URL slug, mapping to display name, filter value(s), and subtitle.
  */
 const CATEGORIES = {
-    cotton: {
-        displayName: 'Cotton Collection',
-        filter: ['Cotton'],
-        subtitle: 'Soft, breathable, and gentle on delicate skin',
-        gradient: 'from-pink-50 to-rose-50',
-    },
-    mixed: {
-        displayName: 'Mixed Collection',
-        filter: ['Mixed'],
-        subtitle: 'A variety of styles and materials for every occasion',
-        gradient: 'from-rose-50 to-pink-50',
-        Image: '/Images/pampers/01.jpg'
+    'regular-wear': {
+        displayName: 'Regular wear',
+        filter: ['Regular wear'],
+        subtitle: 'Everyday comfort for your little ones',
+        gradient: 'from-blue-50 to-indigo-50',
     },
     'infant-clothings': {
         displayName: 'Infant Clothings',
@@ -29,6 +22,18 @@ const CATEGORIES = {
         subtitle: 'Gentle and soft clothing for newborns and infants',
         gradient: 'from-pink-50 to-rose-50',
         Image: '/Images/pampers/10.jpg'
+    },
+    'new-born-essentials': {
+        displayName: 'New born Essentials',
+        filter: ['New born Essentials'],
+        subtitle: 'Essential care for your newborn',
+        gradient: 'from-emerald-50 to-teal-50',
+    },
+    towels: {
+        displayName: 'Towels',
+        filter: ['Towels'],
+        subtitle: 'Soft and absorbent towels for your baby',
+        gradient: 'from-amber-50 to-yellow-50',
     },
     nightwear: {
         displayName: 'Night Wear Collection',
