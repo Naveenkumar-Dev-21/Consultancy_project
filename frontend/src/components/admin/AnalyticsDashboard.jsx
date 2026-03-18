@@ -43,6 +43,54 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
 
     const COLORS = ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#3b82f6'];
 
+    // --- Realtime Percentage Calculations ---
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    
+    const lastMonthDate = new Date();
+    lastMonthDate.setMonth(now.getMonth() - 1);
+    const lastMonth = lastMonthDate.getMonth();
+    const lastMonthYear = lastMonthDate.getFullYear();
+
+    // Stats for current month
+    const curMonthOrders = allOrders.filter(o => {
+        const d = new Date(o.createdAt);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    });
+
+    const curMonthRevenue = curMonthOrders
+        .filter(o => o.isPaid || o.status === 'Delivered')
+        .reduce((acc, o) => acc + (o.totalPrice || 0), 0);
+    
+    const curMonthPending = curMonthOrders.filter(o => o.status === 'Processing').length;
+
+    // Stats for last month
+    const prevMonthOrders = allOrders.filter(o => {
+        const d = new Date(o.createdAt);
+        return d.getMonth() === lastMonth && d.getFullYear() === lastMonthYear;
+    });
+
+    const prevMonthRevenue = prevMonthOrders
+        .filter(o => o.isPaid || o.status === 'Delivered')
+        .reduce((acc, o) => acc + (o.totalPrice || 0), 0);
+    
+    const prevMonthPending = prevMonthOrders.filter(o => o.status === 'Processing').length;
+
+    // Calculate Percentages
+    const calcTrend = (cur, prev) => {
+        if (prev === 0) return cur > 0 ? { value: 100, positive: true } : null;
+        const diff = ((cur - prev) / prev) * 100;
+        return {
+            value: Math.abs(Math.round(diff * 10) / 10), // Round to 1 decimal
+            positive: diff >= 0
+        };
+    };
+
+    const revenueTrend = calcTrend(curMonthRevenue, prevMonthRevenue);
+    const ordersTrend = calcTrend(curMonthOrders.length, prevMonthOrders.length);
+    const pendingTrend = calcTrend(curMonthPending, prevMonthPending);
+
     // Order Status Data (Real)
     const statusCounts = allOrders.reduce((acc, o) => {
         const s = o.status || 'Processing';
@@ -86,14 +134,14 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                     value={`₹${stats.revenue.toLocaleString()}`} 
                     icon="IndianRupee" 
                     color="success"
-                    trend={{ value: 12, positive: true }}
+                    trend={revenueTrend}
                 />
                 <StatCard 
                     title="Total Orders" 
                     value={stats.orders} 
                     icon="ShoppingBag" 
                     color="primary"
-                    trend={{ value: 8, positive: true }}
+                    trend={ordersTrend}
                 />
                 <StatCard 
                     title="Total Products" 
@@ -106,7 +154,7 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                     value={stats.pending} 
                     icon="Clock" 
                     color="warning"
-                    trend={{ value: 5, positive: false }}
+                    trend={pendingTrend}
                 />
             </div>
 
