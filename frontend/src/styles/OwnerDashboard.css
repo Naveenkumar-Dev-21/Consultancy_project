@@ -322,23 +322,34 @@
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .admin-sidebar {
-    width: 80px;
+    transform: translateX(-100%);
+    box-shadow: none;
   }
-  .admin-sidebar-header span,
-  .admin-nav-item span {
-    display: none;
+  .admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 20px 0 25px -5px rgba(0, 0, 0, 0.1), 10px 0 10px -5px rgba(0, 0, 0, 0.04);
   }
   .admin-main {
-    margin-left: 80px;
+    margin-left: 0;
+  }
+  .admin-header {
+    padding: 0 1rem;
+  }
+  .admin-content {
+    padding: 1rem;
   }
 }
 
 @media (max-width: 640px) {
-  .admin-sidebar {
-    display: none;
+  .admin-table-container {
+      margin: 0 -1rem;
+      padding: 0 1rem;
   }
-  .admin-main {
-    margin-left: 0;
+  .admin-card {
+      border-radius: 0.75rem;
+  }
+  .admin-card-header {
+      padding: 1rem;
   }
 }
 

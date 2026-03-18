@@ -44,6 +44,7 @@ const OwnerDashboard = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [editingProduct, setEditingProduct] = useState(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
 
 
@@ -490,6 +491,8 @@ const OwnerDashboard = () => {
                 setActiveTab={setActiveTab} 
                 onLogout={handleLogout} 
                 userName={user?.name} 
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
             />
 
             <main className="admin-main">
@@ -498,6 +501,7 @@ const OwnerDashboard = () => {
                     userName={user?.name} 
                     searchTerm={searchTerm}
                     setSearchTerm={setSearchTerm}
+                    toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
                 />
 
                 <div className="admin-content">

@@ -1,10 +1,16 @@
 import React from 'react';
-import { Bell, Search, User } from 'lucide-react';
+import { Bell, Search, User, Menu } from 'lucide-react';
 
-const DashboardHeader = ({ title, userName, searchTerm, setSearchTerm }) => {
+const DashboardHeader = ({ title, userName, searchTerm, setSearchTerm, toggleSidebar }) => {
     return (
         <header className="admin-header">
             <div className="flex items-center gap-4">
+                <button 
+                    className="p-2 -ml-2 text-slate-600 lg:hidden hover:bg-slate-100 rounded-lg transition-colors"
+                    onClick={toggleSidebar}
+                >
+                    <Menu size={24} />
+                </button>
                 <h1 className="text-xl font-bold text-slate-800">{title}</h1>
             </div>
 
