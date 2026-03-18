@@ -1,7 +1,4 @@
-import React from 'react';
-import { ShoppingCart, Star, Heart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useWishlist } from '../../context/WishlistContext';
+import { getFullUrl } from '../../utils/urlUtils';
 
 const ProductCard = ({ product, addToCartHandler }) => {
     const navigate = useNavigate();
@@ -36,7 +33,7 @@ const ProductCard = ({ product, addToCartHandler }) => {
                 onClick={() => navigate(`/category/product/${product._id}`, { state: { product } })}
             >
                 <img
-                    src={product.image}
+                    src={getFullUrl(product.image)}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

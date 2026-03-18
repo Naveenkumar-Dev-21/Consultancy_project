@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/OwnerDashboard.css';
 import { generateInvoice } from '../utils/pdfGenerator';
 import { useToast } from '../context/ToastContext';
+import { getFullUrl } from '../utils/urlUtils';
+import { compressImage } from '../utils/imageCompression';
 
 // New Admin Components
 import DashboardSidebar from '../components/admin/DashboardSidebar';
@@ -348,10 +350,12 @@ const OwnerDashboard = () => {
 
             // Upload cover image if file selected
             if (!productForm.isUrl && productForm.imageFile) {
-                const formData = new FormData();
-                formData.append('image', productForm.imageFile);
                 setUploading(true);
                 try {
+                    const compressedFile = await compressImage(productForm.imageFile);
+                    const formData = new FormData();
+                    formData.append('image', compressedFile);
+                    
                     const uploadConfig = {
                         headers: {
                             ...config.headers
@@ -373,11 +377,18 @@ const OwnerDashboard = () => {
             // Upload description images if new files selected
             let descImagePaths = [...(productForm.descriptionImages || [])];
             if (productForm.descriptionImageFiles && productForm.descriptionImageFiles.length > 0) {
-                const formData = new FormData();
-                productForm.descriptionImageFiles.forEach(file => {
-                    formData.append('images', file);
-                });
+                setUploading(true);
                 try {
+                    const formData = new FormData();
+                    // Compress all description images
+                    const compressedFiles = await Promise.all(
+                        productForm.descriptionImageFiles.map(file => compressImage(file))
+                    );
+                    
+                    compressedFiles.forEach(file => {
+                        formData.append('images', file);
+                    });
+                    
                     const uploadConfig = {
                         headers: {
                             ...config.headers
@@ -617,11 +628,11 @@ const OwnerDashboard = () => {
                                                 <tr key={product._id}>
                                                     <td>
                                                         <img
-                                                            src={product.image}
+                                                            src={getFullUrl(product.image)}
                                                             alt=""
                                                             className="img-fluid rounded"
                                                             style={{ width: '40px', height: '40px', objectFit: 'cover', cursor: 'pointer' }}
-                                                            onClick={() => setPreviewImage(product.image)}
+                                                            onClick={() => setPreviewImage(getFullUrl(product.image))}
                                                         />
                                                     </td>
                                                     <td><strong>{product.name}</strong></td>
@@ -1039,7 +1050,7 @@ const OwnerDashboard = () => {
                                             <div className="d-flex gap-2 flex-wrap mb-2">
                                                 {productForm.descriptionImages.map((img, idx) => (
                                                     <div key={idx} className="position-relative" style={{ width: '80px', height: '80px' }}>
-                                                        <img src={img} alt={`Desc ${idx + 1}`} 
+                                                        <img src={getFullUrl(img)} alt={`Desc ${idx + 1}`} 
                                                             className="w-100 h-100 rounded border" style={{ objectFit: 'cover' }} />
                                                         <button type="button" 
                                                             className="btn btn-danger btn-sm position-absolute top-0 end-0 p-0"

@@ -5,6 +5,7 @@ import api from '../services/api';
 import { useCart } from '../context/CartContext';
 import { generateInvoice } from '../utils/pdfGenerator';
 import { useToast } from '../context/ToastContext';
+import { getFullUrl } from '../utils/urlUtils';
 
 const CartPage = () => {
     const { cartItems, removeFromCart, cartTotal, clearCart, updateQty } = useCart();
@@ -256,7 +257,7 @@ const CartPage = () => {
                         {cartItems.map((item) => (
                             <div key={item.product} className="bg-white/80 backdrop-blur-xl p-4 sm:p-6 rounded-2xl sm:rounded-[24px] shadow-card border border-rose-100/60 flex gap-4 sm:gap-6 items-center group">
                                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-rose-50/50 rounded-xl overflow-hidden flex-shrink-0">
-                                    <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110" />
+                                    <img src={getFullUrl(item.image)} alt={item.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start gap-2">

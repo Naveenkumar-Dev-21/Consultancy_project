@@ -7,6 +7,7 @@ import ProductCard from '../components/common/ProductCard';
 import ReviewForm from '../components/reviews/ReviewForm';
 import ReviewList from '../components/reviews/ReviewList';
 import api from '../services/api';
+import { getFullUrl } from '../utils/urlUtils';
 
 // Image Lightbox Component
 const ImageLightbox = ({ images, currentIndex, onClose, onNavigate }) => {
@@ -60,7 +61,7 @@ const ImageLightbox = ({ images, currentIndex, onClose, onNavigate }) => {
                 onClick={(e) => e.stopPropagation()}
             >
                 <img 
-                    src={images[currentIndex]} 
+                    src={getFullUrl(images[currentIndex])} 
                     alt={`Image ${currentIndex + 1}`}
                     className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
                 />
@@ -289,7 +290,7 @@ const CategoryProductDetailPage = () => {
                             onClick={() => setLightboxOpen(true)}
                         >
                             <img
-                                src={productImages[selectedImage]}
+                                src={getFullUrl(productImages[selectedImage])}
                                 alt={product.name}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
@@ -311,7 +312,7 @@ const CategoryProductDetailPage = () => {
                                         onClick={() => setSelectedImage(idx)}
                                         className={`bg-rose-50/50 aspect-square overflow-hidden border-2 transition-all rounded-xl ${selectedImage === idx ? 'border-rose-400 ring-2 ring-rose-200' : 'border-transparent hover:border-rose-200'}`}
                                     >
-                                        <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
+                                        <img src={getFullUrl(img)} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
                                     </button>
                                 ))}
                             </div>
