@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+import { useWishlist } from '../../context/WishlistContext';
 import { getFullUrl } from '../../utils/urlUtils';
 
 const ProductCard = ({ product, addToCartHandler }) => {
