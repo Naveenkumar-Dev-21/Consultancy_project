@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { Heart, Star } from 'lucide-react';
 import { useWishlist } from '../../context/WishlistContext';
 import { getFullUrl } from '../../utils/urlUtils';
 
