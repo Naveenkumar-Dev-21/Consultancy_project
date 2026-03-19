@@ -7,6 +7,7 @@ import { useCart } from '../context/CartContext';
 import HeroCarousel from '../components/common/HeroCarousel';
 
 import ProductCard from '../components/common/ProductCard';
+import { getFullUrl } from '../utils/urlUtils';
 
 const HomePage = () => {
     const { addToCart } = useCart();
