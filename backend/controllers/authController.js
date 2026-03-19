@@ -177,6 +177,12 @@ export const googleAuth = async (req, res) => {
       await user.save();
     }
 
+    // Check if token generation is possible
+    if (!process.env.JWT_SECRET) {
+      console.error("CRITICAL ERROR: JWT_SECRET is not defined in environment variables!");
+      throw new Error("Server configuration error: JWT_SECRET missing");
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
@@ -187,7 +193,14 @@ export const googleAuth = async (req, res) => {
       token: generateToken(user._id, user.role)
     });
   } catch (error) {
-    console.error("Google auth error:", error);
-    res.status(500).json({ error: "Error with Google authentication" });
+    console.error("Google auth error DETAILS:", {
+      message: error.message,
+      stack: error.stack,
+      requestBody: req.body
+    });
+    res.status(500).json({ 
+      error: "Error with Google authentication",
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
