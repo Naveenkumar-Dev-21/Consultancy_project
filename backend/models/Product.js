@@ -64,8 +64,9 @@ const productSchema = mongoose.Schema(
         ageGroup: {
             type: String,
         },
-        size: {
-            type: String,
+        sizes: {
+            type: [String],
+            default: [],
         },
         gender: {
             type: String,

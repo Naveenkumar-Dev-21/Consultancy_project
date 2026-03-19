@@ -14,6 +14,7 @@ const HomePage = () => {
     const [loading, setLoading] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [addedToCartId, setAddedToCartId] = useState(null);
+    const [allCategories, setAllCategories] = useState([]);
 
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -56,7 +57,16 @@ const HomePage = () => {
                 setLoading(false);
             }
         };
+        const fetchCategories = async () => {
+            try {
+                const { data } = await api.get('/api/categories');
+                setAllCategories(data);
+            } catch (error) {
+                console.error("Error fetching categories", error);
+            }
+        };
         fetchProducts();
+        fetchCategories();
     }, []);
 
     // Filter Logic
@@ -138,13 +148,9 @@ const HomePage = () => {
                             onChange={(e) => handleCategoryChange(e.target.value)}
                         >
                             <option value="All">All Categories</option>
-                            <option value="Regular wear">Regular wear</option>
-                            <option value="Infant Clothings">Infant Clothings</option>
-                            <option value="New born Essentials">New born Essentials</option>
-                            <option value="Towels">Towels</option>
-                            <option value="Night Wear">Night Wear</option>
-                            <option value="Casual">Casual</option>
-                            <option value="Frock">Frock</option>
+                            {allCategories.map(cat => (
+                                <option key={cat._id} value={cat.name}>{cat.name}</option>
+                            ))}
                         </select>
                     </div>
 
@@ -236,26 +242,27 @@ const HomePage = () => {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
-                    {[
-                        { name: 'Regular wear', img: '/Images/Casuals/17.jpg' },
-                        { name: 'Infant Clothings', img: '/Images/pampers/10.jpg' },
-                        { name: 'New born Essentials', img: '/Images/pampers/16.jpg' },
-                        { name: 'Night Wear', img: '/Images/nightdresses/11.jpg' },
-                        { name: 'Towels', img: '/Images/pampers/17.jpg' }
-                    ].map((cat) => (
+                    {(allCategories.length > 0 ? allCategories : [
+                        { name: 'Regular wear', image: '/Images/Casuals/17.jpg' },
+                        { name: 'Infant Clothings', image: '/Images/pampers/10.jpg' },
+                        { name: 'New born Essentials', image: '/Images/pampers/16.jpg' },
+                        { name: 'Night Wear', image: '/Images/nightdresses/11.jpg' },
+                        { name: 'Towels', image: '/Images/pampers/17.jpg' }
+                    ]).map((cat) => (
                         <div
                             key={cat.name}
                             onClick={() => handleCategoryChange(cat.name)}
                             className={`relative h-32 sm:h-36 md:h-40 rounded-2xl overflow-hidden cursor-pointer group shadow-card transition-all hover:-translate-y-1 hover:shadow-glow ${selectedCategory === cat.name ? 'ring-4 ring-rose-400 ring-offset-2' : ''}`}
                         >
-                            {cat.img ? (
-                                <img src={cat.img} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out" />
-                            ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-rose-100 via-pink-100 to-rose-200" />
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent group-hover:from-black/40 transition-colors" />
-                            <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4">
-                                <span className="text-white font-bold text-sm sm:text-base drop-shadow-lg">{cat.name}</span>
+                            <img 
+                                src={getFullUrl(cat.image || cat.img)} 
+                                alt={cat.name} 
+                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                            />
+                            <div className={`absolute inset-0 bg-gradient-to-t ${cat.gradient || 'from-rose-500/80 to-transparent'} opacity-60 group-hover:opacity-80 transition-opacity`} />
+                            <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 text-white">
+                                <h3 className="text-sm sm:text-base font-bold leading-tight">{cat.name}</h3>
+                                <p className="text-[10px] sm:text-xs text-white/80 line-clamp-1 mt-0.5">{cat.subtitle || 'Shop Collection'}</p>
                             </div>
                         </div>
                     ))}

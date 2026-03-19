@@ -175,7 +175,7 @@ export const generateInvoice = (order, userName) => {
         doc.setFont('helvetica', 'normal');
         doc.text('Aadhiran Kids Collections - Thank you for trusting us with your little one\'s comfort!', 105, pageHeight - 12, { align: 'center' });
         doc.setFontSize(8);
-        doc.text('Visit us again at www.aadhiran.com', 105, pageHeight - 7, { align: 'center' });
+        doc.text('Visit us again at www.aadhirankidscollections.com', 105, pageHeight - 7, { align: 'center' });
 
         // Save
         const fileName = `Invoice_${(order._id || 'order').substring(0, 8)}.pdf`;

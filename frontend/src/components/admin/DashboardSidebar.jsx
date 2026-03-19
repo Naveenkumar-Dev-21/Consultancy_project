@@ -8,6 +8,7 @@ import {
     Tag, 
     LogOut,
     FileText,
+    Layers,
     X
 } from 'lucide-react';
 
@@ -19,6 +20,7 @@ const DashboardSidebar = ({ activeTab, setActiveTab, onLogout, userName, isOpen,
         { id: 'users', label: 'Users', icon: Users },
         { id: 'verification', label: 'Invoices', icon: FileText },
         { id: 'coupons', label: 'Coupons', icon: Tag },
+        { id: 'categories', label: 'Categories', icon: Layers },
         { id: 'notifications', label: 'Notifications', icon: Bell },
     ];
 

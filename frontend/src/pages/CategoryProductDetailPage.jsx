@@ -87,7 +87,7 @@ const CategoryProductDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [similarProducts, setSimilarProducts] = useState([]);
 
-    const [selectedSize, setSelectedSize] = useState('0-1 Year');
+    const [selectedSize, setSelectedSize] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
     const [addedToCart, setAddedToCart] = useState(false);
@@ -97,7 +97,7 @@ const CategoryProductDetailPage = () => {
     const [reviewsLoading, setReviewsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('details');
 
-    const sizes = ['0-1 Year', '1-2 Years', '2-3 Years', '3-4 Years', '4-5 Years', '5-6 Years', '6-7 Years'];
+
 
     const fetchProduct = useCallback(async () => {
         if (!id) return;
@@ -176,9 +176,14 @@ const CategoryProductDetailPage = () => {
         );
     }
 
-    const originalPrice = product.originalPrice && product.originalPrice > product.price
-        ? product.originalPrice
-        : Math.round(product.price * 1.25);
+    // Only use admin-set originalPrice, never fabricate one
+    const hasDiscount = product.originalPrice && product.originalPrice > product.price;
+    const discountPercent = hasDiscount
+        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+        : 0;
+
+    // Use sizes from the product, fallback to empty
+    const availableSizes = product.sizes && product.sizes.length > 0 ? product.sizes : [];
 
     const addToCartHandler = () => {
         if (quantity > product.stock) return;
@@ -352,20 +357,25 @@ const CategoryProductDetailPage = () => {
 
                         <div className="flex items-center gap-3 flex-wrap">
                             <span className="text-3xl sm:text-4xl font-bold text-gray-900">₹{product.price}</span>
-                            <span className="text-lg sm:text-xl text-gray-400 line-through">₹{originalPrice}</span>
-                            <span className="bg-green-50 text-green-600 px-3 py-1 text-sm font-bold rounded-full border border-green-200">
-                                20% OFF
-                            </span>
+                            {hasDiscount && (
+                                <>
+                                    <span className="text-lg sm:text-xl text-gray-400 line-through">₹{product.originalPrice}</span>
+                                    <span className="bg-green-50 text-green-600 px-3 py-1 text-sm font-bold rounded-full border border-green-200">
+                                        {discountPercent}% OFF
+                                    </span>
+                                </>
+                            )}
                         </div>
 
                         {/* Size Selector */}
+                        {availableSizes.length > 0 && (
                         <div>
                             <div className="flex items-center justify-between mb-3">
                                 <label className="text-sm sm:text-base font-bold text-gray-900">Select Size</label>
                                 <button className="text-sm text-rose-500 hover:underline font-medium">Size Guide</button>
                             </div>
                             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-                                {sizes.map((size) => (
+                                {availableSizes.map((size) => (
                                     <button
                                         key={size}
                                         onClick={() => setSelectedSize(size)}
@@ -379,6 +389,7 @@ const CategoryProductDetailPage = () => {
                                 ))}
                             </div>
                         </div>
+                        )}
 
                         {/* Quantity Selector */}
                         <div>

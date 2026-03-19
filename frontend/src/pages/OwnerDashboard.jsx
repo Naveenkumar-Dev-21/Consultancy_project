@@ -24,6 +24,7 @@ const OwnerDashboard = () => {
     const [allUsers, setAllUsers] = useState([]);
     const [allInvoices, setAllInvoices] = useState([]);
     const [allCoupons, setAllCoupons] = useState([]);
+    const [allCategories, setAllCategories] = useState([]);
 
 
     // Loading States
@@ -32,6 +33,7 @@ const OwnerDashboard = () => {
     const [usersLoading, setUsersLoading] = useState(false);
     const [invoicesLoading, setInvoicesLoading] = useState(false);
     const [couponsLoading, setCouponsLoading] = useState(false);
+    const [categoriesLoading, setCategoriesLoading] = useState(false);
 
     // Filter State
     const [statusFilter, setStatusFilter] = useState('');
@@ -52,7 +54,7 @@ const OwnerDashboard = () => {
 
     // Form States
     const [productForm, setProductForm] = useState({
-        name: '', price: '', category: '', material: '', size: '', ageGroup: '',
+        name: '', price: '', category: '', material: '', sizes: [], ageGroup: '',
         description: '', height: '', width: '', depth: '', unit: 'cm',
         weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
         gender: 'Unisex',
@@ -60,6 +62,9 @@ const OwnerDashboard = () => {
         descriptionImageFiles: [], // new files to upload
         isCustomCategory: false,
         customCategory: ''
+    });
+    const [categoryForm, setCategoryForm] = useState({
+        name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50'
     });
     const [uploading, setUploading] = useState(false);
 
@@ -104,6 +109,8 @@ const OwnerDashboard = () => {
             loadInvoices();
         } else if (activeTab === 'coupons') {
             loadCoupons();
+        } else if (activeTab === 'categories') {
+            loadCategories();
         }
     }, [activeTab]); // eslint-disable-next-line react-hooks/exhaustive-deps
 
@@ -123,6 +130,7 @@ const OwnerDashboard = () => {
         loadUsers();
 
         loadCoupons();
+        loadCategories();
     };
 
     const loadOrders = async () => {
@@ -151,6 +159,45 @@ const OwnerDashboard = () => {
             toast.error('Failed to load products');
         } finally {
             setProductsLoading(false);
+        }
+    };
+
+    const loadCategories = async () => {
+        setCategoriesLoading(true);
+        try {
+            const { data } = await api.get('/api/categories');
+            setAllCategories(data);
+        } catch (error) {
+            console.error('Error loading categories:', error);
+            toast.error('Failed to load categories');
+        } finally {
+            setCategoriesLoading(false);
+        }
+    };
+
+    const saveCategoryHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const config = getAuthConfig();
+            await api.post('/api/categories', categoryForm, config);
+            toast.success('Category created successfully');
+            setCategoryForm({ name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50' });
+            loadCategories();
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to save category');
+        }
+    };
+
+    const deleteCategoryHandler = async (id) => {
+        if (window.confirm('Are you sure you want to delete this category?')) {
+            try {
+                const config = getAuthConfig();
+                await api.delete(`/api/categories/${id}`, config);
+                toast.success('Category deleted');
+                loadCategories();
+            } catch (error) {
+                toast.error(error.response?.data?.error || 'Failed to delete category');
+            }
         }
     };
 
@@ -305,7 +352,7 @@ const OwnerDashboard = () => {
                 originalPrice: product.originalPrice || '',
                 category: product.category,
                 material: product.material || 'Cotton',
-                size: product.size || 'Medium',
+                sizes: product.sizes || (product.size ? [product.size] : []),
                 ageGroup: product.ageGroup || '0-6 Months',
                 description: product.description,
                 height: product.dimensions?.height || '',
@@ -325,7 +372,7 @@ const OwnerDashboard = () => {
         } else {
             setEditingProduct(null);
             setProductForm({
-                name: '', price: '', originalPrice: '', category: '', material: 'Cotton', size: 'Medium', ageGroup: '0-6 Months',
+                name: '', price: '', originalPrice: '', category: '', material: 'Cotton', sizes: [], ageGroup: '0-6 Months',
                 description: '', height: '', width: '', depth: '', unit: 'cm',
                 weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
                 gender: 'Unisex',
@@ -415,7 +462,7 @@ const OwnerDashboard = () => {
                 category: productForm.category,
                 stock: Number(productForm.stock),
                 material: productForm.material,
-                size: productForm.size,
+                sizes: productForm.sizes || [],
                 ageGroup: productForm.ageGroup,
                 dimensions: {
                     height: Number(productForm.height),
@@ -896,6 +943,88 @@ const OwnerDashboard = () => {
                     )}
 
 
+                    {activeTab === 'categories' && (
+                        <div className="dashboard-card fade-in">
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h4>Category Management</h4>
+                                <span className="text-muted small">Home page collections list will refresh automatically</span>
+                            </div>
+
+                            <form onSubmit={saveCategoryHandler} className="mb-4 p-4 bg-light rounded shadow-sm">
+                                <h5 className="mb-3">Add New Category</h5>
+                                <div className="row g-3">
+                                    <div className="col-md-3">
+                                        <label className="form-label fw-bold">Name</label>
+                                        <input type="text" className="form-control" required placeholder="e.g. Traditional Wear"
+                                            value={categoryForm.name} onChange={e => setCategoryForm({...categoryForm, name: e.target.value})} />
+                                    </div>
+                                    <div className="col-md-3">
+                                        <label className="form-label fw-bold">Subtitle</label>
+                                        <input type="text" className="form-control" placeholder="e.g. Best for festivals"
+                                            value={categoryForm.subtitle} onChange={e => setCategoryForm({...categoryForm, subtitle: e.target.value})} />
+                                    </div>
+                                    <div className="col-md-3">
+                                        <label className="form-label fw-bold">Gradient</label>
+                                        <select className="form-select" value={categoryForm.gradient}
+                                            onChange={e => setCategoryForm({...categoryForm, gradient: e.target.value})}>
+                                            <option value="from-rose-50 to-pink-50">Rose/Pink (Soft)</option>
+                                            <option value="from-blue-50 to-indigo-50">Blue/Indigo (Infant)</option>
+                                            <option value="from-amber-50 to-orange-50">Amber/Orange (Casual)</option>
+                                            <option value="from-purple-50 to-fuchsia-50">Purple/Fuchsia (Trendy)</option>
+                                            <option value="from-emerald-50 to-teal-50">Emerald/Teal (Essentials)</option>
+                                        </select>
+                                    </div>
+                                    <div className="col-md-3">
+                                        <label className="form-label fw-bold">Image URL</label>
+                                        <input type="text" className="form-control" placeholder="/Images/..."
+                                            value={categoryForm.image} onChange={e => setCategoryForm({...categoryForm, image: e.target.value})} />
+                                    </div>
+                                </div>
+                                <button type="submit" className="btn btn-primary-custom mt-3">
+                                    <i className="fas fa-plus me-2"></i>Create Category
+                                </button>
+                            </form>
+
+                            {categoriesLoading ? <div className="loading"><i className="fas fa-spinner fa-spin fa-2x"></i></div> : (
+                                <div className="table-responsive table-container">
+                                    <table className="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Image</th>
+                                                <th>Name</th>
+                                                <th>Slug</th>
+                                                <th>Subtitle</th>
+                                                <th>Created</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {allCategories.length === 0 ? (
+                                                <tr><td colSpan="6" className="text-center py-4">No categories created yet</td></tr>
+                                            ) : allCategories.map(cat => (
+                                                <tr key={cat._id}>
+                                                    <td>
+                                                        <img src={getFullUrl(cat.image)} alt={cat.name} className="rounded" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
+                                                    </td>
+                                                    <td><span className="fw-bold">{cat.name}</span></td>
+                                                    <td><code>{cat.slug}</code></td>
+                                                    <td>{cat.subtitle}</td>
+                                                    <td>{new Date(cat.createdAt).toLocaleDateString()}</td>
+                                                    <td>
+                                                        <button className="btn-action bg-danger text-white" onClick={() => deleteCategoryHandler(cat._id)}>
+                                                            <i className="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+
             {/* Modals overlay */}
             {(showProductModal || showOrderModal || previewImage || showUserModal) && (
                 <div className="modal-backdrop fade show"></div>
@@ -1124,13 +1253,9 @@ const OwnerDashboard = () => {
                                                         }
                                                     }}>
                                                     <option value="">Select Category</option>
-                                                    <option value="Regular wear">Regular wear</option>
-                                                    <option value="Infant Clothings">Infant Clothings</option>
-                                                    <option value="New born Essentials">New born Essentials</option>
-                                                    <option value="Night Wear">Night Wear</option>
-                                                    <option value="Casual">Casual</option>
-                                                    <option value="Frock">Frock</option>
-                                                    <option value="Towels">Towels</option>
+                                                    {allCategories.map(cat => (
+                                                        <option key={cat._id} value={cat.name}>{cat.name}</option>
+                                                    ))}
                                                     <option value="NEW_CAT">Add New Category +</option>
                                                 </select>
                                             ) : (
@@ -1158,24 +1283,30 @@ const OwnerDashboard = () => {
                                             </select>
                                         </div>
                                         <div className="col-md-3 mb-3">
-                                            <label className="form-label">Size</label>
-                                            <select className="form-select" value={productForm.size} onChange={e => setProductForm({ ...productForm, size: e.target.value })}>
-                                                <option value="XS">XS</option>
-                                                <option value="S">S</option>
-                                                <option value="M">M</option>
-                                                <option value="L">L</option>
-                                                <option value="XL">XL</option>
-                                                <option value="1-2">1-2</option>
-                                                <option value="2-3">2-3</option>
-                                                <option value="3-4">3-4</option>
-                                                <option value="4-5">4-5</option>
-                                                <option value="5-6">5-6</option>
-                                                <option value="7-8">7-8</option>
-                                                <option value="9-10">9-10</option>
-                                                <option value="Small">Small</option>
-                                                <option value="Medium">Medium</option>
-                                                <option value="Large">Large</option>
-                                            </select>
+                                            <label className="form-label">Available Sizes</label>
+                                            <div className="d-flex flex-wrap gap-2">
+                                                {['XS','S','M','L','XL','1-2','2-3','3-4','4-5','5-6','7-8','9-10','Small','Medium','Large'].map(sz => (
+                                                    <button
+                                                        key={sz}
+                                                        type="button"
+                                                        className={`btn btn-sm ${(productForm.sizes || []).includes(sz) ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                                        onClick={() => {
+                                                            const current = productForm.sizes || [];
+                                                            const updated = current.includes(sz)
+                                                                ? current.filter(s => s !== sz)
+                                                                : [...current, sz];
+                                                            setProductForm({ ...productForm, sizes: updated });
+                                                        }}
+                                                    >
+                                                        {sz}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {(productForm.sizes || []).length > 0 && (
+                                                <small className="text-muted mt-1 d-block">
+                                                    Selected: {(productForm.sizes || []).join(', ')}
+                                                </small>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="row">
@@ -1243,7 +1374,7 @@ const OwnerDashboard = () => {
                                                 <li key={i} className="list-group-item d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <strong>{item.name}</strong>
-                                                        <div className="small text-muted">{item.qty} x ₹{item.price}</div>
+                                                        <div className="small text-muted">{item.qty} x ₹{item.price}{item.size || item.selectedSize ? ` · Size: ${item.size || item.selectedSize}` : ''}</div>
                                                     </div>
                                                     <span>₹{item.qty * item.price}</span>
                                                 </li>

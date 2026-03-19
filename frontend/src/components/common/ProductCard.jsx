@@ -8,10 +8,11 @@ const ProductCard = ({ product, addToCartHandler }) => {
     const { toggleWishlist, isInWishlist } = useWishlist();
     const wishlisted = isInWishlist(product._id);
 
-    // Use real originalPrice from DB, fallback to calculated
-    const originalPrice = product.originalPrice && product.originalPrice > product.price
-        ? product.originalPrice
-        : Math.round(product.price * 1.25);
+    // Only show originalPrice if admin actually set one that is higher than price
+    const hasDiscount = product.originalPrice && product.originalPrice > product.price;
+    const discountPercent = hasDiscount
+        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+        : 0;
 
     const handleAddToCart = (e) => {
         e.stopPropagation();
@@ -46,6 +47,15 @@ const ProductCard = ({ product, addToCartHandler }) => {
                     <div className="absolute top-3 left-3">
                         <span className="bg-gradient-to-r from-rose-400 to-pink-500 text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-rose-500/20">
                             New
+                        </span>
+                    </div>
+                )}
+
+                {/* Discount Badge */}
+                {hasDiscount && (
+                    <div className="absolute top-3 left-3 mt-7">
+                        <span className="bg-green-500 text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
+                            {discountPercent}% OFF
                         </span>
                     </div>
                 )}
@@ -96,7 +106,9 @@ const ProductCard = ({ product, addToCartHandler }) => {
                 <div className="mt-auto mb-4">
                     <div className="flex items-baseline gap-2">
                         <span className="text-lg sm:text-xl font-bold text-gray-900">₹{product.price}</span>
-                        <span className="text-xs sm:text-sm text-gray-400 line-through">₹{originalPrice}</span>
+                        {hasDiscount && (
+                            <span className="text-xs sm:text-sm text-gray-400 line-through">₹{product.originalPrice}</span>
+                        )}
                     </div>
                 </div>
 

@@ -85,7 +85,14 @@ const CheckoutPage = () => {
         localStorage.setItem('shippingAddress', JSON.stringify(shippingDetails));
 
         const orderData = {
-            orderItems: cartItems,
+            orderItems: cartItems.map(item => ({
+                product: item.product,
+                name: item.name,
+                image: item.image,
+                price: item.price,
+                qty: item.qty,
+                size: item.selectedSize || '',
+            })),
             shippingAddress: shippingDetails,
             totalPrice: finalTotal,
             couponCode: appliedCoupon ? appliedCoupon.code : undefined,
@@ -221,7 +228,7 @@ const CheckoutPage = () => {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-sm sm:text-base font-bold text-gray-900 truncate">{item.name}</h4>
-                                            <p className="text-xs sm:text-sm text-gray-400">Qty: {item.qty} × ₹{item.price}</p>
+                                            <p className="text-xs sm:text-sm text-gray-400">Qty: {item.qty} × ₹{item.price}{item.selectedSize ? ` · Size: ${item.selectedSize}` : ''}</p>
                                         </div>
                                         <p className="font-bold text-gray-900 text-sm sm:text-base">₹{item.price * item.qty}</p>
                                     </div>
