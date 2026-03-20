@@ -11,20 +11,19 @@ export const createOrder = async (req, res) => {
             orderItems,
             shippingAddress,
             paymentMethod,
-            itemsPrice,
-            taxPrice,
-            shippingPrice,
-            totalPrice,
             couponCode,
             discountAmount,
         } = req.body;
 
-        if (orderItems && orderItems.length === 0) {
+        if (!orderItems || orderItems.length === 0) {
             res.status(400).json({ message: 'No order items' });
             return;
         }
 
-        // Check stock availability and decrement stock
+        // Server-side price recalculation to prevent price manipulation
+        let calculatedItemsPrice = 0;
+
+        // Check stock availability, verify prices, and decrement stock
         for (const item of orderItems) {
             const product = await Product.findById(item.product);
 
@@ -40,10 +39,20 @@ export const createOrder = async (req, res) => {
                 return;
             }
 
+            // Use server-side price, not client-provided price
+            item.price = product.price;
+            calculatedItemsPrice += product.price * item.qty;
+
             // Decrement stock
             product.stock -= item.qty;
             await product.save();
         }
+
+        // Recalculate totals server-side
+        const calculatedTaxPrice = Math.round(calculatedItemsPrice * 0.05); // 5% tax
+        const calculatedShippingPrice = calculatedItemsPrice > 500 ? 0 : 50;
+        const validDiscount = discountAmount > 0 ? Math.min(discountAmount, calculatedItemsPrice) : 0;
+        const calculatedTotalPrice = calculatedItemsPrice + calculatedTaxPrice + calculatedShippingPrice - validDiscount;
 
         // If coupon code was used, increment its usedCount
         if (couponCode) {
@@ -58,12 +67,12 @@ export const createOrder = async (req, res) => {
             user: req.user._id,
             shippingAddress,
             paymentMethod,
-            itemsPrice,
-            taxPrice,
-            shippingPrice,
-            totalPrice,
+            itemsPrice: calculatedItemsPrice,
+            taxPrice: calculatedTaxPrice,
+            shippingPrice: calculatedShippingPrice,
+            totalPrice: calculatedTotalPrice,
             couponCode: couponCode || undefined,
-            discountAmount: discountAmount || 0,
+            discountAmount: validDiscount,
         });
 
         const createdOrder = await order.save();
@@ -105,11 +114,16 @@ export const getOrderById = async (req, res) => {
         const order = await Order.findById(req.params.id)
             .populate('user', 'name email');
 
-        if (order) {
-            res.json(order);
-        } else {
-            res.status(404).json({ message: 'Order not found' });
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
         }
+
+        // Authorization: only the order owner or an admin can view the order
+        if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Not authorized to view this order' });
+        }
+
+        res.json(order);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -3,7 +3,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { User, Lock, Mail, ArrowRight } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
-import { jwtDecode } from 'jwt-decode';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -46,12 +45,9 @@ const LoginPage = () => {
 
     const handleGoogleSuccess = async (credentialResponse) => {
         try {
-            const decoded = jwtDecode(credentialResponse.credential);
+            // Send raw credential token to backend for secure server-side verification
             const { data } = await api.post('/api/auth/google', {
-                googleId: decoded.sub,
-                email: decoded.email,
-                name: decoded.name,
-                picture: decoded.picture
+                credential: credentialResponse.credential,
             });
             localStorage.setItem('userInfo', JSON.stringify(data));
 

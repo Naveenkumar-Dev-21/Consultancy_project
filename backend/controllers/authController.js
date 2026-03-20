@@ -1,5 +1,8 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateToken = (id, role) =>
   jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -10,7 +13,7 @@ const generateToken = (id, role) =>
 export const signup = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    console.log(`[AUTH] Signup attempt for: ${email}`);
+    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] Signup attempt for: ${email}`);
 
     if (!name || !email || !password) {
       return res.status(400).json({ error: "Please provide all required fields (name, email, password)" });
@@ -20,7 +23,7 @@ export const signup = async (req, res) => {
     let user = await User.findOne({ email });
     
     if (user) {
-      console.log(`[AUTH] User already exists: ${email}`);
+      if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] User already exists: ${email}`);
       // User exists - check if they only have Google auth
       if (user.authProvider === 'google' && !user.password) {
         // Google user wants to add password - link account
@@ -57,7 +60,7 @@ export const signup = async (req, res) => {
       await user.save();
     }
 
-    console.log(`[AUTH] Signup successful for: ${email}`);
+    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] Signup successful for: ${email}`);
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -78,7 +81,7 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(`[AUTH] Login attempt for: ${email}`);
+    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] Login attempt for: ${email}`);
 
     if (!email || !password) {
       return res.status(400).json({ error: "Please provide both email and password" });
@@ -87,13 +90,13 @@ export const login = async (req, res) => {
     const user = await User.findOne({ email });
     
     if (!user) {
-      console.log(`[AUTH] User not found: ${email}`);
+      if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] User not found: ${email}`);
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
     // Check if user has a password (might be Google-only user)
     if (!user.password) {
-      console.log(`[AUTH] Google-only account attempting password login: ${email}`);
+      if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] Google-only account attempting password login: ${email}`);
       return res.status(400).json({ 
         error: "This account was created with Google. Please login with Google or set a password first.",
         googleOnly: true
@@ -102,13 +105,13 @@ export const login = async (req, res) => {
 
     // Verify password
     const isMatch = await user.matchPassword(password);
-    console.log(`[AUTH] Password match for ${email}: ${isMatch}`);
+    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] Password match result for ${email}`);
     
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    console.log(`[AUTH] Login successful for: ${email}`);
+    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] Login successful for: ${email}`);
     res.json({
       _id: user._id,
       name: user.name,
@@ -129,7 +132,25 @@ export const login = async (req, res) => {
 // @access  Public
 export const googleAuth = async (req, res) => {
   try {
-    const { googleId, email, name, picture } = req.body;
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ error: 'Google credential token is required' });
+    }
+
+    // Verify the Google ID token server-side
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch (verifyError) {
+      return res.status(401).json({ error: 'Invalid Google token' });
+    }
+
+    const { sub: googleId, email, name, picture } = payload;
 
     // Find user by EMAIL (not googleId) for account linking
     let user = await User.findOne({ email });
@@ -193,11 +214,7 @@ export const googleAuth = async (req, res) => {
       token: generateToken(user._id, user.role)
     });
   } catch (error) {
-    console.error("Google auth error DETAILS:", {
-      message: error.message,
-      stack: error.stack,
-      requestBody: req.body
-    });
+    console.error("Google auth error:", error.message);
     res.status(500).json({ 
       error: "Error with Google authentication",
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
