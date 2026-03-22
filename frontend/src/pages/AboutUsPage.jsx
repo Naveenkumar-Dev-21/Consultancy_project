@@ -1,16 +1,7 @@
-import React, { useMemo } from 'react';
-import { Heart, Sparkles, Baby, Shield, Leaf, Star, CheckCircle2, Quote } from 'lucide-react';
+import React from 'react';
+import { Baby, CheckCircle2, Heart } from 'lucide-react';
 
 const AboutUsPage = () => {
-    const floatingBubbles = useMemo(() => [...Array(20)].map((_, i) => ({
-        id: i,
-        width: `${(i * 37) % 50 + 50}px`,
-        height: `${(i * 29) % 50 + 50}px`,
-        top: `${(i * 13) % 100}%`,
-        left: `${(i * 17) % 100}%`,
-        animationDuration: `${(i % 5) * 2 + 10}s`
-    })), []);
-
     return (
         <div className="min-h-screen font-sans bg-slate-50/50">
             {/* Hero Section */}
@@ -62,22 +53,12 @@ const AboutUsPage = () => {
                         </div>
                         <div className="relative animate-fade-in group">
                             <div className="absolute -inset-4 bg-gradient-to-tr from-rose-100 to-pink-50 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-700"></div>
-                            <div className="relative bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-soft border border-white/80 overflow-hidden">
-                                <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
-                                    <p>
-                                        And began creating pieces the way a mother would choose for her own child—slowly, thoughtfully, and without shortcuts. Every fabric was touched, tested, and trusted. Every stitch was guided by patience.
-                                    </p>
-                                    <div className="grid grid-cols-2 gap-4 mt-8">
-                                        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                            <p className="font-bold text-gray-900 mb-1">Comfort</p>
-                                            <p className="text-sm text-gray-500">Never optional</p>
-                                        </div>
-                                        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                                            <p className="font-bold text-gray-900 mb-1">Safety</p>
-                                            <p className="text-sm text-gray-500">Never assumed</p>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div className="relative overflow-hidden rounded-[2.5rem] shadow-soft border border-white/80">
+                                <img 
+                                    src="/Images/aboutus/image1.jpg" 
+                                    alt="Mother's Care Products" 
+                                    className="w-full h-full object-cover rounded-[2.5rem]"
+                                />
                             </div>
                         </div>
                     </div>
@@ -124,24 +105,12 @@ const AboutUsPage = () => {
                     <div className="relative overflow-hidden bg-white/40 backdrop-blur-xl rounded-[3rem] shadow-soft border border-white/80 p-8 sm:p-20">
                         <div className="grid md:grid-cols-5 gap-12 items-center">
                             <div className="md:col-span-2 relative">
-                                <div className="aspect-square bg-gradient-to-br from-rose-200 via-pink-100 to-rose-300 rounded-[2.5rem] shadow-inner flex items-center justify-center group overflow-hidden">
-                                     {/* Background bubbles */}
-                                    <div className="absolute inset-0 opacity-40">
-                                        {floatingBubbles.slice(0, 10).map((bubble) => (
-                                            <div 
-                                                key={bubble.id} 
-                                                className="absolute bg-white rounded-full transition-transform duration-1000 group-hover:scale-150"
-                                                style={{
-                                                    width: bubble.width,
-                                                    height: bubble.height,
-                                                    top: bubble.top,
-                                                    left: bubble.left,
-                                                    animation: `float ${bubble.animationDuration} ease-in-out infinite`
-                                                }}
-                                            />
-                                        ))}
-                                    </div>
-                                    <Heart className="text-white drop-shadow-2xl relative z-10" size={80} fill="currentColor" />
+                                <div className="aspect-square rounded-[2.5rem] shadow-inner flex items-center justify-center group overflow-hidden">
+                                    <img 
+                                        src="/Images/aboutus/image2.jpg" 
+                                        alt="Founder Sujitha Nishok" 
+                                        className="w-full h-full object-cover rounded-[2.5rem]"
+                                    />
                                 </div>
                                 <div className="absolute -bottom-6 -right-6 bg-white py-4 px-8 rounded-2xl shadow-lg border border-slate-50 hidden sm:block">
                                     <p className="font-bold text-gray-900">Sujitha Nishok</p>

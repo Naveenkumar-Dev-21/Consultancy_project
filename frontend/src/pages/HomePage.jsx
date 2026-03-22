@@ -50,8 +50,9 @@ const HomePage = () => {
             setLoading(true);
             try {
                 const { data } = await api.get('/api/products');
-                setProducts(data);
-                setFilteredProducts(data);
+                const productsData = Array.isArray(data) ? data : [];
+                setProducts(productsData);
+                setFilteredProducts(productsData);
             } catch (error) {
                 console.error("Error fetching products", error);
             } finally {
@@ -61,7 +62,7 @@ const HomePage = () => {
         const fetchCategories = async () => {
             try {
                 const { data } = await api.get('/api/categories');
-                setAllCategories(data);
+                setAllCategories(Array.isArray(data) ? data : []);
             } catch (error) {
                 console.error("Error fetching categories", error);
             }
@@ -72,7 +73,7 @@ const HomePage = () => {
 
     // Filter Logic
     useEffect(() => {
-        let result = products;
+        let result = Array.isArray(products) ? products : [];
 
         if (searchTerm) {
             result = result.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -103,7 +104,7 @@ const HomePage = () => {
         setFilteredProducts(result);
     }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedSize, selectedAgeGroup, selectedGender, products]);
 
-    const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
+    const categories = ['All', ...(Array.isArray(products) ? [...new Set(products.map(p => p.category).filter(Boolean))] : [])];
 
     const addToCartHandler = (product, e) => {
         e.stopPropagation();
@@ -149,7 +150,7 @@ const HomePage = () => {
                             onChange={(e) => handleCategoryChange(e.target.value)}
                         >
                             <option value="All">All Categories</option>
-                            {allCategories.map(cat => (
+                            {Array.isArray(allCategories) && allCategories.map(cat => (
                                 <option key={cat._id} value={cat.name}>{cat.name}</option>
                             ))}
                         </select>
@@ -243,7 +244,7 @@ const HomePage = () => {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
-                    {(allCategories.length > 0 ? allCategories : [
+                    {(Array.isArray(allCategories) && allCategories.length > 0 ? allCategories : [
                         { name: 'Regular wear', image: '/Images/Casuals/17.jpg' },
                         { name: 'Infant Clothings', image: '/Images/pampers/10.jpg' },
                         { name: 'New born Essentials', image: '/Images/pampers/16.jpg' },
@@ -293,7 +294,7 @@ const HomePage = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
-                        {filteredProducts.map((product) => (
+                        {Array.isArray(filteredProducts) && filteredProducts.map((product) => (
                             <ProductCard
                                 key={product._id}
                                 product={product}
@@ -305,7 +306,7 @@ const HomePage = () => {
                 )}
 
                 {/* Empty State */}
-                {!loading && filteredProducts.length === 0 && (
+                {!loading && (!Array.isArray(filteredProducts) || filteredProducts.length === 0) && (
                     <div className="text-center py-20 sm:py-32 bg-white rounded-3xl border border-dashed border-rose-200">
                         <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Search className="text-rose-300" size={32} />

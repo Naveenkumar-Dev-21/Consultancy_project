@@ -139,7 +139,7 @@ const OwnerDashboard = () => {
             const config = getAuthConfig();
             const { data } = await api.get('/api/orders', config);
             // API returns array: [...]
-            setAllOrders(data);
+            setAllOrders(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error loading orders:', error);
             toast.error('Failed to load orders');
@@ -153,7 +153,7 @@ const OwnerDashboard = () => {
         try {
             const { data } = await api.get('/api/products');
             // API returns array: [...]
-            setAllProducts(data);
+            setAllProducts(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error loading products:', error);
             toast.error('Failed to load products');
@@ -166,7 +166,7 @@ const OwnerDashboard = () => {
         setCategoriesLoading(true);
         try {
             const { data } = await api.get('/api/categories');
-            setAllCategories(data);
+            setAllCategories(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error loading categories:', error);
             toast.error('Failed to load categories');
@@ -206,7 +206,7 @@ const OwnerDashboard = () => {
         try {
             const config = getAuthConfig();
             const { data } = await api.get('/api/orders/invoices', config);
-            setAllInvoices(data);
+            setAllInvoices(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error loading invoices:', error);
         } finally {
@@ -219,7 +219,7 @@ const OwnerDashboard = () => {
         try {
             const config = getAuthConfig();
             const { data } = await api.get('/api/users', config);
-            setAllUsers(data);
+            setAllUsers(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error loading users:', error);
             if (error.response && (error.response.status === 401 || error.response.status === 403)) {
@@ -254,7 +254,7 @@ const OwnerDashboard = () => {
         try {
             const config = getAuthConfig();
             const { data } = await api.get('/api/coupons', config);
-            setAllCoupons(data);
+            setAllCoupons(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error loading coupons:', error);
         } finally {
@@ -604,7 +604,7 @@ const OwnerDashboard = () => {
                                         <tbody>
                                             {filteredOrders.length === 0 ? (
                                                 <tr><td colSpan="6" className="text-center py-4">No orders found</td></tr>
-                                            ) : filteredOrders.map(order => (
+                                            ) : (Array.isArray(filteredOrders) && filteredOrders.map(order => (
                                                 <tr key={order._id} style={order.status === 'Cancelled' ? { backgroundColor: '#fef2f2' } : {}}>
                                                     <td><strong style={order.status === 'Cancelled' ? { color: '#dc3545', textDecoration: 'line-through' } : {}}>{order._id.substring(0, 8)}</strong></td>
                                                     <td style={order.status === 'Cancelled' ? { color: '#dc3545' } : {}}>{order.user?.name || 'Unknown'}</td>
@@ -636,7 +636,7 @@ const OwnerDashboard = () => {
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -671,7 +671,7 @@ const OwnerDashboard = () => {
                                         <tbody>
                                             {filteredProducts.length === 0 ? (
                                                 <tr><td colSpan="7" className="text-center py-4">No products found</td></tr>
-                                            ) : filteredProducts.map(product => (
+                                            ) : (Array.isArray(filteredProducts) && filteredProducts.map(product => (
                                                 <tr key={product._id}>
                                                     <td>
                                                         <img
@@ -702,7 +702,7 @@ const OwnerDashboard = () => {
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -733,7 +733,7 @@ const OwnerDashboard = () => {
                                         <tbody>
                                             {filteredUsers.length === 0 ? (
                                                 <tr><td colSpan="5" className="text-center py-4">No users found</td></tr>
-                                            ) : filteredUsers.map(u => (
+                                            ) : (Array.isArray(filteredUsers) && filteredUsers.map(u => (
                                                 <tr key={u._id}>
                                                     <td>{u.name}</td>
                                                     <td>{u.email}</td>
@@ -754,7 +754,7 @@ const OwnerDashboard = () => {
                                                         </button>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -770,7 +770,7 @@ const OwnerDashboard = () => {
                                 <p className="text-muted text-center py-5">No recent activities</p>
                             ) : (
                                 <div className="list-group list-group-flush">
-                                    {allOrders.slice(0, 10).map((order) => (
+                                    {Array.isArray(allOrders) && allOrders.slice(0, 10).map((order) => (
                                         <div key={order._id} className="list-group-item d-flex justify-content-between align-items-center">
                                             <div>
                                                 <div className="fw-bold">New Order Received</div>
@@ -804,7 +804,7 @@ const OwnerDashboard = () => {
                                         <tbody>
                                             {filteredInvoices.length === 0 ? (
                                                 <tr><td colSpan="6" className="text-center py-4">No invoices found</td></tr>
-                                            ) : filteredInvoices.map(invoice => (
+                                            ) : (Array.isArray(filteredInvoices) && filteredInvoices.map(invoice => (
                                                 <tr key={invoice._id}>
                                                     <td><strong>{invoice._id.substring(0, 8)}...</strong></td>
                                                     <td>
@@ -830,7 +830,7 @@ const OwnerDashboard = () => {
                                                         </button>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -915,7 +915,7 @@ const OwnerDashboard = () => {
                                         <tbody>
                                             {filteredCoupons.length === 0 ? (
                                                 <tr><td colSpan="8" className="text-center py-4">No coupons created yet</td></tr>
-                                            ) : filteredCoupons.map(coupon => (
+                                            ) : (Array.isArray(filteredCoupons) && filteredCoupons.map(coupon => (
                                                 <tr key={coupon._id}>
                                                     <td><strong className="font-monospace">{coupon.code}</strong></td>
                                                     <td>{coupon.discountType === 'percentage' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}`}</td>
@@ -934,7 +934,7 @@ const OwnerDashboard = () => {
                                                         </button>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -1001,7 +1001,7 @@ const OwnerDashboard = () => {
                                         <tbody>
                                             {allCategories.length === 0 ? (
                                                 <tr><td colSpan="6" className="text-center py-4">No categories created yet</td></tr>
-                                            ) : allCategories.map(cat => (
+                                            ) : (Array.isArray(allCategories) && allCategories.map(cat => (
                                                 <tr key={cat._id}>
                                                     <td>
                                                         <img src={getFullUrl(cat.image)} alt={cat.name} className="rounded" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
@@ -1016,7 +1016,7 @@ const OwnerDashboard = () => {
                                                         </button>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )))}
                                         </tbody>
                                     </table>
                                 </div>
@@ -1253,7 +1253,7 @@ const OwnerDashboard = () => {
                                                         }
                                                     }}>
                                                     <option value="">Select Category</option>
-                                                    {allCategories.map(cat => (
+                                                    {Array.isArray(allCategories) && allCategories.map(cat => (
                                                         <option key={cat._id} value={cat.name}>{cat.name}</option>
                                                     ))}
                                                     <option value="NEW_CAT">Add New Category +</option>

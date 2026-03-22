@@ -254,7 +254,7 @@ const CartPage = () => {
                 <div className="grid lg:grid-cols-12 gap-8 sm:gap-12">
                     {/* Items List */}
                     <div className="lg:col-span-8 space-y-4 sm:space-y-6">
-                        {cartItems.map((item) => (
+                        {Array.isArray(cartItems) && cartItems.map((item) => (
                             <div key={item.product} className="bg-white/80 backdrop-blur-xl p-4 sm:p-6 rounded-2xl sm:rounded-[24px] shadow-card border border-rose-100/60 flex gap-4 sm:gap-6 items-center group">
                                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-rose-50/50 rounded-xl overflow-hidden flex-shrink-0">
                                     <img src={getFullUrl(item.image)} alt={item.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110" />

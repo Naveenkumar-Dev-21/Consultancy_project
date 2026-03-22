@@ -35,7 +35,7 @@ const CategoryPage = () => {
             try {
                 // 1. Fetch category details
                 const { data: categories } = await api.get('/api/categories');
-                const matchedCategory = categories.find(c => c.slug === slug);
+                const matchedCategory = Array.isArray(categories) ? categories.find(c => c.slug === slug) : null;
                 
                 if (matchedCategory) {
                     setCategory(matchedCategory);
@@ -52,10 +52,10 @@ const CategoryPage = () => {
                 const categoryName = matchedCategory ? matchedCategory.name : (FALLBACK_CATEGORIES[slug]?.name || slug.replace(/-/g, ' '));
                 
                 // Allow some fuzzy matching if needed, but primary is exact match
-                const filtered = productsData.filter(p => 
+                const filtered = Array.isArray(productsData) ? productsData.filter(p => 
                     p.category === categoryName || 
                     (slug === 'nightwear' && ['Night Wear', 'Night Dress'].includes(p.category))
-                );
+                ) : [];
                 setProducts(filtered);
             } catch (error) {
                 console.error('Error fetching data:', error);

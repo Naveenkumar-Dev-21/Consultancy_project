@@ -122,7 +122,7 @@ const CategoryProductDetailPage = () => {
         try {
             setReviewsLoading(true);
             const { data } = await api.get(`/api/reviews/${id}`);
-            setReviews(data.reviews);
+            setReviews(Array.isArray(data?.reviews) ? data.reviews : []);
         } catch (error) {
             console.error("Error fetching reviews", error);
         } finally {
@@ -594,7 +594,7 @@ const CategoryProductDetailPage = () => {
                         </button>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 sm:gap-8">
-                        {similarProducts.map((p) => (
+                        {Array.isArray(similarProducts) && similarProducts.map((p) => (
                             <ProductCard
                                 key={p._id}
                                 product={p}

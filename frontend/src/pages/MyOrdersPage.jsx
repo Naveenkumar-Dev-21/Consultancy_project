@@ -145,7 +145,7 @@ const MyOrdersPage = () => {
                     </div>
                 ) : (
                     <div className="space-y-6 sm:space-y-8">
-                        {orders.map((order) => (
+                        {Array.isArray(orders) && orders.map((order) => (
                             <div key={order._id} className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-[32px] shadow-card border border-rose-100/60 overflow-hidden group hover:shadow-soft transition-all">
                                 <div className="p-5 sm:p-8 md:p-10">
                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6 mb-8 sm:mb-10 pb-6 sm:pb-10 border-b border-rose-100">
