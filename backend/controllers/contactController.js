@@ -41,19 +41,22 @@ export const sendContactEmail = async (req, res) => {
             await transporter.sendMail(mailOptions);
             res.status(200).json({ message: 'Email sent successfully' });
         } else {
-            // Fallback for development if no credentials provided
-            console.log('--- Email Simulation ---');
-            console.log('To: aadhiranbabyproducts@gmail.com');
-            console.log('From:', email);
-            console.log('Subject:', subject);
-            console.log('Message:', message);
-            console.log('------------------------');
+            // Log for debugging
+            console.warn('--- Backend Email Service Missing Configuration ---');
+            console.warn('Please set EMAIL_USER and EMAIL_PASS in your environment variables.');
+            console.warn('--------------------------------------------------');
             
-            // Still return success so frontend works, but log the warning
-            res.status(200).json({ 
-                message: 'Message received (Simulation). Please configure EMAIL_USER and EMAIL_PASS for actual delivery.',
-                simulated: true 
-            });
+            if (process.env.NODE_ENV === 'production') {
+                return res.status(500).json({ 
+                    message: 'Email service is not configured on the server. Please check environment variables (EMAIL_USER/EMAIL_PASS).' 
+                });
+            } else {
+                // Keep simulation for local development
+                res.status(200).json({ 
+                    message: 'Message received (Simulation Mode). Configure EMAIL_USER and EMAIL_PASS for actual delivery.',
+                    simulated: true 
+                });
+            }
         }
     } catch (error) {
         console.error('Error sending email:', error);

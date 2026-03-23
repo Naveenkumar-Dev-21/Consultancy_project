@@ -17,6 +17,18 @@ const storage = multer.diskStorage({
     },
 });
 
+const categoryStorage = multer.diskStorage({
+    destination(req, file, cb) {
+        cb(null, 'uploads/categories/');
+    },
+    filename(req, file, cb) {
+        cb(
+            null,
+            `category-${Date.now()}${path.extname(file.originalname)}`
+        );
+    },
+});
+
 function checkFileType(file, cb) {
     const filetypes = /jpg|jpeg|png/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -37,8 +49,20 @@ const upload = multer({
     },
 });
 
+const uploadCategory = multer({
+    storage: categoryStorage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: function (req, file, cb) {
+        checkFileType(file, cb);
+    },
+});
+
 router.post('/', upload.single('image'), (req, res) => {
     // Return relative path with forward slashes for Windows compatibility, prefixed with slash
+    res.send(`/${req.file.path.replace(/\\/g, '/')}`);
+});
+
+router.post('/category', uploadCategory.single('image'), (req, res) => {
     res.send(`/${req.file.path.replace(/\\/g, '/')}`);
 });
 

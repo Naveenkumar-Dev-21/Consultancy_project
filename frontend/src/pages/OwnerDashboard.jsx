@@ -64,7 +64,8 @@ const OwnerDashboard = () => {
         customCategory: ''
     });
     const [categoryForm, setCategoryForm] = useState({
-        name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50'
+        name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50',
+        isUrl: true, imageFile: null
     });
     const [uploading, setUploading] = useState(false);
 
@@ -179,9 +180,36 @@ const OwnerDashboard = () => {
         e.preventDefault();
         try {
             const config = getAuthConfig();
-            await api.post('/api/categories', categoryForm, config);
+            let imagePath = categoryForm.image;
+
+            if (!categoryForm.isUrl && categoryForm.imageFile) {
+                setUploading(true);
+                try {
+                    const compressedFile = await compressImage(categoryForm.imageFile);
+                    const formData = new FormData();
+                    formData.append('image', compressedFile);
+                    
+                    const { data } = await api.post('/api/upload/category', formData, config);
+                    imagePath = data;
+                } catch (error) {
+                    console.error(error);
+                    setUploading(false);
+                    toast.error('Image upload failed');
+                    return;
+                }
+            }
+
+            const payload = {
+                name: categoryForm.name,
+                image: imagePath,
+                subtitle: categoryForm.subtitle,
+                gradient: categoryForm.gradient
+            };
+
+            await api.post('/api/categories', payload, config);
             toast.success('Category created successfully');
-            setCategoryForm({ name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50' });
+            setCategoryForm({ name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50', isUrl: true, imageFile: null });
+            setUploading(false);
             loadCategories();
         } catch (error) {
             toast.error(error.response?.data?.error || 'Failed to save category');
@@ -975,9 +1003,30 @@ const OwnerDashboard = () => {
                                         </select>
                                     </div>
                                     <div className="col-md-3">
-                                        <label className="form-label fw-bold">Image URL</label>
-                                        <input type="text" className="form-control" placeholder="/Images/..."
-                                            value={categoryForm.image} onChange={e => setCategoryForm({...categoryForm, image: e.target.value})} />
+                                        <label className="form-label fw-bold">Image Source</label>
+                                        <div className="d-flex mt-2">
+                                            <div className="form-check me-3">
+                                                <input className="form-check-input" type="radio" name="catImageSource"
+                                                    checked={categoryForm.isUrl} onChange={() => setCategoryForm({ ...categoryForm, isUrl: true })} />
+                                                <label className="form-check-label small">URL</label>
+                                            </div>
+                                            <div className="form-check">
+                                                <input className="form-check-input" type="radio" name="catImageSource"
+                                                    checked={!categoryForm.isUrl} onChange={() => setCategoryForm({ ...categoryForm, isUrl: false })} />
+                                                <label className="form-check-label small">Upload</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-3">
+                                        <label className="form-label fw-bold">{categoryForm.isUrl ? 'Image URL' : 'Upload Image'}</label>
+                                        {categoryForm.isUrl ? (
+                                            <input type="text" className="form-control" placeholder="/Images/..."
+                                                value={categoryForm.image} onChange={e => setCategoryForm({...categoryForm, image: e.target.value})} />
+                                        ) : (
+                                            <input type="file" className="form-control" accept="image/*"
+                                                onChange={e => setCategoryForm({ ...categoryForm, imageFile: e.target.files[0] })} />
+                                        )}
+                                        {uploading && <div className="text-info small mt-1">Uploading...</div>}
                                     </div>
                                 </div>
                                 <button type="submit" className="btn btn-primary-custom mt-3">
