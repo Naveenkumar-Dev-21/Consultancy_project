@@ -1,9 +1,21 @@
 import path from 'path';
 import express from 'express';
 import multer from 'multer';
+import fs from 'fs';
 
 
 const router = express.Router();
+
+// Ensure directories exist
+const uploadDir = 'uploads/';
+const categoryDir = 'uploads/categories/';
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+if (!fs.existsSync(categoryDir)) {
+    fs.mkdirSync(categoryDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
     destination(req, file, cb) {
