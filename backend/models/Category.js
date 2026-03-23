@@ -25,6 +25,10 @@ const categorySchema = mongoose.Schema(
         gradient: {
             type: String,
             default: 'from-rose-50 to-pink-50'
+        },
+        subCategories: {
+            type: [String],
+            default: []
         }
     },
     {

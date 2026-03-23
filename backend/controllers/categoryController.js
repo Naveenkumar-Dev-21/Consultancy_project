@@ -18,7 +18,7 @@ export const getCategories = async (req, res) => {
 // @access  Private/Admin
 export const createCategory = async (req, res) => {
     try {
-        const { name, image, subtitle, gradient } = req.body;
+        const { name, image, subtitle, gradient, subCategories } = req.body;
         
         const categoryExists = await Category.findOne({ name });
         if (categoryExists) {
@@ -32,10 +32,40 @@ export const createCategory = async (req, res) => {
             slug,
             image,
             subtitle,
-            gradient
+            gradient,
+            subCategories: subCategories || []
         });
 
         res.status(201).json(category);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+// @desc    Update a category
+// @route   PUT /api/categories/:id
+// @access  Private/Admin
+export const updateCategory = async (req, res) => {
+    try {
+        const { name, image, subtitle, gradient, subCategories } = req.body;
+        const category = await Category.findById(req.params.id);
+
+        if (category) {
+            category.name = name || category.name;
+            category.image = image || category.image;
+            category.subtitle = subtitle || category.subtitle;
+            category.gradient = gradient || category.gradient;
+            category.subCategories = subCategories || category.subCategories;
+
+            if (name) {
+                category.slug = slugify(name, { lower: true });
+            }
+
+            const updatedCategory = await category.save();
+            res.json(updatedCategory);
+        } else {
+            res.status(404).json({ error: 'Category not found' });
+        }
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

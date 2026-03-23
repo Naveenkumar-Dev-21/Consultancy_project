@@ -65,8 +65,9 @@ const OwnerDashboard = () => {
     });
     const [categoryForm, setCategoryForm] = useState({
         name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50',
-        isUrl: true, imageFile: null
+        isUrl: true, imageFile: null, subCategories: []
     });
+    const [newSubCategory, setNewSubCategory] = useState('');
     const [uploading, setUploading] = useState(false);
 
 
@@ -203,12 +204,13 @@ const OwnerDashboard = () => {
                 name: categoryForm.name,
                 image: imagePath,
                 subtitle: categoryForm.subtitle,
-                gradient: categoryForm.gradient
+                gradient: categoryForm.gradient,
+                subCategories: categoryForm.subCategories
             };
 
             await api.post('/api/categories', payload, config);
             toast.success('Category created successfully');
-            setCategoryForm({ name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50', isUrl: true, imageFile: null });
+            setCategoryForm({ name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50', isUrl: true, imageFile: null, subCategories: [] });
             setUploading(false);
             loadCategories();
         } catch (error) {
@@ -272,6 +274,26 @@ const OwnerDashboard = () => {
         } catch {
             toast.error('Failed to delete user');
         }
+    };
+
+    const addSubCategory = () => {
+        if (!newSubCategory.trim()) return;
+        if (categoryForm.subCategories.includes(newSubCategory.trim())) {
+            toast.warn('Sub-category already added');
+            return;
+        }
+        setCategoryForm({
+            ...categoryForm,
+            subCategories: [...categoryForm.subCategories, newSubCategory.trim()]
+        });
+        setNewSubCategory('');
+    };
+
+    const removeSubCategory = (sub) => {
+        setCategoryForm({
+            ...categoryForm,
+            subCategories: categoryForm.subCategories.filter(s => s !== sub)
+        });
     };
 
 
@@ -392,6 +414,7 @@ const OwnerDashboard = () => {
                 featured: product.featured || false,
                 imageUrl: product.image || '',
                 gender: product.gender || 'Unisex',
+                subCategory: product.subCategory || '',
                 descriptionImages: product.descriptionImages || [],
                 descriptionImageFiles: [],
                 isCustomCategory: isCustom,
@@ -403,7 +426,7 @@ const OwnerDashboard = () => {
                 name: '', price: '', originalPrice: '', category: '', material: 'Cotton', sizes: [], ageGroup: '0-6 Months',
                 description: '', height: '', width: '', depth: '', unit: 'cm',
                 weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
-                gender: 'Unisex',
+                gender: 'Unisex', subCategory: '',
                 descriptionImages: [], descriptionImageFiles: [],
                 isCustomCategory: false,
                 customCategory: ''
@@ -499,7 +522,8 @@ const OwnerDashboard = () => {
                     unit: productForm.unit
                 },
                 featured: productForm.featured,
-                gender: productForm.gender
+                gender: productForm.gender,
+                subCategory: productForm.subCategory
             };
 
             if (editingProduct) {
@@ -1028,6 +1052,24 @@ const OwnerDashboard = () => {
                                         )}
                                         {uploading && <div className="text-info small mt-1">Uploading...</div>}
                                     </div>
+                                    <div className="col-md-6">
+                                        <label className="form-label fw-bold">Sub-categories</label>
+                                        <div className="input-group mb-2">
+                                            <input type="text" className="form-control" placeholder="Add sub-category (e.g. Diapers)"
+                                                value={newSubCategory} onChange={e => setNewSubCategory(e.target.value)}
+                                                onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addSubCategory())} />
+                                            <button className="btn btn-outline-primary" type="button" onClick={addSubCategory}>Add</button>
+                                        </div>
+                                        <div className="d-flex flex-wrap gap-2">
+                                            {categoryForm.subCategories.map((sub, idx) => (
+                                                <span key={idx} className="badge bg-primary d-flex align-items-center gap-2">
+                                                    {sub}
+                                                    <button type="button" className="btn-close btn-close-white" style={{ fontSize: '0.5rem' }} 
+                                                        onClick={() => removeSubCategory(sub)}></button>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                                 <button type="submit" className="btn btn-primary-custom mt-3">
                                     <i className="fas fa-plus me-2"></i>Create Category
@@ -1042,7 +1084,7 @@ const OwnerDashboard = () => {
                                                 <th>Image</th>
                                                 <th>Name</th>
                                                 <th>Slug</th>
-                                                <th>Subtitle</th>
+                                                <th>Sub-categories</th>
                                                 <th>Created</th>
                                                 <th>Actions</th>
                                             </tr>
@@ -1057,7 +1099,13 @@ const OwnerDashboard = () => {
                                                     </td>
                                                     <td><span className="fw-bold">{cat.name}</span></td>
                                                     <td><code>{cat.slug}</code></td>
-                                                    <td>{cat.subtitle}</td>
+                                                    <td>
+                                                        <div className="d-flex flex-wrap gap-1">
+                                                            {cat.subCategories && cat.subCategories.length > 0 ? cat.subCategories.map((sub, i) => (
+                                                                <span key={i} className="badge bg-light text-dark border">{sub}</span>
+                                                            )) : <span className="text-muted small">None</span>}
+                                                        </div>
+                                                    </td>
                                                     <td>{new Date(cat.createdAt).toLocaleDateString()}</td>
                                                     <td>
                                                         <button className="btn-action bg-danger text-white" onClick={() => deleteCategoryHandler(cat._id)}>
@@ -1290,31 +1338,42 @@ const OwnerDashboard = () => {
                                                 <option value="Unisex">Unisex</option>
                                             </select>
                                         </div>
-                                        <div className="col-md-3 mb-3">
-                                            <label className="form-label">Category</label>
-                                            {!productForm.isCustomCategory ? (
-                                                <select className="form-select" required value={productForm.category} 
-                                                    onChange={e => {
-                                                        if (e.target.value === 'NEW_CAT') {
-                                                            setProductForm({ ...productForm, isCustomCategory: true, category: '' });
-                                                        } else {
-                                                            setProductForm({ ...productForm, category: e.target.value });
-                                                        }
-                                                    }}>
-                                                    <option value="">Select Category</option>
-                                                    {Array.isArray(allCategories) && allCategories.map(cat => (
-                                                        <option key={cat._id} value={cat.name}>{cat.name}</option>
-                                                    ))}
-                                                    <option value="NEW_CAT">Add New Category +</option>
-                                                </select>
-                                            ) : (
-                                                <div className="input-group">
-                                                    <input type="text" className="form-control" placeholder="New category name" required
-                                                        value={productForm.category} onChange={e => setProductForm({ ...productForm, category: e.target.value })} />
-                                                    <button className="btn btn-outline-secondary" type="button" onClick={() => setProductForm({ ...productForm, isCustomCategory: false, category: '' })}>×</button>
-                                                </div>
-                                            )}
-                                        </div>
+                                         <div className="col-md-3 mb-3">
+                                             <label className="form-label">Category</label>
+                                             {!productForm.isCustomCategory ? (
+                                                 <select className="form-select" required value={productForm.category} 
+                                                     onChange={e => {
+                                                         if (e.target.value === 'NEW_CAT') {
+                                                             setProductForm({ ...productForm, isCustomCategory: true, category: '', subCategory: '' });
+                                                         } else {
+                                                             setProductForm({ ...productForm, category: e.target.value, subCategory: '' });
+                                                         }
+                                                     }}>
+                                                     <option value="">Select Category</option>
+                                                     {Array.isArray(allCategories) && allCategories.map(cat => (
+                                                         <option key={cat._id} value={cat.name}>{cat.name}</option>
+                                                     ))}
+                                                     <option value="NEW_CAT">Add New Category +</option>
+                                                 </select>
+                                             ) : (
+                                                 <div className="input-group">
+                                                     <input type="text" className="form-control" placeholder="New category name" required
+                                                         value={productForm.category} onChange={e => setProductForm({ ...productForm, category: e.target.value, subCategory: '' })} />
+                                                     <button className="btn btn-outline-secondary" type="button" onClick={() => setProductForm({ ...productForm, isCustomCategory: false, category: '', subCategory: '' })}>×</button>
+                                                 </div>
+                                             )}
+                                         </div>
+                                         <div className="col-md-3 mb-3">
+                                             <label className="form-label">Sub Category</label>
+                                             <select className="form-select" value={productForm.subCategory} 
+                                                 onChange={e => setProductForm({ ...productForm, subCategory: e.target.value })}
+                                                 disabled={!productForm.category || productForm.isCustomCategory}>
+                                                 <option value="">No Sub Category</option>
+                                                 {productForm.category && allCategories.find(c => c.name === productForm.category)?.subCategories?.map((sub, i) => (
+                                                     <option key={i} value={sub}>{sub}</option>
+                                                 ))}
+                                             </select>
+                                         </div>
                                         <div className="col-md-3 mb-3">
                                             <label className="form-label">Age Group</label>
                                             <select className="form-select" value={productForm.ageGroup} onChange={e => setProductForm({ ...productForm, ageGroup: e.target.value })}>

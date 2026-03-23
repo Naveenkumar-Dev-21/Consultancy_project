@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import { getCategories, createCategory, deleteCategory } from '../controllers/categoryController.js';
+import { getCategories, createCategory, deleteCategory, updateCategory } from '../controllers/categoryController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
 router.route('/')
@@ -8,6 +8,7 @@ router.route('/')
     .post(protect, admin, createCategory);
 
 router.route('/:id')
+    .put(protect, admin, updateCategory)
     .delete(protect, admin, deleteCategory);
 
 export default router;
