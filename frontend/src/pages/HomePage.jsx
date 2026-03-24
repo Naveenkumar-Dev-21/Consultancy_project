@@ -25,7 +25,6 @@ const HomePage = () => {
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(5000);
-    const [selectedSize, setSelectedSize] = useState('');
     const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
     const [selectedGender, setSelectedGender] = useState('');
 
@@ -88,11 +87,6 @@ const HomePage = () => {
         }
         // Filter by price range
         result = result.filter(p => p.price >= minPrice && p.price <= maxPrice);
-        // Filter by size
-        if (selectedSize) {
-            result = result.filter(p => p.size === selectedSize);
-        }
-        // Filter by age group
         if (selectedAgeGroup) {
             result = result.filter(p => p.ageGroup === selectedAgeGroup);
         }
@@ -102,7 +96,7 @@ const HomePage = () => {
         }
 
         setFilteredProducts(result);
-    }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedSize, selectedAgeGroup, selectedGender, products]);
+    }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedAgeGroup, selectedGender, products]);
 
     const categories = ['All', ...(Array.isArray(products) ? [...new Set(products.map(p => p.category).filter(Boolean))] : [])];
 
@@ -188,22 +182,6 @@ const HomePage = () => {
                     <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 flex-grow lg:flex-grow-0">
                         <select
                             className="flex-grow lg:w-[100px] bg-white px-3 py-2.5 rounded-xl border border-rose-100 text-xs font-bold text-gray-700 shadow-sm outline-none cursor-pointer"
-                            value={selectedSize}
-                            onChange={(e) => setSelectedSize(e.target.value)}
-                        >
-                            <option value="">Size</option>
-                            <option value="XS">XS</option>
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                            <option value="1-2">1-2</option>
-                            <option value="2-3">2-3</option>
-                            <option value="3-4">3-4</option>
-                        </select>
-
-                        <select
-                            className="flex-grow lg:w-[100px] bg-white px-3 py-2.5 rounded-xl border border-rose-100 text-xs font-bold text-gray-700 shadow-sm outline-none cursor-pointer"
                             value={selectedGender}
                             onChange={(e) => setSelectedGender(e.target.value)}
                         >
@@ -219,10 +197,18 @@ const HomePage = () => {
                             onChange={(e) => setSelectedAgeGroup(e.target.value)}
                         >
                             <option value="">Age Group</option>
-                            <option value="0-6 Months">0-6M</option>
-                            <option value="6-12 Months">6-12M</option>
-                            <option value="1-2 Years">1-2Y</option>
-                            <option value="2-3 Years">2-3Y</option>
+                            <option value="0-3M">0-3M</option>
+                            <option value="3-6M">3-6M</option>
+                            <option value="6-9M">6-9M</option>
+                            <option value="9-12M">9-12M</option>
+                            <option value="12-18M">12-18M</option>
+                            <option value="1-2Y">1-2Y</option>
+                            <option value="2-3Y">2-3Y</option>
+                            <option value="3-4Y">3-4Y</option>
+                            <option value="4-5Y">4-5Y</option>
+                            <option value="5-6Y">5-6Y</option>
+                            <option value="7-8Y">7-8Y</option>
+                            <option value="9-10Y">9-10Y</option>
                         </select>
                     </div>
                 </div>
@@ -314,7 +300,7 @@ const HomePage = () => {
                         <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">No items found</h3>
                         <p className="text-gray-400 mb-8 text-base">We couldn't find matches for your search.</p>
                         <button
-                            onClick={() => { setSearchTerm(''); setSelectedCategory('All'); setMinPrice(0); setMaxPrice(5000); setSelectedSize(''); setSelectedAgeGroup(''); setSelectedGender(''); }}
+                            onClick={() => { setSearchTerm(''); setSelectedCategory('All'); setMinPrice(0); setMaxPrice(5000); setSelectedAgeGroup(''); setSelectedGender(''); }}
                             className="px-8 py-3.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-full text-base font-bold shadow-lg shadow-rose-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95"
                         >
                             Clear All Filters

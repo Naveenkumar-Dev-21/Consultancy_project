@@ -1377,17 +1377,18 @@ const OwnerDashboard = () => {
                                         <div className="col-md-3 mb-3">
                                             <label className="form-label">Age Group</label>
                                             <select className="form-select" value={productForm.ageGroup} onChange={e => setProductForm({ ...productForm, ageGroup: e.target.value })}>
-                                                <option value="0-6 Months">0-6 Months</option>
-                                                <option value="6-12 Months">6-12 Months</option>
-                                                <option value="1-2 Years">1-2 Years</option>
-                                                <option value="2-3 Years">2-3 Years</option>
-                                                <option value="3-4 Years">3-4 Years</option>
-                                                <option value="4-5 Years">4-5 Years</option>
-                                                <option value="5-6 Years">5-6 Years</option>
-                                                <option value="7-8 Years">7-8 Years</option>
-                                                <option value="9-10 Years">9-10 Years</option>
-                                                <option value="2-4 Years">2-4 Years</option>
-                                                <option value="4+ Years">4+ Years</option>
+                                                <option value="0-3M">0-3M</option>
+                                                <option value="3-6M">3-6M</option>
+                                                <option value="6-9M">6-9M</option>
+                                                <option value="9-12M">9-12M</option>
+                                                <option value="12-18M">12-18M</option>
+                                                <option value="1-2Y">1-2Y</option>
+                                                <option value="2-3Y">2-3Y</option>
+                                                <option value="3-4Y">3-4Y</option>
+                                                <option value="4-5Y">4-5Y</option>
+                                                <option value="5-6Y">5-6Y</option>
+                                                <option value="7-8Y">7-8Y</option>
+                                                <option value="9-10Y">9-10Y</option>
                                             </select>
                                         </div>
                                         <div className="col-md-3 mb-3">
