@@ -55,7 +55,7 @@ export const createRazorpayOrder = async (req, res) => {
         const options = {
             amount: Math.round(amount * 100), // amount in paise
             currency,
-            receipt: `receipt_${orderId}_${Date.now()}`,
+            receipt: `rcpt_${orderId.toString().substring(0, 18)}_${Date.now().toString().substring(8)}`, // Max 40 chars
         };
 
         // Initialize Razorpay instance check

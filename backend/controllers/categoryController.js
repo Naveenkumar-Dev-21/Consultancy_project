@@ -81,8 +81,27 @@ export const deleteCategory = async (req, res) => {
             return res.status(404).json({ error: 'Category not found' });
         }
         
+        // Delete image from filesystem
+        if (category.image && !category.image.startsWith('http') && category.image !== '/placeholder-category.png') {
+            const fs = await import('fs');
+            const path = await import('path');
+            const __dirname = path.resolve();
+
+            // Remove leading slash if present to make it relative to root
+            const relativePath = category.image.startsWith('/') ? category.image.substring(1) : category.image;
+            const fullPath = path.join(__dirname, relativePath);
+            
+            if (fs.existsSync(fullPath)) {
+                try {
+                    fs.unlinkSync(fullPath);
+                } catch (err) {
+                    console.error(`Failed to delete category image: ${fullPath}`, err);
+                }
+            }
+        }
+
         await Category.deleteOne({ _id: req.params.id });
-        res.json({ message: 'Category removed' });
+        res.json({ message: 'Category removed and image deleted' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

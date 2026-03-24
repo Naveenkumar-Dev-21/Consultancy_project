@@ -125,8 +125,39 @@ export const deleteProduct = async (req, res) => {
         const product = await Product.findById(req.params.id);
 
         if (product) {
+            // Delete images from filesystem
+            const fs = await import('fs');
+            const path = await import('path');
+            const __dirname = path.resolve();
+
+            // Helper to delete a file safely
+            const deleteFile = (filePath) => {
+                if (!filePath) return;
+                // Decrypt the path if it's encrypted (it's stored encrypted in DB)
+                const decryptedPath = decrypt(filePath);
+                // Remove leading slash if present to make it relative to root
+                const relativePath = decryptedPath.startsWith('/') ? decryptedPath.substring(1) : decryptedPath;
+                const fullPath = path.join(__dirname, relativePath);
+                
+                if (fs.existsSync(fullPath)) {
+                    try {
+                        fs.unlinkSync(fullPath);
+                    } catch (err) {
+                        console.error(`Failed to delete file: ${fullPath}`, err);
+                    }
+                }
+            };
+
+            // Delete main image
+            deleteFile(product.image);
+
+            // Delete description images
+            if (product.descriptionImages && product.descriptionImages.length > 0) {
+                product.descriptionImages.forEach(img => deleteFile(img));
+            }
+
             await Product.deleteOne({ _id: req.params.id });
-            res.json({ message: 'Product removed' });
+            res.json({ message: 'Product removed and images deleted' });
         } else {
             res.status(404).json({ message: 'Product not found' });
         }
