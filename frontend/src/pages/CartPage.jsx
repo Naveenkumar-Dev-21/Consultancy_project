@@ -117,45 +117,48 @@ const CartPage = () => {
                 },
             };
 
+            // 1. Create order in database FIRST (with server-side price validation)
+            const orderData = {
+                orderItems: cartItems.map(item => ({
+                    name: item.name,
+                    qty: item.qty,
+                    image: item.image,
+                    price: item.price,
+                    product: item.product,
+                })),
+                shippingAddress: shippingDetails,
+                paymentMethod: 'Razorpay',
+                itemsPrice: cartTotal,
+                taxPrice: 0,
+                shippingPrice: 0,
+                totalPrice: finalTotal,
+                couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+                discountAmount: discountAmount,
+            };
+
+            const { data: order } = await api.post('/api/orders', orderData, config);
+
+            // 2. Create Razorpay order using the orderId from our DB
             const { data: razorpayData } = await api.post(
                 '/api/payment/create-order',
                 {
-                    amount: finalTotal,
+                    orderId: order._id,
                     currency: 'INR',
-                    receipt: `receipt_${Date.now()}`,
                 },
                 config
             );
 
+            // 3. Open Razorpay Checkout
             const options = {
                 key: razorpayData.key,
                 amount: razorpayData.amount,
                 currency: razorpayData.currency,
                 name: 'Baby Products Store',
-                description: 'Purchase baby products',
+                description: `Order #${order._id.substring(0, 8).toUpperCase()}`,
                 order_id: razorpayData.orderId,
                 handler: async function (response) {
                     try {
-                        const orderData = {
-                            orderItems: cartItems.map(item => ({
-                                name: item.name,
-                                qty: item.qty,
-                                image: item.image,
-                                price: item.price,
-                                product: item.product,
-                            })),
-                            shippingAddress: shippingDetails,
-                            paymentMethod: 'Razorpay',
-                            itemsPrice: cartTotal,
-                            taxPrice: 0,
-                            shippingPrice: 0,
-                            totalPrice: finalTotal,
-                            couponCode: appliedCoupon ? appliedCoupon.code : undefined,
-                            discountAmount: discountAmount,
-                        };
-
-                        const { data: order } = await api.post('/api/orders', orderData, config);
-
+                        // 4. Verify payment
                         const verifyData = {
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
@@ -190,7 +193,8 @@ const CartPage = () => {
             });
             rzp.open();
         } catch (error) {
-            toast.error('Error initiating payment');
+            const errorMessage = error.response?.data?.message || 'Error initiating payment';
+            toast.error(errorMessage);
             console.error(error);
         }
     };
