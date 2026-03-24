@@ -40,7 +40,12 @@ app.use(cors({
     if (!origin) return callback(null, true);
     
     const normalizedOrigin = origin.replace(/\/$/, "");
-    if (allowedOrigins.includes(normalizedOrigin) || process.env.NODE_ENV === 'development') {
+    
+    // Check if origin is in whitelist or is a Vercel deployment URL
+    const isAllowedOrigin = allowedOrigins.includes(normalizedOrigin);
+    const isVercelDeployment = normalizedOrigin.endsWith(".vercel.app");
+    
+    if (isAllowedOrigin || isVercelDeployment || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
       console.warn(`CORS blocked for origin: ${origin}`);

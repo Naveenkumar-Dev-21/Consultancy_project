@@ -48,10 +48,34 @@ export const createOrder = async (req, res) => {
             await product.save();
         }
 
+        // Recalculate discount server-side if a coupon is provided
+        let calculatedDiscount = 0;
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
+            
+            if (coupon) {
+                // Check if coupon is valid (expiry, usage limit, min amount)
+                const isExpired = new Date() > coupon.expiresAt;
+                const limitReached = coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit;
+                const minAmountMet = calculatedItemsPrice >= coupon.minOrderAmount;
+
+                if (!isExpired && !limitReached && minAmountMet) {
+                    if (coupon.discountType === 'percentage') {
+                        calculatedDiscount = (calculatedItemsPrice * coupon.discountValue) / 100;
+                        if (coupon.maxDiscount !== null && calculatedDiscount > coupon.maxDiscount) {
+                            calculatedDiscount = coupon.maxDiscount;
+                        }
+                    } else {
+                        calculatedDiscount = coupon.discountValue;
+                    }
+                }
+            }
+        }
+
         // Recalculate totals server-side
         const calculatedTaxPrice = Math.round(calculatedItemsPrice * 0.05); // 5% tax
         const calculatedShippingPrice = calculatedItemsPrice > 500 ? 0 : 50;
-        const validDiscount = discountAmount > 0 ? Math.min(discountAmount, calculatedItemsPrice) : 0;
+        const validDiscount = Math.min(calculatedDiscount, calculatedItemsPrice);
         const calculatedTotalPrice = calculatedItemsPrice + calculatedTaxPrice + calculatedShippingPrice - validDiscount;
 
         // If coupon code was used, increment its usedCount

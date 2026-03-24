@@ -58,6 +58,15 @@ export const createRazorpayOrder = async (req, res) => {
             receipt: `receipt_${orderId}_${Date.now()}`,
         };
 
+        // Initialize Razorpay instance check
+        if (!razorpay || !razorpay.orders) {
+            console.error('Razorpay SDK not properly initialized');
+            return res.status(500).json({ 
+                message: 'Internal server error', 
+                error: 'Razorpay initialization failed' 
+            });
+        }
+
         const razorpayOrder = await razorpay.orders.create(options);
 
         res.json({
@@ -67,10 +76,10 @@ export const createRazorpayOrder = async (req, res) => {
             key: process.env.RAZORPAY_KEY_ID, // Send key ID to frontend
         });
     } catch (error) {
-        console.error('Razorpay order creation error:', error.message);
+        console.error('Razorpay order creation error:', error);
         res.status(500).json({ 
             message: 'Failed to create payment order', 
-            error: error.message 
+            error: error instanceof Error ? error.message : 'Unknown error' 
         });
     }
 };
