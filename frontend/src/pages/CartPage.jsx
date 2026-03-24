@@ -192,6 +192,16 @@ const CartPage = () => {
                 theme: {
                     color: '#f43f5e',
                 },
+                modal: {
+                    ondismiss: function() {
+                        toast.info('Payment cancelled or window closed.');
+                    },
+                    confirm_close: true,
+                },
+                retry: {
+                    enabled: true,
+                    max_count: 3
+                }
             };
 
             const rzp = new window.Razorpay(options);

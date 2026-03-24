@@ -338,6 +338,15 @@ const CategoryProductDetailPage = () => {
                             {product.name}
                         </h1>
 
+                        {product.ageGroup && (
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-gray-400 uppercase tracking-wider">Age Group:</span>
+                                <span className="bg-rose-50 text-rose-500 px-3 py-1 text-sm font-bold rounded-full border border-rose-200">
+                                    {product.ageGroup}
+                                </span>
+                            </div>
+                        )}
+
                         <div className="flex items-center gap-3">
                             <div className="flex">
                                 {[...Array(5)].map((_, i) => (
