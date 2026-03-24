@@ -72,9 +72,9 @@ export const createOrder = async (req, res) => {
             }
         }
 
-        // Recalculate totals server-side
-        const calculatedTaxPrice = Math.round(calculatedItemsPrice * 0.05); // 5% tax
-        const calculatedShippingPrice = calculatedItemsPrice > 500 ? 0 : 50;
+        // Recalculate totals server-side (tax and shipping removed as per user request)
+        const calculatedTaxPrice = 0;
+        const calculatedShippingPrice = 0;
         const validDiscount = Math.min(calculatedDiscount, calculatedItemsPrice);
         const calculatedTotalPrice = calculatedItemsPrice + calculatedTaxPrice + calculatedShippingPrice - validDiscount;
 
@@ -97,6 +97,9 @@ export const createOrder = async (req, res) => {
             totalPrice: calculatedTotalPrice,
             couponCode: couponCode || undefined,
             discountAmount: validDiscount,
+            paymentResult: req.body.paymentResult,
+            isPaid: req.body.paymentResult ? true : false,
+            paidAt: req.body.paymentResult ? Date.now() : undefined,
         });
 
         const createdOrder = await order.save();

@@ -117,48 +117,56 @@ const CartPage = () => {
                 },
             };
 
-            // 1. Create order in database FIRST (with server-side price validation)
-            const orderData = {
-                orderItems: cartItems.map(item => ({
-                    name: item.name,
-                    qty: item.qty,
-                    image: item.image,
-                    price: item.price,
-                    product: item.product,
-                })),
-                shippingAddress: shippingDetails,
-                paymentMethod: 'Razorpay',
-                itemsPrice: cartTotal,
-                taxPrice: 0,
-                shippingPrice: 0,
-                totalPrice: finalTotal,
-                couponCode: appliedCoupon ? appliedCoupon.code : undefined,
-                discountAmount: discountAmount,
-            };
-
-            const { data: order } = await api.post('/api/orders', orderData, config);
-
-            // 2. Create Razorpay order using the orderId from our DB
+            // 1. Create Razorpay order session FIRST
+            // We send the items and coupon for server-side price calculation
             const { data: razorpayData } = await api.post(
                 '/api/payment/create-order',
                 {
-                    orderId: order._id,
+                    orderItems: cartItems.map(item => ({
+                        product: item.product,
+                        qty: item.qty,
+                        name: item.name
+                    })),
+                    couponCode: appliedCoupon ? appliedCoupon.code : undefined,
                     currency: 'INR',
                 },
                 config
             );
 
-            // 3. Open Razorpay Checkout
+            // 2. Open Razorpay Checkout
             const options = {
                 key: razorpayData.key,
                 amount: razorpayData.amount,
                 currency: razorpayData.currency,
                 name: 'Baby Products Store',
-                description: `Order #${order._id.substring(0, 8).toUpperCase()}`,
+                description: 'Purchase baby products',
                 order_id: razorpayData.orderId,
                 handler: async function (response) {
                     try {
-                        // 4. Verify payment
+                        // 3. ONLY after successful payment, create the order in our DB
+                        const orderData = {
+                            orderItems: cartItems.map(item => ({
+                                name: item.name,
+                                qty: item.qty,
+                                image: item.image,
+                                price: item.price,
+                                product: item.product,
+                            })),
+                            shippingAddress: shippingDetails,
+                            paymentMethod: 'Razorpay',
+                            couponCode: appliedCoupon ? appliedCoupon.code : undefined,
+                            discountAmount: discountAmount,
+                            // We can also pass payment info to store
+                            paymentResult: {
+                                id: response.razorpay_payment_id,
+                                status: 'success',
+                                update_time: new Date().toISOString()
+                            }
+                        };
+
+                        const { data: order } = await api.post('/api/orders', orderData, config);
+
+                        // 4. Verify payment status on server
                         const verifyData = {
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
@@ -172,7 +180,7 @@ const CartPage = () => {
                         setIsSuccess(true);
                         clearCart();
                     } catch (error) {
-                        toast.error('Payment verification failed. Please contact support.');
+                        toast.error('Payment verification or order creation failed. Please contact support.');
                         console.error(error);
                     }
                 },

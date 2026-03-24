@@ -1,6 +1,8 @@
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import Order from '../models/Order.js';
+import Product from '../models/Product.js';
+import Coupon from '../models/Coupon.js';
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
@@ -22,40 +24,53 @@ export const createRazorpayOrder = async (req, res) => {
             });
         }
 
-        const { orderId, currency = 'INR' } = req.body;
+        const { orderItems, couponCode, currency = 'INR' } = req.body;
 
-        // Fetch order from database to get validated amount
-        const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ 
-                message: 'Order not found',
-                error: `No order found with ID: ${orderId}`
-            });
+        if (!orderItems || orderItems.length === 0) {
+            return res.status(400).json({ message: 'No order items' });
         }
 
-        // Check if order belongs to the user
-        if (order.user.toString() !== req.user._id.toString()) {
-            return res.status(401).json({ 
-                message: 'Not authorized',
-                error: 'Order does not belong to this user'
-            });
+        // --- Recalculate amount server-side for security ---
+        let calculatedItemsPrice = 0;
+        for (const item of orderItems) {
+            const product = await Product.findById(item.product);
+            if (!product) {
+                return res.status(404).json({ message: `Product ${item.name} not found` });
+            }
+            calculatedItemsPrice += product.price * item.qty;
         }
 
-        // Check if order is already paid
-        if (order.isPaid) {
-            return res.status(400).json({ 
-                message: 'Order already paid',
-                error: 'Payment has already been processed for this order'
-            });
+        let calculatedDiscount = 0;
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ code: couponCode.toUpperCase(), isActive: true });
+            if (coupon) {
+                const isExpired = new Date() > coupon.expiresAt;
+                const limitReached = coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit;
+                const minAmountMet = calculatedItemsPrice >= coupon.minOrderAmount;
+
+                if (!isExpired && !limitReached && minAmountMet) {
+                    if (coupon.discountType === 'percentage') {
+                        calculatedDiscount = (calculatedItemsPrice * coupon.discountValue) / 100;
+                        if (coupon.maxDiscount !== null && calculatedDiscount > coupon.maxDiscount) {
+                            calculatedDiscount = coupon.maxDiscount;
+                        }
+                    } else {
+                        calculatedDiscount = coupon.discountValue;
+                    }
+                }
+            }
         }
 
-        const amount = order.totalPrice;
+        const validDiscount = Math.min(calculatedDiscount, calculatedItemsPrice);
+        
+        // No tax, no shipping as per user request
+        const amount = calculatedItemsPrice - validDiscount;
 
         // Razorpay expects amount in smallest currency unit (paise for INR)
         const options = {
             amount: Math.round(amount * 100), // amount in paise
             currency,
-            receipt: `rcpt_${orderId.toString().substring(0, 18)}_${Date.now().toString().substring(8)}`, // Max 40 chars
+            receipt: `rcpt_${req.user._id.toString().substring(18)}_${Date.now().toString().substring(8)}`, // Max 40 chars
         };
 
         // Initialize Razorpay instance check
