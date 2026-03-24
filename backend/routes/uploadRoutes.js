@@ -55,7 +55,7 @@ function checkFileType(file, cb) {
 
 const upload = multer({
     storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max per file
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB max per file
     fileFilter: function (req, file, cb) {
         checkFileType(file, cb);
     },
@@ -63,7 +63,7 @@ const upload = multer({
 
 const uploadCategory = multer({
     storage: categoryStorage,
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB max per file
     fileFilter: function (req, file, cb) {
         checkFileType(file, cb);
     },
