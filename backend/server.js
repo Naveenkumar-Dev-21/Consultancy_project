@@ -78,6 +78,7 @@ const authLimiter = rateLimit({
 app.use('/api/auth', authLimiter);
 
 app.use(express.json({ limit: '100mb' })); // Body limit — increased to 100mb for large uploads
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 // Data sanitization against NoSQL query injection
 app.use((req, res, next) => {
