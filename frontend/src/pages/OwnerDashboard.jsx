@@ -186,7 +186,7 @@ const OwnerDashboard = () => {
             if (!categoryForm.isUrl && categoryForm.imageFile) {
                 setUploading(true);
                 try {
-                    const compressedFile = await compressImage(categoryForm.imageFile);
+                    const compressedFile = await compressImage(categoryForm.imageFile, { maxWidth: 800, maxHeight: 800, quality: 0.6 });
                     const formData = new FormData();
                     formData.append('image', compressedFile);
                     
@@ -450,7 +450,7 @@ const OwnerDashboard = () => {
             if (!productForm.isUrl && productForm.imageFile) {
                 setUploading(true);
                 try {
-                    const compressedFile = await compressImage(productForm.imageFile);
+                    const compressedFile = await compressImage(productForm.imageFile, { maxWidth: 1200, maxHeight: 1200, quality: 0.7 });
                     const formData = new FormData();
                     formData.append('image', compressedFile);
                     
@@ -480,7 +480,7 @@ const OwnerDashboard = () => {
                     const formData = new FormData();
                     // Compress all description images
                     const compressedFiles = await Promise.all(
-                        productForm.descriptionImageFiles.map(file => compressImage(file))
+                        productForm.descriptionImageFiles.map(file => compressImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.7 }))
                     );
                     
                     compressedFiles.forEach(file => {
