@@ -24,6 +24,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (Vercel/Render)
 
 // CORS configuration
 const allowedOrigins = [
@@ -63,7 +64,7 @@ app.use(helmet({
 // Limit requests from same API
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 500, // Increased from 100 to 500 for better admin experience
   message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 app.use('/api', limiter);
@@ -71,7 +72,7 @@ app.use('/api', limiter);
 // Specifically limit auth routes more strictly
 const authLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // Limit each IP to 20 requests per hour for auth
+  max: 50, // Increased from 20 to 50
   message: 'Too many login/signup attempts, please try again after an hour'
 });
 app.use('/api/auth', authLimiter);

@@ -10,11 +10,15 @@ const router = express.Router();
 const uploadDir = 'uploads/';
 const categoryDir = 'uploads/categories/';
 
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-if (!fs.existsSync(categoryDir)) {
-    fs.mkdirSync(categoryDir, { recursive: true });
+try {
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    if (!fs.existsSync(categoryDir)) {
+        fs.mkdirSync(categoryDir, { recursive: true });
+    }
+} catch (error) {
+    console.error('Error creating upload directories:', error);
 }
 
 const storage = multer.diskStorage({
@@ -70,11 +74,17 @@ const uploadCategory = multer({
 });
 
 router.post('/', upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send({ message: 'No image uploaded' });
+    }
     // Return relative path with forward slashes for Windows compatibility, prefixed with slash
     res.send(`/${req.file.path.replace(/\\/g, '/')}`);
 });
 
 router.post('/category', uploadCategory.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send({ message: 'No image uploaded' });
+    }
     res.send(`/${req.file.path.replace(/\\/g, '/')}`);
 });
 

@@ -9,6 +9,13 @@ export const notFound = (req, res, next) => {
 
 // Centralized error handler — formats all errors consistently
 export const errorHandler = (err, req, res, next) => {
+    // Ensure CORS headers are present even on errors
+    const origin = req.get('origin');
+    if (origin) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
     res.status(statusCode).json({
         message: err.message,
