@@ -54,7 +54,7 @@ const OwnerDashboard = () => {
 
     // Form States
     const [productForm, setProductForm] = useState({
-        name: '', price: '', category: '', material: '', sizes: [], ageGroup: '',
+        name: '', price: '', category: '', material: '', sizes: [], ageGroup: [],
         description: '', height: '', width: '', depth: '', unit: 'cm',
         weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
         gender: 'Unisex',
@@ -403,7 +403,7 @@ const OwnerDashboard = () => {
                 category: product.category,
                 material: product.material || 'Cotton',
                 sizes: product.sizes || (product.size ? [product.size] : []),
-                ageGroup: product.ageGroup || '0-6 Months',
+                ageGroup: Array.isArray(product.ageGroup) ? product.ageGroup : (product.ageGroup ? [product.ageGroup] : []),
                 description: product.description,
                 height: product.dimensions?.height || '',
                 width: product.dimensions?.width || '',
@@ -423,7 +423,7 @@ const OwnerDashboard = () => {
         } else {
             setEditingProduct(null);
             setProductForm({
-                name: '', price: '', originalPrice: '', category: '', material: 'Cotton', sizes: [], ageGroup: '0-6 Months',
+                name: '', price: '', originalPrice: '', category: '', material: 'Cotton', sizes: [], ageGroup: [],
                 description: '', height: '', width: '', depth: '', unit: 'cm',
                 weight: '', stock: 0, featured: false, imageUrl: '', isUrl: true, imageFile: null,
                 gender: 'Unisex', subCategory: '',
@@ -736,7 +736,15 @@ const OwnerDashboard = () => {
                                                     </td>
                                                     <td><strong>{product.name}</strong></td>
                                                     <td>{product.category}</td>
-                                                    <td>{product.ageGroup || '-'}</td>
+                                                    <td>
+                                                        <div className="d-flex flex-wrap gap-1">
+                                                            {Array.isArray(product.ageGroup) ? (
+                                                                product.ageGroup.length > 0 ? product.ageGroup.map((ag, i) => (
+                                                                    <span key={i} className="badge bg-light text-dark border-1 border-secondary-subtle">{ag}</span>
+                                                                )) : '-'
+                                                            ) : (product.ageGroup || '-')}
+                                                        </div>
+                                                    </td>
                                                     <td>₹{product.price.toLocaleString()}</td>
                                                     <td>
                                                         <span className={`badge ${product.stock > 0 ? 'bg-success' : 'bg-danger'}`}>
@@ -1374,22 +1382,31 @@ const OwnerDashboard = () => {
                                                  ))}
                                              </select>
                                          </div>
-                                        <div className="col-md-3 mb-3">
+                                        <div className="col-md-5 mb-3">
                                             <label className="form-label">Age Group</label>
-                                            <select className="form-select" value={productForm.ageGroup} onChange={e => setProductForm({ ...productForm, ageGroup: e.target.value })}>
-                                                <option value="0-3M">0-3M</option>
-                                                <option value="3-6M">3-6M</option>
-                                                <option value="6-9M">6-9M</option>
-                                                <option value="9-12M">9-12M</option>
-                                                <option value="12-18M">12-18M</option>
-                                                <option value="1-2Y">1-2Y</option>
-                                                <option value="2-3Y">2-3Y</option>
-                                                <option value="3-4Y">3-4Y</option>
-                                                <option value="4-5Y">4-5Y</option>
-                                                <option value="5-6Y">5-6Y</option>
-                                                <option value="7-8Y">7-8Y</option>
-                                                <option value="9-10Y">9-10Y</option>
-                                            </select>
+                                            <div className="d-flex flex-wrap gap-2">
+                                                {['0-3M','3-6M','6-9M','9-12M','12-18M','1-2Y','2-3Y','3-4Y','4-5Y','5-6Y','7-8Y','9-10Y'].map(ag => (
+                                                    <button
+                                                        key={ag}
+                                                        type="button"
+                                                        className={`btn btn-sm ${(productForm.ageGroup || []).includes(ag) ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                                        onClick={() => {
+                                                            const current = productForm.ageGroup || [];
+                                                            const updated = current.includes(ag)
+                                                                ? current.filter(a => a !== ag)
+                                                                : [...current, ag];
+                                                            setProductForm({ ...productForm, ageGroup: updated });
+                                                        }}
+                                                    >
+                                                        {ag}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {(productForm.ageGroup || []).length > 0 && (
+                                                <small className="text-muted mt-1 d-block">
+                                                    Selected: {(productForm.ageGroup || []).join(', ')}
+                                                </small>
+                                            )}
                                         </div>
                                         <div className="col-md-3 mb-3">
                                             <label className="form-label">Available Sizes</label>

@@ -88,7 +88,11 @@ const HomePage = () => {
         // Filter by price range
         result = result.filter(p => p.price >= minPrice && p.price <= maxPrice);
         if (selectedAgeGroup) {
-            result = result.filter(p => p.ageGroup === selectedAgeGroup);
+            result = result.filter(p => 
+                Array.isArray(p.ageGroup) 
+                    ? p.ageGroup.includes(selectedAgeGroup) 
+                    : p.ageGroup === selectedAgeGroup
+            );
         }
         // Filter by gender
         if (selectedGender) {

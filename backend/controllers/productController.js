@@ -105,7 +105,7 @@ export const updateProduct = async (req, res) => {
         product.brand = req.body.brand || product.brand;
         product.category = req.body.category || product.category;
         product.stock = req.body.stock !== undefined ? req.body.stock : product.stock;
-        product.ageGroup = req.body.ageGroup || product.ageGroup;
+        product.ageGroup = req.body.ageGroup !== undefined ? req.body.ageGroup : product.ageGroup;
         product.sizes = req.body.sizes !== undefined ? req.body.sizes : product.sizes;
         product.gender = req.body.gender || product.gender;
         product.originalPrice = req.body.originalPrice !== undefined ? req.body.originalPrice : product.originalPrice;

@@ -338,12 +338,16 @@ const CategoryProductDetailPage = () => {
                             {product.name}
                         </h1>
 
-                        {product.ageGroup && (
-                            <div className="flex items-center gap-2">
+                        {product.ageGroup && (Array.isArray(product.ageGroup) ? product.ageGroup.length > 0 : true) && (
+                            <div className="flex items-center gap-3 flex-wrap">
                                 <span className="text-sm font-bold text-gray-400 uppercase tracking-wider">Age Group:</span>
-                                <span className="bg-rose-50 text-rose-500 px-3 py-1 text-sm font-bold rounded-full border border-rose-200">
-                                    {product.ageGroup}
-                                </span>
+                                <div className="flex flex-wrap gap-2">
+                                    {(Array.isArray(product.ageGroup) ? product.ageGroup : [product.ageGroup]).map((ag, i) => (
+                                        <span key={i} className="bg-rose-50 text-rose-500 px-3 py-1 text-sm font-bold rounded-full border border-rose-200">
+                                            {ag}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         )}
 
