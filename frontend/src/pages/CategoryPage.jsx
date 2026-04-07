@@ -28,6 +28,7 @@ const CategoryPage = () => {
     const [loading, setLoading] = useState(true);
     const [category, setCategory] = useState(null);
     const [categoryLoading, setCategoryLoading] = useState(true);
+    const [selectedSubCategory, setSelectedSubCategory] = useState('');
 
     useEffect(() => {
         const fetchCategoryAndProducts = async () => {
@@ -57,6 +58,7 @@ const CategoryPage = () => {
                     (slug === 'nightwear' && ['Night Wear', 'Night Dress'].includes(p.category))
                 ) : [];
                 setProducts(filtered);
+                setSelectedSubCategory(''); // Reset subcategory when category changes
             } catch (error) {
                 console.error('Error fetching data:', error);
             } finally {
@@ -84,6 +86,12 @@ const CategoryPage = () => {
         setTimeout(() => setAddedToCartId(null), 2000);
     };
 
+    // Get subcategories and filter products
+    const subCategories = category?.subCategories || [];
+    const displayedProducts = selectedSubCategory
+        ? products.filter(p => p.subCategory === selectedSubCategory)
+        : products;
+
     return (
         <div className="min-h-screen relative overflow-hidden">
             {/* Background Blobs */}
@@ -110,6 +118,34 @@ const CategoryPage = () => {
                         {(category.name || category.displayName || '').split(' ')[0]} <span className="gradient-text-pink">{(category.name || category.displayName || '').split(' ').slice(1).join(' ')}</span>
                     </h1>
                     <p className="text-lg sm:text-xl text-gray-600 max-w-2xl font-medium leading-relaxed">{category.subtitle}</p>
+                    {/* Subcategory Filter Chips */}
+                    {subCategories.length > 0 && (
+                        <div className="flex flex-wrap items-center gap-2 mt-6">
+                            <button
+                                onClick={() => setSelectedSubCategory('')}
+                                className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 border ${
+                                    selectedSubCategory === ''
+                                        ? 'bg-white text-gray-900 border-white shadow-lg'
+                                        : 'bg-white/20 text-gray-700 border-white/40 hover:bg-white/40 backdrop-blur-sm'
+                                }`}
+                            >
+                                All
+                            </button>
+                            {subCategories.map((sub) => (
+                                <button
+                                    key={sub}
+                                    onClick={() => setSelectedSubCategory(sub)}
+                                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 border ${
+                                        selectedSubCategory === sub
+                                            ? 'bg-white text-gray-900 border-white shadow-lg'
+                                            : 'bg-white/20 text-gray-700 border-white/40 hover:bg-white/40 backdrop-blur-sm'
+                                    }`}
+                                >
+                                    {sub}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -118,14 +154,22 @@ const CategoryPage = () => {
                     <div className="flex justify-center py-12">
                         <div className="animate-spin rounded-full h-12 w-12 border-4 border-rose-400 border-t-transparent"></div>
                     </div>
-                ) : products.length === 0 ? (
+                ) : displayedProducts.length === 0 ? (
                     <div className="text-center py-12">
-                        <p className="text-gray-400 text-lg font-medium">No products found in this category yet.</p>
-                        <button onClick={() => navigate('/')} className="mt-4 text-rose-500 hover:underline font-bold text-base">Browse all products</button>
+                        <p className="text-gray-400 text-lg font-medium">
+                            {selectedSubCategory 
+                                ? `No products found in "${selectedSubCategory}" sub-category.`
+                                : 'No products found in this category yet.'}
+                        </p>
+                        {selectedSubCategory ? (
+                            <button onClick={() => setSelectedSubCategory('')} className="mt-4 text-rose-500 hover:underline font-bold text-base">Show all in this category</button>
+                        ) : (
+                            <button onClick={() => navigate('/')} className="mt-4 text-rose-500 hover:underline font-bold text-base">Browse all products</button>
+                        )}
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
-                        {products.map((product) => (
+                        {displayedProducts.map((product) => (
                             <ProductCard key={product._id} product={product} addToCartHandler={addToCartHandler} addedToCartId={addedToCartId} />
                         ))}
                     </div>

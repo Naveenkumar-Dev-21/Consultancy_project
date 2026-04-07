@@ -27,6 +27,7 @@ const HomePage = () => {
     const [maxPrice, setMaxPrice] = useState(5000);
     const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
     const [selectedGender, setSelectedGender] = useState('');
+    const [selectedSubCategory, setSelectedSubCategory] = useState('');
 
     // Sync state with URL
     useEffect(() => {
@@ -38,6 +39,7 @@ const HomePage = () => {
     // Update URL when category changes
     const handleCategoryChange = (cat) => {
         setSelectedCategory(cat);
+        setSelectedSubCategory(''); // Reset subcategory when category changes
         if (cat === 'All') searchParams.delete('category');
         else searchParams.set('category', cat);
         setSearchParams(searchParams);
@@ -98,9 +100,13 @@ const HomePage = () => {
         if (selectedGender) {
             result = result.filter(p => p.gender === selectedGender);
         }
+        // Filter by subcategory
+        if (selectedSubCategory) {
+            result = result.filter(p => p.subCategory === selectedSubCategory);
+        }
 
         setFilteredProducts(result);
-    }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedAgeGroup, selectedGender, products]);
+    }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedAgeGroup, selectedGender, selectedSubCategory, products]);
 
     const categories = ['All', ...(Array.isArray(products) ? [...new Set(products.map(p => p.category).filter(Boolean))] : [])];
 
@@ -110,6 +116,11 @@ const HomePage = () => {
         setAddedToCartId(product._id);
         setTimeout(() => setAddedToCartId(null), 2000);
     };
+
+    // Get subcategories for the currently selected category
+    const currentCategorySubCategories = selectedCategory !== 'All'
+        ? (allCategories.find(c => c.name === selectedCategory)?.subCategories || [])
+        : [];
 
     return (
         <div className="min-h-screen font-sans relative overflow-hidden">
@@ -218,6 +229,43 @@ const HomePage = () => {
                 </div>
             </motion.div>
 
+            {/* Subcategory Filter Chips */}
+            {currentCategorySubCategories.length > 0 && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="section-container -mt-4 mb-6 relative z-10"
+                >
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mr-1">Sub-category:</span>
+                        <button
+                            onClick={() => setSelectedSubCategory('')}
+                            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                                selectedSubCategory === ''
+                                    ? 'bg-gradient-to-r from-rose-400 to-pink-500 text-white border-transparent shadow-md shadow-rose-200/50'
+                                    : 'bg-white text-gray-600 border-rose-100 hover:border-rose-300 hover:text-rose-500'
+                            }`}
+                        >
+                            All
+                        </button>
+                        {currentCategorySubCategories.map((sub) => (
+                            <button
+                                key={sub}
+                                onClick={() => setSelectedSubCategory(sub)}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
+                                    selectedSubCategory === sub
+                                        ? 'bg-gradient-to-r from-rose-400 to-pink-500 text-white border-transparent shadow-md shadow-rose-200/50'
+                                        : 'bg-white text-gray-600 border-rose-100 hover:border-rose-300 hover:text-rose-500'
+                                }`}
+                            >
+                                {sub}
+                            </button>
+                        ))}
+                    </div>
+                </motion.div>
+            )}
+
             {/* Shop by Category Visuals */}
             <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -304,7 +352,7 @@ const HomePage = () => {
                         <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">No items found</h3>
                         <p className="text-gray-400 mb-8 text-base">We couldn't find matches for your search.</p>
                         <button
-                            onClick={() => { setSearchTerm(''); setSelectedCategory('All'); setMinPrice(0); setMaxPrice(5000); setSelectedAgeGroup(''); setSelectedGender(''); }}
+                            onClick={() => { setSearchTerm(''); setSelectedCategory('All'); setMinPrice(0); setMaxPrice(5000); setSelectedAgeGroup(''); setSelectedGender(''); setSelectedSubCategory(''); }}
                             className="px-8 py-3.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-full text-base font-bold shadow-lg shadow-rose-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95"
                         >
                             Clear All Filters

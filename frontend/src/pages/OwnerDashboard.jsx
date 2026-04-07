@@ -67,6 +67,7 @@ const OwnerDashboard = () => {
         name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50',
         isUrl: true, imageFile: null, subCategories: []
     });
+    const [editingCategory, setEditingCategory] = useState(null);
     const [newSubCategory, setNewSubCategory] = useState('');
     const [uploading, setUploading] = useState(false);
 
@@ -198,6 +199,9 @@ const OwnerDashboard = () => {
                     toast.error('Image upload failed');
                     return;
                 }
+            } else if (editingCategory && !categoryForm.image && !categoryForm.imageFile) {
+                // Keep old image if editing and no new image provided
+                imagePath = editingCategory.image;
             }
 
             const payload = {
@@ -208,14 +212,42 @@ const OwnerDashboard = () => {
                 subCategories: categoryForm.subCategories
             };
 
-            await api.post('/api/categories', payload, config);
-            toast.success('Category created successfully');
+            if (editingCategory) {
+                await api.put(`/api/categories/${editingCategory._id}`, payload, config);
+                toast.success('Category updated successfully');
+            } else {
+                await api.post('/api/categories', payload, config);
+                toast.success('Category created successfully');
+            }
             setCategoryForm({ name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50', isUrl: true, imageFile: null, subCategories: [] });
+            setEditingCategory(null);
             setUploading(false);
             loadCategories();
         } catch (error) {
             toast.error(error.response?.data?.error || 'Failed to save category');
         }
+    };
+
+    const editCategoryHandler = (cat) => {
+        setEditingCategory(cat);
+        setCategoryForm({
+            name: cat.name,
+            image: cat.image || '',
+            subtitle: cat.subtitle || '',
+            gradient: cat.gradient || 'from-rose-50 to-pink-50',
+            isUrl: true,
+            imageFile: null,
+            subCategories: cat.subCategories || []
+        });
+        setNewSubCategory('');
+        // Scroll to the form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const cancelEditCategory = () => {
+        setEditingCategory(null);
+        setCategoryForm({ name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50', isUrl: true, imageFile: null, subCategories: [] });
+        setNewSubCategory('');
     };
 
     const deleteCategoryHandler = async (id) => {
@@ -1011,7 +1043,14 @@ const OwnerDashboard = () => {
                             </div>
 
                             <form onSubmit={saveCategoryHandler} className="mb-4 p-4 bg-light rounded shadow-sm">
-                                <h5 className="mb-3">Add New Category</h5>
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 className="mb-0">{editingCategory ? 'Edit Category' : 'Add New Category'}</h5>
+                                    {editingCategory && (
+                                        <button type="button" className="btn btn-sm btn-outline-secondary" onClick={cancelEditCategory}>
+                                            <i className="fas fa-times me-1"></i>Cancel Edit
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="row g-3">
                                     <div className="col-md-3">
                                         <label className="form-label fw-bold">Name</label>
@@ -1059,6 +1098,9 @@ const OwnerDashboard = () => {
                                                 onChange={e => setCategoryForm({ ...categoryForm, imageFile: e.target.files[0] })} />
                                         )}
                                         {uploading && <div className="text-info small mt-1">Uploading...</div>}
+                                        {editingCategory && categoryForm.isUrl && !categoryForm.image && (
+                                            <small className="text-muted">Leave empty to keep existing image</small>
+                                        )}
                                     </div>
                                     <div className="col-md-6">
                                         <label className="form-label fw-bold">Sub-categories</label>
@@ -1080,7 +1122,11 @@ const OwnerDashboard = () => {
                                     </div>
                                 </div>
                                 <button type="submit" className="btn btn-primary-custom mt-3">
-                                    <i className="fas fa-plus me-2"></i>Create Category
+                                    {editingCategory ? (
+                                        <><i className="fas fa-save me-2"></i>Update Category</>
+                                    ) : (
+                                        <><i className="fas fa-plus me-2"></i>Create Category</>
+                                    )}
                                 </button>
                             </form>
 
@@ -1116,9 +1162,14 @@ const OwnerDashboard = () => {
                                                     </td>
                                                     <td>{new Date(cat.createdAt).toLocaleDateString()}</td>
                                                     <td>
-                                                        <button className="btn-action bg-danger text-white" onClick={() => deleteCategoryHandler(cat._id)}>
-                                                            <i className="fas fa-trash"></i>
-                                                        </button>
+                                                        <div className="action-buttons">
+                                                            <button className="btn-action btn-view" onClick={() => editCategoryHandler(cat)} title="Edit category">
+                                                                <i className="fas fa-edit"></i>
+                                                            </button>
+                                                            <button className="btn-action bg-danger text-white" onClick={() => deleteCategoryHandler(cat._id)} title="Delete category">
+                                                                <i className="fas fa-trash"></i>
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             )))}
