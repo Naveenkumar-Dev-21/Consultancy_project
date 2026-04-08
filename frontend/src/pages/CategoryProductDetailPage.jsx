@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Swal from 'sweetalert2';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ShoppingCart, Star, X, Check, Minus, Plus, ZoomIn, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -187,6 +188,16 @@ const CategoryProductDetailPage = () => {
 
     const addToCartHandler = () => {
         if (quantity > product.stock) return;
+        if (availableSizes.length > 0 && !selectedSize) {
+            Swal.fire({
+                title: 'Please Select a Size',
+                text: 'You need to choose a size before adding to cart',
+                icon: 'warning',
+                confirmButtonColor: '#fb7185',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
         addToCart({ ...product, selectedSize, quantity });
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);

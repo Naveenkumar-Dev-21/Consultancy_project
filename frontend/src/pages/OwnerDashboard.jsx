@@ -1551,7 +1551,10 @@ const OwnerDashboard = () => {
                                                 <li key={i} className="list-group-item d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <strong>{item.name}</strong>
-                                                        <div className="small text-muted">{item.qty} x ₹{item.price}{item.size || item.selectedSize ? ` · Size: ${item.size || item.selectedSize}` : ''}</div>
+                                                        <div className="small text-muted">{item.qty} x ₹{item.price}</div>
+                                                        {(item.size || item.selectedSize) && (
+                                                            <span className="badge bg-info text-dark mt-1">Size: {item.size || item.selectedSize}</span>
+                                                        )}
                                                     </div>
                                                     <span>₹{item.qty * item.price}</span>
                                                 </li>

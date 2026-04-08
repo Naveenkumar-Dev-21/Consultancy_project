@@ -28,7 +28,9 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = (product) => {
         setCartItems(prev => {
-            const existing = prev.find(item => item.product === product._id);
+            const incomingSize = product.selectedSize || null;
+            // Match by both product ID and size so same product with different sizes = separate entries
+            const existing = prev.find(item => item.product === product._id && item.selectedSize === incomingSize);
             const currentQty = existing ? existing.qty : 0;
             const requestedQty = currentQty + 1;
             const availableStock = product.stock;
@@ -53,13 +55,13 @@ export const CartProvider = ({ children }) => {
                     showConfirmButton: false
                 });
                 return prev.map(item =>
-                    item.product === product._id ? { ...item, qty: item.qty + 1 } : item
+                    (item.product === product._id && item.selectedSize === incomingSize) ? { ...item, qty: item.qty + 1 } : item
                 );
             }
 
             Swal.fire({
                 title: 'Added!',
-                text: `${product.name} added to cart`,
+                text: `${product.name}${incomingSize ? ` (${incomingSize})` : ''} added to cart`,
                 icon: 'success',
                 timer: 1500,
                 showConfirmButton: false
@@ -70,16 +72,16 @@ export const CartProvider = ({ children }) => {
                 name: product.name,
                 image: product.image,
                 price: product.price,
-                qty: product.quantity || product.qty || 1, // Handle qty from product if passed
-                stock: product.stock, // Store stock info
-                selectedSize: product.selectedSize || null,
+                qty: product.quantity || product.qty || 1,
+                stock: product.stock,
+                selectedSize: incomingSize,
                 category: product.category || 'Other'
             }];
         });
     };
 
-    const removeFromCart = (id) => {
-        setCartItems(prev => prev.filter(item => item.product !== id));
+    const removeFromCart = (id, size = null) => {
+        setCartItems(prev => prev.filter(item => !(item.product === id && item.selectedSize === size)));
         Swal.fire({
             title: 'Removed!',
             text: 'Item removed from cart',
@@ -94,11 +96,11 @@ export const CartProvider = ({ children }) => {
         localStorage.removeItem('cartItems');
     };
 
-    const updateQty = (id, newQty) => {
+    const updateQty = (id, newQty, size = null) => {
         if (newQty < 1) return;
         
         setCartItems(prev => {
-           const item = prev.find(i => i.product === id);
+           const item = prev.find(i => i.product === id && i.selectedSize === size);
            if (!item) return prev;
 
            if (newQty > item.stock) {
@@ -112,7 +114,7 @@ export const CartProvider = ({ children }) => {
                return prev;
            }
 
-           return prev.map(i => i.product === id ? { ...i, qty: newQty } : i);
+           return prev.map(i => (i.product === id && i.selectedSize === size) ? { ...i, qty: newQty } : i);
         });
     };
 

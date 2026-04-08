@@ -211,7 +211,7 @@ const MyOrdersPage = () => {
                                                     </div>
                                                     <div>
                                                         <h4 className="font-bold text-gray-900 leading-tight mb-1 text-sm sm:text-base">{item.name}</h4>
-                                                        <p className="text-xs sm:text-sm font-medium text-gray-400">Qty: {item.qty} • ₹{item.price}</p>
+                                                        <p className="text-xs sm:text-sm font-medium text-gray-400">Qty: {item.qty} • ₹{item.price}{item.size ? ` • Size: ${item.size}` : ''}</p>
                                                     </div>
                                                 </div>
                                             ))}
