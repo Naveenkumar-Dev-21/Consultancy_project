@@ -54,8 +54,9 @@ export const signup = async (req, res) => {
       authProvider: 'local'
     });
 
-    // Check if admin email
-    if (email === process.env.ADMIN_EMAIL && user.role !== "admin") {
+    // Check if admin email (supports comma-separated list)
+    const adminEmails = (process.env.ADMIN_EMAIL || '').split(',').map(e => e.trim().toLowerCase());
+    if (adminEmails.includes(email.toLowerCase()) && user.role !== "admin") {
       user.role = "admin";
       await user.save();
     }
@@ -192,8 +193,9 @@ export const googleAuth = async (req, res) => {
       });
     }
 
-    // Check if admin email
-    if (email === process.env.ADMIN_EMAIL && user.role !== "admin") {
+    // Check if admin email (supports comma-separated list)
+    const adminEmails = (process.env.ADMIN_EMAIL || '').split(',').map(e => e.trim().toLowerCase());
+    if (adminEmails.includes(email.toLowerCase()) && user.role !== "admin") {
       user.role = "admin";
       await user.save();
     }
