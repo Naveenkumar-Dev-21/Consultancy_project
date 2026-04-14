@@ -7,13 +7,17 @@ export default {
     theme: {
         extend: {
             colors: {
-                'beelittle-coral': '#f87171',
+                'beelittle-coral': '#fb7185',
                 'beelittle-peach': '#fff1f2',
                 'apple-text': '#1d1d1f',
                 primary: '#FCD7D7',
                 secondary: '#E9F5DB',
                 accent: '#C5D3E8',
                 dark: '#1F2937',
+                rose: {
+                    25: '#fff9f9',
+                    975: '#2d0a12',
+                }
             },
             fontFamily: {
                 sans: ['Poppins', 'system-ui', '-apple-system', 'sans-serif'],
@@ -44,14 +48,24 @@ export default {
             },
             boxShadow: {
                 'soft': '0 2px 20px rgba(248,113,113,0.08)',
-                'glow': '0 4px 30px rgba(248,113,113,0.15)',
-                'card': '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)',
+                'glow': '0 4px 30px rgba(248,113,113,0.18), 0 1px 4px rgba(248,113,113,0.08)',
+                'glow-lg': '0 8px 50px rgba(248,113,113,0.22), 0 2px 10px rgba(248,113,113,0.10)',
+                'card': '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06)',
+                'card-hover': '0 8px 32px rgba(248,113,113,0.14), 0 2px 8px rgba(0,0,0,0.06)',
+                'inner-rose': 'inset 0 2px 8px rgba(248,113,133,0.08)',
+                'xl-rose': '0 20px 60px -10px rgba(248,113,133,0.25)',
+            },
+            backgroundImage: {
+                'gradient-rose': 'linear-gradient(135deg, #f43f5e 0%, #fb7185 50%, #ec4899 100%)',
+                'gradient-peach': 'linear-gradient(135deg, #fda4af 0%, #fb7185 100%)',
+                'gradient-warm': 'linear-gradient(135deg, #fff1f2 0%, #fce7f3 100%)',
             },
             animation: {
                 'float': 'float 6s ease-in-out infinite',
                 'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
                 'slide-up': 'slideUp 0.5s ease-out',
                 'fade-in': 'fadeIn 0.6s ease-out',
+                'spin-slow': 'spin 3s linear infinite',
             },
             keyframes: {
                 float: {

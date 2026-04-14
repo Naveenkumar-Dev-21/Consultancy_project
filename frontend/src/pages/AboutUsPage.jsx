@@ -1,30 +1,87 @@
 import React from 'react';
-import { Baby, CheckCircle2, Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Baby, CheckCircle2, Heart, Users, Package, Sparkles } from 'lucide-react';
+
+const fadeUp = {
+    hidden: { opacity: 0, y: 32 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+};
+const scaleIn = {
+    hidden: { opacity: 0, scale: 0.92 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
+};
+
+const stats = [
+    { icon: Package, label: '500+', sub: 'Products', color: 'bg-rose-50 text-rose-400' },
+    { icon: Users, label: '10K+', sub: 'Happy Families', color: 'bg-pink-50 text-pink-400' },
+    { icon: Sparkles, label: '100%', sub: 'Pure Cotton', color: 'bg-amber-50 text-amber-400' },
+];
 
 const AboutUsPage = () => {
     return (
-        <div className="min-h-screen font-sans bg-slate-50/50">
+        <div className="min-h-screen font-sans bg-slate-50/50 overflow-hidden">
+
             {/* Hero Section */}
             <div className="relative overflow-hidden pt-20 pb-16 sm:pt-32 sm:pb-24">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,182,193,0.2),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(255,192,203,0.1),transparent_50%)]"></div>
+                <div className="blob-1 -top-20 -right-10 opacity-40 blob-animated" />
+                <div className="blob-2 -bottom-10 -left-10 opacity-30 blob-animated-reverse" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,182,193,0.2),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(255,192,203,0.1),transparent_50%)]" />
+
                 <div className="section-container relative z-10">
                     <div className="max-w-4xl mx-auto text-center px-4">
-                        <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-md px-5 py-2.5 rounded-full shadow-sm mb-8 border border-rose-100 animate-fade-in">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6 }}
+                            className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-md px-5 py-2.5 rounded-full shadow-sm mb-8 border border-rose-100"
+                        >
                             <Heart className="text-rose-400" size={16} fill="currentColor" />
                             <span className="text-xs font-bold text-rose-500 uppercase tracking-widest">The Heart of Our Brand</span>
-                        </div>
-                        
-                        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black text-gray-900 mb-6 tracking-tight leading-[1.1]">
-                            The Origin <br/>
+                        </motion.div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 28 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.7, delay: 0.15 }}
+                            className="text-5xl sm:text-6xl md:text-8xl font-black text-gray-900 mb-6 tracking-tight leading-[1.1]"
+                        >
+                            The Origin <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 via-pink-500 to-rose-400">
-                                Mother’s Care
+                                Mother's Care
                             </span>
-                        </h1>
-                        
-                        <p className="text-xl sm:text-2xl text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto italic">
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                            className="text-xl sm:text-2xl text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto italic"
+                        >
                             "We believe true quality is felt, not spoken."
-                        </p>
+                        </motion.p>
                     </div>
+                </div>
+            </div>
+
+            {/* Stats Row */}
+            <div className="section-container -mt-6 mb-20 relative z-10">
+                <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto px-4">
+                    {stats.map(({ icon: Icon, label, sub, color }, idx) => (
+                        <motion.div
+                            key={sub}
+                            initial={{ opacity: 0, y: 24 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: idx * 0.1 }}
+                            className="bg-white/80 backdrop-blur-md rounded-2xl shadow-card border border-rose-100/50 p-4 sm:p-6 text-center"
+                        >
+                            <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center mx-auto mb-3`}>
+                                <Icon size={20} />
+                            </div>
+                            <p className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">{label}</p>
+                            <p className="text-xs text-gray-500 font-medium mt-0.5">{sub}</p>
+                        </motion.div>
+                    ))}
                 </div>
             </div>
 
@@ -32,7 +89,13 @@ const AboutUsPage = () => {
             <div className="section-container py-12">
                 <div className="max-w-5xl mx-auto px-4">
                     <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <div className="space-y-8 animate-slide-up">
+                        <motion.div
+                            variants={fadeUp}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="space-y-8"
+                        >
                             <div className="inline-block p-4 bg-rose-50 rounded-3xl">
                                 <Baby className="text-rose-400" size={32} />
                             </div>
@@ -40,8 +103,8 @@ const AboutUsPage = () => {
                                 Rooted in Motherhood
                             </h2>
                             <div className="space-y-6 text-lg text-gray-600 leading-relaxed font-light">
-                                <p className="font-semibold text-gray-800 text-xl border-l-4 border-rose-200 pl-6 py-2">
-                                    We began not in a studio, but in a mother’s arms.
+                                <p className="font-semibold text-gray-800 text-xl border-l-4 border-rose-300 pl-6 py-2">
+                                    We began not in a studio, but in a mother's arms.
                                 </p>
                                 <p>
                                     Like every mother, we searched endlessly for products that felt truly right for her child—soft on the skin, gentle in touch, and made with honest care. What we found instead were compromises.
@@ -50,17 +113,28 @@ const AboutUsPage = () => {
                                     Fabrics that looked beautiful but lacked comfort. Designs that followed trends but ignored tenderness. So we chose a different path.
                                 </p>
                             </div>
-                        </div>
-                        <div className="relative animate-fade-in group">
-                            <div className="absolute -inset-4 bg-gradient-to-tr from-rose-100 to-pink-50 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-700"></div>
-                            <div className="relative overflow-hidden rounded-[2.5rem] shadow-soft border border-white/80">
-                                <img 
-                                    src="/Images/aboutus/image1.jpg" 
-                                    alt="Mother's Care Products" 
+                        </motion.div>
+
+                        <motion.div
+                            variants={scaleIn}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                            className="relative group"
+                        >
+                            <div className="absolute -inset-4 bg-gradient-to-tr from-rose-100 to-pink-50 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+                            <motion.div
+                                className="relative overflow-hidden rounded-[2.5rem] shadow-soft border border-white/80"
+                                whileHover={{ scale: 1.02 }}
+                                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                            >
+                                <img
+                                    src="/Images/aboutus/image1.jpg"
+                                    alt="Mother's Care Products"
                                     className="w-full h-full object-cover rounded-[2.5rem]"
                                 />
-                            </div>
-                        </div>
+                            </motion.div>
+                        </motion.div>
                     </div>
                 </div>
             </div>
@@ -68,108 +142,106 @@ const AboutUsPage = () => {
             {/* Quality Statement Section */}
             <div className="section-container py-24">
                 <div className="max-w-4xl mx-auto px-4 text-center">
-                    <div className="bg-slate-900 text-white rounded-[3rem] p-12 sm:p-20 relative overflow-hidden shadow-2xl">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/20 rounded-full blur-3xl -mr-32 -mt-32"></div>
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-32 -mb-32"></div>
-                        
+                    <motion.div
+                        variants={scaleIn}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="bg-slate-900 text-white rounded-[3rem] p-12 sm:p-20 relative overflow-hidden shadow-2xl"
+                    >
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/20 rounded-full blur-3xl -mr-32 -mt-32" />
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-32 -mb-32" />
+
                         <div className="relative z-10">
                             <span className="text-rose-400 font-bold uppercase tracking-widest text-sm mb-6 block">Our Signature Fabric</span>
                             <h2 className="text-4xl sm:text-5xl font-bold mb-8 leading-tight">
-                                Bio washed Pure Cotton, <br/>
+                                Bio washed Pure Cotton, <br />
                                 <span className="text-rose-300">Made to Hold Its Shape.</span>
                             </h2>
-                            
+
                             <div className="flex flex-wrap justify-center gap-6 sm:gap-12">
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle2 className="text-rose-400" size={24} />
-                                    <span className="text-lg font-medium">No Shrinkage</span>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <CheckCircle2 className="text-rose-400" size={24} />
-                                    <span className="text-lg font-medium">No Compromise</span>
-                                </div>
+                                {['No Shrinkage', 'No Compromise'].map((text, i) => (
+                                    <motion.div
+                                        key={text}
+                                        initial={{ opacity: 0, x: i === 0 ? -20 : 20 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ duration: 0.5, delay: 0.3 + i * 0.15 }}
+                                        className="flex items-center gap-3"
+                                    >
+                                        <CheckCircle2 className="text-rose-400" size={24} />
+                                        <span className="text-lg font-medium">{text}</span>
+                                    </motion.div>
+                                ))}
                             </div>
-                            
+
                             <p className="mt-12 text-slate-400 text-lg sm:text-xl font-light leading-relaxed max-w-2xl mx-auto">
                                 Each product reflects a balance of refined design and everyday comfort, made for children to move freely, feel secure, and be themselves.
                             </p>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-
 
             {/* Founder Section */}
             <div className="section-container py-24 pb-32">
                 <div className="max-w-6xl mx-auto px-4">
-                    <div className="relative overflow-hidden bg-white/40 backdrop-blur-xl rounded-[3rem] shadow-soft border border-white/80 p-8 sm:p-20">
+                    <motion.div
+                        variants={fadeUp}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="relative overflow-hidden bg-white/40 backdrop-blur-xl rounded-[3rem] shadow-soft border border-white/80 p-8 sm:p-20"
+                    >
                         <div className="grid md:grid-cols-5 gap-12 items-center">
                             <div className="md:col-span-2 relative">
-                                <div className="aspect-square rounded-[2.5rem] shadow-inner flex items-center justify-center group overflow-hidden">
-                                    <img 
-                                        src="/Images/aboutus/image2.jpg" 
-                                        alt="Founder Sujitha Nishok" 
+                                <motion.div
+                                    whileInView={{ scale: [0.95, 1] }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                                    className="aspect-square rounded-[2.5rem] shadow-inner flex items-center justify-center group overflow-hidden"
+                                >
+                                    <img
+                                        src="/Images/aboutus/image2.jpg"
+                                        alt="Founder Sujitha Nishok"
                                         className="w-full h-full object-cover rounded-[2.5rem]"
                                     />
-                                </div>
-                                <div className="absolute -bottom-6 -right-6 bg-white py-4 px-8 rounded-2xl shadow-lg border border-slate-50 hidden sm:block">
+                                </motion.div>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: 0.4 }}
+                                    className="absolute -bottom-6 -right-6 bg-white py-4 px-8 rounded-2xl shadow-lg border border-slate-50 hidden sm:block"
+                                >
                                     <p className="font-bold text-gray-900">Sujitha Nishok</p>
                                     <p className="text-rose-500 text-sm font-medium">Founder & Visionary</p>
-                                </div>
+                                </motion.div>
                             </div>
-                            
+
                             <div className="md:col-span-3 space-y-8">
                                 <div className="space-y-4">
                                     <h3 className="text-3xl font-bold text-gray-900">The Founder's Desire</h3>
                                     <p className="text-xl text-gray-600 leading-relaxed italic font-light">
-                                        “This brand was born from my desire to give children what I would give my own son (Aadhiran)—softness they can feel, comfort they can trust, and care woven quietly into every thread.”
+                                        "This brand was born from my desire to give children what I would give my own son (Aadhiran)—softness they can feel, comfort they can trust, and care woven quietly into every thread."
                                     </p>
                                 </div>
-                                
-                                <blockquote className="text-lg text-gray-500 bg-slate-50 p-8 rounded-2xl border-l-4 border-slate-200">
-                                    “Every piece we create reflects the care, thought, and love a mother gives naturally.”
+
+                                <blockquote className="text-lg text-gray-500 bg-slate-50 p-8 rounded-2xl border-l-4 border-rose-300">
+                                    "Every piece we create reflects the care, thought, and love a mother gives naturally."
                                 </blockquote>
-                                
+
                                 <div className="sm:hidden pt-4">
                                     <p className="font-bold text-gray-900">Sujitha Nishok</p>
                                     <p className="text-rose-500 text-sm font-medium">Founder</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
-
-            <style jsx>{`
-                @keyframes float {
-                    0%, 100% { transform: translateY(0) rotate(0deg); }
-                    50% { transform: translateY(-30px) rotate(180deg); }
-                }
-                .animate-fade-in {
-                    animation: fadeIn 1s ease-out;
-                }
-                .animate-slide-up {
-                    animation: slideUp 0.8s ease-out;
-                }
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes slideUp {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .shadow-soft {
-                    box-shadow: 0 20px 50px rgba(0,0,0,0.05);
-                }
-                .section-container {
-                    max-width: 1200px;
-                    margin: 0 auto;
-                }
-            `}</style>
         </div>
     );
 };
 
 export default AboutUsPage;
-

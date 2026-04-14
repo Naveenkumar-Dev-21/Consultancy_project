@@ -1,4 +1,5 @@
 import React from 'react';
+import ScrollToTop from './components/common/ScrollToTop';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -67,6 +68,7 @@ function App() {
           </Routes>
         </main>
         {!isAdminRoute && <Footer />}
+        {!isAdminRoute && <ScrollToTop />}
       </div>
     </WishlistProvider>
     </CartProvider>
