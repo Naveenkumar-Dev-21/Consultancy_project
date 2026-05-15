@@ -94,7 +94,7 @@ const ImageLightbox = ({ images, currentIndex, onClose, onNavigate }) => {
 // ─── Trust badges ────────────────────────────────────────────────────────────
 const trustItems = [
     { icon: Truck, label: 'Free Shipping', sub: 'On orders over ₹2000' },
-    { icon: RotateCcw, label: '30-Day Returns', sub: 'Easy & hassle-free' },
+    { icon: Star, label: 'Premium Quality', sub: 'Bio-washed & Durable' },
     { icon: Shield, label: 'Safe for Babies', sub: 'Hypoallergenic & tested' },
 ];
 

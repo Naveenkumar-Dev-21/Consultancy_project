@@ -157,7 +157,6 @@ const ContactUsPage = () => {
                                         >
                                             <option>General Inquiry</option>
                                             <option>Order Status</option>
-                                            <option>Returns & Exchanges</option>
                                             <option>Partnership</option>
                                         </select>
                                     </div>

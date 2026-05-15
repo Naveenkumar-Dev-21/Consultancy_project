@@ -107,13 +107,24 @@ export const generateInvoice = (order, userName) => {
         doc.text(`${address.city || ''}, ${address.postalCode || ''}`, 145, 75);
 
         // --- Products Table ---
-        const tableData = (order.orderItems || []).map((item, idx) => [
-            { content: (idx + 1).toString(), styles: { halign: 'center' } },
-            item.name || 'Product',
-            { content: `Rs. ${item.price?.toLocaleString()}`, styles: { halign: 'right' } },
-            { content: item.qty?.toString() || '1', styles: { halign: 'center' } },
-            { content: `Rs. ${((item.price || 0) * (item.qty || 1)).toLocaleString()}`, styles: { halign: 'right', fontStyle: 'bold' } }
-        ]);
+        const tableData = (order.orderItems || []).map((item, idx) => {
+            const sizeStr = item.size ? `Size: ${item.size}` : '';
+            const ageStr = item.ageGroup 
+                ? `Age: ${typeof item.ageGroup === 'object' ? item.ageGroup.ageGroup : item.ageGroup}` 
+                : '';
+            const details = [sizeStr, ageStr].filter(Boolean).join(' · ');
+            
+            return [
+                { content: (idx + 1).toString(), styles: { halign: 'center' } },
+                {
+                    content: details ? `${item.name}\n${details}` : item.name,
+                    styles: { cellPadding: 3 }
+                },
+                { content: `Rs. ${item.price?.toLocaleString()}`, styles: { halign: 'right' } },
+                { content: item.qty?.toString() || '1', styles: { halign: 'center' } },
+                { content: `Rs. ${((item.price || 0) * (item.qty || 1)).toLocaleString()}`, styles: { halign: 'right', fontStyle: 'bold' } }
+            ];
+        });
 
         autoTable(doc, {
             startY: 105,

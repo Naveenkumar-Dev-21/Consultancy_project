@@ -34,7 +34,6 @@ const Footer = () => {
 
     const supportLinks = [
         { to: '/shipping-policy', label: 'Shipping Policy' },
-        { to: '/returns', label: 'Returns & Exchanges' },
         { to: '/contact', label: 'Contact Us' },
     ];
 
