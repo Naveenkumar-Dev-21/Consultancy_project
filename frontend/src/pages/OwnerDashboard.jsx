@@ -1462,27 +1462,52 @@ const OwnerDashboard = () => {
                                         <div className="col-md-3 mb-3">
                                             <label className="form-label">Available Sizes</label>
                                             <div className="d-flex flex-wrap gap-2">
-                                                {['XS','S','M','L','XL','1-2','2-3','3-4','4-5','5-6','7-8','9-10','Small','Medium','Large'].map(sz => (
+                                                {['XS','S','M','L','XL','1-2','2-3','3-4','4-5','5-6','7-8','9-10','Small','Medium','Large'].map(sz => {
+                                                    const isSelected = (productForm.sizes || []).some(s => (typeof s === 'object' ? s.size : s) === sz);
+                                                    return (
                                                     <button
                                                         key={sz}
                                                         type="button"
-                                                        className={`btn btn-sm ${(productForm.sizes || []).includes(sz) ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                                        className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-secondary'}`}
                                                         onClick={() => {
                                                             const current = productForm.sizes || [];
-                                                            const updated = current.includes(sz)
-                                                                ? current.filter(s => s !== sz)
-                                                                : [...current, sz];
+                                                            const exists = current.some(s => (typeof s === 'object' ? s.size : s) === sz);
+                                                            const updated = exists
+                                                                ? current.filter(s => (typeof s === 'object' ? s.size : s) !== sz)
+                                                                : [...current, { size: sz, price: productForm.price || 0 }];
                                                             setProductForm({ ...productForm, sizes: updated });
                                                         }}
                                                     >
                                                         {sz}
                                                     </button>
-                                                ))}
+                                                )})}
                                             </div>
                                             {(productForm.sizes || []).length > 0 && (
-                                                <small className="text-muted mt-1 d-block">
-                                                    Selected: {(productForm.sizes || []).join(', ')}
-                                                </small>
+                                                <div className="mt-3 bg-light p-2 rounded">
+                                                    <label className="form-label text-muted small fw-bold mb-2">Size Pricing</label>
+                                                    {productForm.sizes.map((s, idx) => {
+                                                        const sizeName = typeof s === 'object' ? s.size : s;
+                                                        const sizePrice = typeof s === 'object' ? s.price : (productForm.price || 0);
+                                                        return (
+                                                            <div key={idx} className="d-flex align-items-center mb-2 gap-2">
+                                                                <span className="badge bg-secondary" style={{ width: '60px' }}>{sizeName}</span>
+                                                                <div className="input-group input-group-sm">
+                                                                    <span className="input-group-text">₹</span>
+                                                                    <input 
+                                                                        type="number" 
+                                                                        className="form-control" 
+                                                                        value={sizePrice}
+                                                                        onChange={(e) => {
+                                                                            const newSizes = [...productForm.sizes];
+                                                                            newSizes[idx] = { size: sizeName, price: Number(e.target.value) };
+                                                                            setProductForm({ ...productForm, sizes: newSizes });
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
                                             )}
                                         </div>
                                     </div>

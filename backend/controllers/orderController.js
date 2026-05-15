@@ -39,9 +39,18 @@ export const createOrder = async (req, res) => {
                 return;
             }
 
+            // Determine price based on selected size, fallback to base price
+            let finalPrice = product.price;
+            if (item.size && product.sizes && product.sizes.length > 0) {
+                const sizeObj = product.sizes.find(s => (typeof s === 'object' ? s.size : s) === item.size);
+                if (sizeObj && typeof sizeObj === 'object' && sizeObj.price) {
+                    finalPrice = sizeObj.price;
+                }
+            }
+
             // Use server-side price, not client-provided price
-            item.price = product.price;
-            calculatedItemsPrice += product.price * item.qty;
+            item.price = finalPrice;
+            calculatedItemsPrice += finalPrice * item.qty;
 
             // Decrement stock
             product.stock -= item.qty;

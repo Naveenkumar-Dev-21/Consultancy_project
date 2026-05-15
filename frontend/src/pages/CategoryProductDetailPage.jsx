@@ -195,6 +195,13 @@ const CategoryProductDetailPage = () => {
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
     const discountPercent = hasDiscount ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
     const availableSizes = product.sizes && product.sizes.length > 0 ? product.sizes : [];
+    const normalizedSizes = availableSizes.map(s => typeof s === 'object' ? s : { size: s, price: product.price });
+    
+    // Find current price
+    const currentPrice = selectedSize 
+        ? (normalizedSizes.find(s => s.size === selectedSize)?.price || product.price)
+        : product.price;
+
     const wishlisted = isInWishlist(product._id);
 
     const addToCartHandler = () => {
@@ -209,7 +216,7 @@ const CategoryProductDetailPage = () => {
             });
             return;
         }
-        addToCart({ ...product, selectedSize, quantity });
+        addToCart({ ...product, price: currentPrice, selectedSize, quantity });
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
     };
@@ -396,17 +403,17 @@ const CategoryProductDetailPage = () => {
 
                         {/* Price */}
                         <div className="flex items-center gap-4 py-4 border-y border-rose-50">
-                            <span className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">₹{product.price}</span>
+                            <span className="text-4xl sm:text-5xl font-black text-gray-900 tracking-tight">₹{currentPrice}</span>
                             {hasDiscount && (
                                 <div className="flex flex-col">
                                     <span className="text-lg text-gray-400 line-through font-medium">₹{product.originalPrice}</span>
-                                    <span className="text-xs text-green-600 font-bold">You save ₹{product.originalPrice - product.price}</span>
+                                    <span className="text-xs text-green-600 font-bold">You save ₹{product.originalPrice - currentPrice}</span>
                                 </div>
                             )}
                         </div>
 
                         {/* Size Selector */}
-                        {availableSizes.length > 0 && (
+                        {normalizedSizes.length > 0 && (
                             <div>
                                 <div className="flex items-center justify-between mb-3">
                                     <label className="text-sm font-black text-gray-900 uppercase tracking-wider">Select Size</label>
@@ -415,23 +422,23 @@ const CategoryProductDetailPage = () => {
                                     </button>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {availableSizes.map((size) => (
+                                    {normalizedSizes.map((s) => (
                                         <motion.button
-                                            key={size}
-                                            onClick={() => setSelectedSize(size)}
+                                            key={s.size}
+                                            onClick={() => setSelectedSize(s.size)}
                                             whileHover={{ scale: 1.06 }}
                                             whileTap={{ scale: 0.93 }}
                                             className={`min-w-[3.5rem] py-3 px-4 text-sm font-bold border-2 transition-all rounded-2xl ${
-                                                selectedSize === size
+                                                selectedSize === s.size
                                                     ? 'bg-gradient-to-br from-rose-400 to-pink-500 text-white border-rose-400 shadow-glow'
                                                     : 'bg-white text-gray-700 border-rose-100 hover:border-rose-300 hover:bg-rose-50'
                                             }`}
                                         >
-                                            {size}
+                                            {s.size}
                                         </motion.button>
                                     ))}
                                 </div>
-                                {availableSizes.length > 0 && !selectedSize && (
+                                {normalizedSizes.length > 0 && !selectedSize && (
                                     <p className="text-xs text-rose-400 mt-2 font-medium">← Please select a size to continue</p>
                                 )}
                             </div>

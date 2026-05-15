@@ -69,7 +69,7 @@ const productSchema = mongoose.Schema(
             default: [],
         },
         sizes: {
-            type: [String],
+            type: [mongoose.Schema.Types.Mixed],
             default: [],
         },
         gender: {
