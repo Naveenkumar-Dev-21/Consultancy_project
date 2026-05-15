@@ -314,7 +314,7 @@ const CartPage = () => {
                                         )}
                                         {item.selectedAgeGroup && (
                                             <span className="text-xs font-bold text-violet-500 bg-violet-50 px-2.5 py-1 rounded-full border border-violet-200">
-                                                Age: {item.selectedAgeGroup}
+                                                Age: {typeof item.selectedAgeGroup === 'object' ? item.selectedAgeGroup.ageGroup : item.selectedAgeGroup}
                                             </span>
                                         )}
                                         <button

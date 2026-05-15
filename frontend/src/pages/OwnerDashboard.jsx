@@ -699,7 +699,9 @@ const OwnerDashboard = () => {
                                                                     • {item.name} 
                                                                     <span className="ms-1 fw-bold">
                                                                         [{item.size || item.selectedSize || '-'}] 
-                                                                        [{item.ageGroup || item.selectedAgeGroup || '-'}]
+                                                                        [{typeof (item.ageGroup || item.selectedAgeGroup) === 'object' 
+                                                                            ? (item.ageGroup || item.selectedAgeGroup).ageGroup 
+                                                                            : (item.ageGroup || item.selectedAgeGroup || '-')}]
                                                                     </span>
                                                                 </div>
                                                             ))}
@@ -785,9 +787,11 @@ const OwnerDashboard = () => {
                                                         <div className="d-flex flex-wrap gap-1">
                                                             {Array.isArray(product.ageGroup) ? (
                                                                 product.ageGroup.length > 0 ? product.ageGroup.map((ag, i) => (
-                                                                    <span key={i} className="badge bg-light text-dark border-1 border-secondary-subtle">{ag}</span>
+                                                                    <span key={i} className="badge bg-light text-dark border-1 border-secondary-subtle">
+                                                                        {typeof ag === 'object' ? ag.ageGroup : ag}
+                                                                    </span>
                                                                 )) : '-'
-                                                            ) : (product.ageGroup || '-')}
+                                                            ) : (typeof product.ageGroup === 'object' ? product.ageGroup.ageGroup : (product.ageGroup || '-'))}
                                                         </div>
                                                     </td>
                                                     <td>₹{product.price.toLocaleString()}</td>
@@ -1594,7 +1598,11 @@ const OwnerDashboard = () => {
                                                             <span className="badge bg-info text-dark mt-1 me-1">Size: {item.size || item.selectedSize}</span>
                                                         )}
                                                         {(item.ageGroup || item.selectedAgeGroup) && (
-                                                            <span className="badge bg-primary text-white mt-1">Age: {item.ageGroup || item.selectedAgeGroup}</span>
+                                                        <span className="badge bg-primary text-white mt-1">
+                                                            Age: {typeof (item.ageGroup || item.selectedAgeGroup) === 'object' 
+                                                                ? (item.ageGroup || item.selectedAgeGroup).ageGroup 
+                                                                : (item.ageGroup || item.selectedAgeGroup)}
+                                                        </span>
                                                         )}
                                                     </div>
                                                     <span>₹{item.qty * item.price}</span>

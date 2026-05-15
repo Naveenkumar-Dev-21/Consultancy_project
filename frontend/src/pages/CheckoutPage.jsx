@@ -271,7 +271,7 @@ const CheckoutPage = () => {
                                             <p className="text-xs sm:text-sm text-gray-400">
                                                 Qty: {item.qty} × ₹{item.price}
                                                 {item.selectedSize && ` · Size: ${item.selectedSize}`}
-                                                {item.selectedAgeGroup && ` · Age: ${item.selectedAgeGroup}`}
+                                                {item.selectedAgeGroup && ` · Age: ${typeof item.selectedAgeGroup === 'object' ? item.selectedAgeGroup.ageGroup : item.selectedAgeGroup}`}
                                             </p>
                                         </div>
                                         <p className="font-bold text-gray-900 text-sm sm:text-base">₹{item.price * item.qty}</p>
