@@ -18,7 +18,7 @@ export const getCategories = async (req, res) => {
 // @access  Private/Admin
 export const createCategory = async (req, res) => {
     try {
-        const { name, image, subtitle, gradient, subCategories } = req.body;
+        const { name, subtitle, gradient, subCategories } = req.body;
         
         const categoryExists = await Category.findOne({ name });
         if (categoryExists) {
@@ -26,6 +26,12 @@ export const createCategory = async (req, res) => {
         }
 
         const slug = slugify(name, { lower: true });
+        
+        // Handle image from file upload or request body
+        let image = req.body.image;
+        if (req.file) {
+            image = `/${req.file.path.replace(/\\/g, '/')}`;
+        }
         
         const category = await Category.create({
             name,
@@ -47,15 +53,37 @@ export const createCategory = async (req, res) => {
 // @access  Private/Admin
 export const updateCategory = async (req, res) => {
     try {
-        const { name, image, subtitle, gradient, subCategories } = req.body;
+        const { name, subtitle, gradient, subCategories } = req.body;
         const category = await Category.findById(req.params.id);
 
         if (category) {
             category.name = name || category.name;
-            category.image = image || category.image;
             category.subtitle = subtitle || category.subtitle;
             category.gradient = gradient || category.gradient;
             category.subCategories = subCategories || category.subCategories;
+
+            // Handle image from file upload or request body
+            if (req.file) {
+                // Delete old image if it exists and is not a placeholder
+                if (category.image && !category.image.startsWith('http') && category.image !== '/placeholder-category.png') {
+                    const fs = await import('fs');
+                    const path = await import('path');
+                    const __dirname = path.resolve();
+                    const relativePath = category.image.startsWith('/') ? category.image.substring(1) : category.image;
+                    const fullPath = path.join(__dirname, relativePath);
+                    
+                    if (fs.existsSync(fullPath)) {
+                        try {
+                            fs.unlinkSync(fullPath);
+                        } catch (err) {
+                            console.error(`Failed to delete old category image: ${fullPath}`, err);
+                        }
+                    }
+                }
+                category.image = `/${req.file.path.replace(/\\/g, '/')}`;
+            } else if (req.body.image) {
+                category.image = req.body.image;
+            }
 
             if (name) {
                 category.slug = slugify(name, { lower: true });
