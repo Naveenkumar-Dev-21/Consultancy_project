@@ -30,7 +30,10 @@ export const createCategory = async (req, res) => {
         // Handle image from file upload or request body
         let image = req.body.image;
         if (req.file) {
-            image = `/${req.file.path.replace(/\\/g, '/')}`;
+            // Ensure path uses forward slashes and starts with /uploads
+            const filePath = req.file.path.replace(/\\/g, '/');
+            image = filePath.startsWith('/') ? filePath : `/${filePath}`;
+            console.log('Category image uploaded:', image, 'File size:', req.file.size);
         }
         
         const category = await Category.create({
@@ -80,7 +83,10 @@ export const updateCategory = async (req, res) => {
                         }
                     }
                 }
-                category.image = `/${req.file.path.replace(/\\/g, '/')}`;
+                // Ensure path uses forward slashes and starts with /uploads
+                const filePath = req.file.path.replace(/\\/g, '/');
+                category.image = filePath.startsWith('/') ? filePath : `/${filePath}`;
+                console.log('Category image updated:', category.image, 'File size:', req.file.size);
             } else if (req.body.image) {
                 category.image = req.body.image;
             }

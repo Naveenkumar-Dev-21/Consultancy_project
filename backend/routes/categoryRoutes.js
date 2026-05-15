@@ -50,6 +50,16 @@ const uploadCategory = multer({
     },
 });
 
+// Multer error handler middleware
+router.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        return res.status(400).json({ error: `Upload error: ${err.message}` });
+    } else if (err) {
+        return res.status(400).json({ error: err.message });
+    }
+    next();
+});
+
 router.route('/')
     .get(getCategories)
     .post(protect, admin, uploadCategory.single('image'), createCategory);
@@ -57,5 +67,32 @@ router.route('/')
 router.route('/:id')
     .put(protect, admin, uploadCategory.single('image'), updateCategory)
     .delete(protect, admin, deleteCategory);
+
+// Debug endpoint to check uploaded files
+router.get('/debug/files', (req, res) => {
+    try {
+        const uploadsDir = 'uploads/';
+        if (!fs.existsSync(uploadsDir)) {
+            return res.json({ error: 'uploads directory does not exist', path: uploadsDir });
+        }
+        
+        const categoryDir = 'uploads/categories/';
+        const categoryExists = fs.existsSync(categoryDir);
+        
+        let categoryFiles = [];
+        if (categoryExists) {
+            categoryFiles = fs.readdirSync(categoryDir);
+        }
+        
+        res.json({
+            uploadsDir: { exists: true, path: uploadsDir },
+            categoryDir: { exists: categoryExists, path: categoryDir },
+            categoryFiles: categoryFiles,
+            totalFiles: categoryFiles.length
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 export default router;
