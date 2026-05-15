@@ -39,12 +39,12 @@ export const createOrder = async (req, res) => {
                 return;
             }
 
-            // Determine price based on selected size, fallback to base price
+            // Determine price based on selected age group, fallback to base price
             let finalPrice = product.price;
-            if (item.size && product.sizes && product.sizes.length > 0) {
-                const sizeObj = product.sizes.find(s => (typeof s === 'object' ? s.size : s) === item.size);
-                if (sizeObj && typeof sizeObj === 'object' && sizeObj.price) {
-                    finalPrice = sizeObj.price;
+            if (item.ageGroup && product.ageGroup && product.ageGroup.length > 0) {
+                const ageObj = product.ageGroup.find(a => (typeof a === 'object' ? a.ageGroup : a) === item.ageGroup);
+                if (ageObj && typeof ageObj === 'object' && ageObj.price) {
+                    finalPrice = ageObj.price;
                 }
             }
 

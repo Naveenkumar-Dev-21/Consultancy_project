@@ -36,6 +36,36 @@ const CheckoutPage = () => {
         setShippingDetails(prev => ({ ...prev, [id]: value }));
     };
 
+    const useProfileAddress = async () => {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        if (!userInfo) return;
+
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userInfo.token}`,
+                },
+            };
+            const { data } = await api.get('/api/users/profile', config);
+            
+            if (data.address) {
+                setShippingDetails({
+                    address: data.address.street || '',
+                    city: data.address.city || '',
+                    postalCode: data.address.postalCode || '',
+                    country: data.address.country || 'India',
+                    phone: data.address.phone || ''
+                });
+                toast.success('Address loaded from your profile!');
+            } else {
+                toast.info('No address found in your profile. Please add one in profile settings.');
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            toast.error('Failed to load address from profile');
+        }
+    };
+
     const applyCoupon = async () => {
         if (!couponCode.trim()) return;
         
@@ -92,6 +122,7 @@ const CheckoutPage = () => {
                 price: item.price,
                 qty: item.qty,
                 size: item.selectedSize || '',
+                ageGroup: item.selectedAgeGroup || '',
             })),
             shippingAddress: shippingDetails,
             totalPrice: finalTotal,
@@ -171,11 +202,20 @@ const CheckoutPage = () => {
                     {/* Shipping Form */}
                     <div className="lg:col-span-7">
                         <div className="bg-white/80 backdrop-blur-xl p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-[40px] shadow-soft border border-rose-100/60">
-                            <div className="flex items-center gap-4 mb-6 sm:mb-8">
-                                <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center">
-                                    <Truck className="text-rose-400" size={24} />
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center">
+                                        <Truck className="text-rose-400" size={24} />
+                                    </div>
+                                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Shipping Address</h2>
                                 </div>
-                                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Shipping Address</h2>
+                                <button
+                                    type="button"
+                                    onClick={useProfileAddress}
+                                    className="flex items-center gap-2 text-xs font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 rounded-xl transition-all border border-rose-100 self-start sm:self-center"
+                                >
+                                    <MapPin size={14} /> USE PROFILE ADDRESS
+                                </button>
                             </div>
 
                             <form id="checkout-form" onSubmit={(e) => { e.preventDefault(); checkoutHandler(); }} className="space-y-5">
@@ -228,7 +268,11 @@ const CheckoutPage = () => {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-sm sm:text-base font-bold text-gray-900 truncate">{item.name}</h4>
-                                            <p className="text-xs sm:text-sm text-gray-400">Qty: {item.qty} × ₹{item.price}{item.selectedSize ? ` · Size: ${item.selectedSize}` : ''}</p>
+                                            <p className="text-xs sm:text-sm text-gray-400">
+                                                Qty: {item.qty} × ₹{item.price}
+                                                {item.selectedSize && ` · Size: ${item.selectedSize}`}
+                                                {item.selectedAgeGroup && ` · Age: ${item.selectedAgeGroup}`}
+                                            </p>
                                         </div>
                                         <p className="font-bold text-gray-900 text-sm sm:text-base">₹{item.price * item.qty}</p>
                                     </div>

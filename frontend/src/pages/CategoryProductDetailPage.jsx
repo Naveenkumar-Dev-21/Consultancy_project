@@ -111,6 +111,7 @@ const CategoryProductDetailPage = () => {
     const [similarProducts, setSimilarProducts] = useState([]);
 
     const [selectedSize, setSelectedSize] = useState(null);
+    const [selectedAgeGroup, setSelectedAgeGroup] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
     const [addedToCart, setAddedToCart] = useState(false);
@@ -195,17 +196,30 @@ const CategoryProductDetailPage = () => {
     const hasDiscount = product.originalPrice && product.originalPrice > product.price;
     const discountPercent = hasDiscount ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
     const availableSizes = product.sizes && product.sizes.length > 0 ? product.sizes : [];
-    const normalizedSizes = availableSizes.map(s => typeof s === 'object' ? s : { size: s, price: product.price });
+    const availableAgeGroups = product.ageGroup && product.ageGroup.length > 0 ? product.ageGroup : [];
+    const normalizedAgeGroups = availableAgeGroups.map(a => typeof a === 'object' ? a : { ageGroup: a, price: product.price });
     
-    // Find current price
-    const currentPrice = selectedSize 
-        ? (normalizedSizes.find(s => s.size === selectedSize)?.price || product.price)
+    // Find current price based on age group
+    const currentPrice = selectedAgeGroup 
+        ? (normalizedAgeGroups.find(a => a.ageGroup === selectedAgeGroup)?.price || product.price)
         : product.price;
 
     const wishlisted = isInWishlist(product._id);
 
     const addToCartHandler = () => {
         if (quantity > product.stock) return;
+        
+        if (availableAgeGroups.length > 0 && !selectedAgeGroup) {
+            Swal.fire({
+                title: 'Please Select an Age Group',
+                text: 'You need to choose an age group before adding to cart',
+                icon: 'warning',
+                confirmButtonColor: '#fb7185',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
         if (availableSizes.length > 0 && !selectedSize) {
             Swal.fire({
                 title: 'Please Select a Size',
@@ -216,7 +230,8 @@ const CategoryProductDetailPage = () => {
             });
             return;
         }
-        addToCart({ ...product, price: currentPrice, selectedSize, quantity });
+        
+        addToCart({ ...product, price: currentPrice, selectedSize, selectedAgeGroup, quantity });
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
     };
@@ -384,18 +399,6 @@ const CategoryProductDetailPage = () => {
                             </div>
                         </div>
 
-                        {/* Age Group chips */}
-                        {product.ageGroup && (Array.isArray(product.ageGroup) ? product.ageGroup.length > 0 : true) && (
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Age:</span>
-                                {(Array.isArray(product.ageGroup) ? product.ageGroup : [product.ageGroup]).map((ag, i) => (
-                                    <span key={i} className="bg-violet-50 text-violet-500 px-3 py-1 text-xs font-bold rounded-full border border-violet-100">
-                                        {ag}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-
                         {/* Description */}
                         <p className="text-gray-500 leading-relaxed text-base border-l-4 border-rose-100 pl-4">
                             {product.description || `Premium quality ${product.category?.toLowerCase() || 'baby'} wear crafted with care. Gentle on delicate skin, perfect for everyday comfort.`}
@@ -412,8 +415,37 @@ const CategoryProductDetailPage = () => {
                             )}
                         </div>
 
+                        {/* Age Group Selector */}
+                        {normalizedAgeGroups.length > 0 && (
+                            <div>
+                                <div className="flex items-center justify-between mb-3">
+                                    <label className="text-sm font-black text-gray-900 uppercase tracking-wider">Select Age Group</label>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {normalizedAgeGroups.map((a) => (
+                                        <motion.button
+                                            key={a.ageGroup}
+                                            onClick={() => setSelectedAgeGroup(a.ageGroup)}
+                                            whileHover={{ scale: 1.06 }}
+                                            whileTap={{ scale: 0.93 }}
+                                            className={`min-w-[4rem] py-3 px-4 text-sm font-bold border-2 transition-all rounded-2xl ${
+                                                selectedAgeGroup === a.ageGroup
+                                                    ? 'bg-gradient-to-br from-violet-400 to-indigo-500 text-white border-violet-400 shadow-glow'
+                                                    : 'bg-white text-gray-700 border-violet-100 hover:border-violet-300 hover:bg-violet-50'
+                                            }`}
+                                        >
+                                            {a.ageGroup}
+                                        </motion.button>
+                                    ))}
+                                </div>
+                                {normalizedAgeGroups.length > 0 && !selectedAgeGroup && (
+                                    <p className="text-xs text-violet-400 mt-2 font-medium">← Please select an age group to see the specific price</p>
+                                )}
+                            </div>
+                        )}
+
                         {/* Size Selector */}
-                        {normalizedSizes.length > 0 && (
+                        {availableSizes.length > 0 && (
                             <div>
                                 <div className="flex items-center justify-between mb-3">
                                     <label className="text-sm font-black text-gray-900 uppercase tracking-wider">Select Size</label>
@@ -422,23 +454,23 @@ const CategoryProductDetailPage = () => {
                                     </button>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {normalizedSizes.map((s) => (
+                                    {availableSizes.map((size) => (
                                         <motion.button
-                                            key={s.size}
-                                            onClick={() => setSelectedSize(s.size)}
+                                            key={size}
+                                            onClick={() => setSelectedSize(size)}
                                             whileHover={{ scale: 1.06 }}
                                             whileTap={{ scale: 0.93 }}
                                             className={`min-w-[3.5rem] py-3 px-4 text-sm font-bold border-2 transition-all rounded-2xl ${
-                                                selectedSize === s.size
+                                                selectedSize === size
                                                     ? 'bg-gradient-to-br from-rose-400 to-pink-500 text-white border-rose-400 shadow-glow'
                                                     : 'bg-white text-gray-700 border-rose-100 hover:border-rose-300 hover:bg-rose-50'
                                             }`}
                                         >
-                                            {s.size}
+                                            {size}
                                         </motion.button>
                                     ))}
                                 </div>
-                                {normalizedSizes.length > 0 && !selectedSize && (
+                                {availableSizes.length > 0 && !selectedSize && (
                                     <p className="text-xs text-rose-400 mt-2 font-medium">← Please select a size to continue</p>
                                 )}
                             </div>

@@ -278,7 +278,7 @@ const CartPage = () => {
                     {/* Items List */}
                     <div className="lg:col-span-8 space-y-4 sm:space-y-6">
                         {Array.isArray(cartItems) && cartItems.map((item, idx) => (
-                            <div key={`${item.product}-${item.selectedSize || 'nosize'}-${idx}`} className="bg-white/80 backdrop-blur-xl p-4 sm:p-6 rounded-2xl sm:rounded-[24px] shadow-card border border-rose-100/60 flex gap-4 sm:gap-6 items-center group">
+                            <div key={`${item.product}-${item.selectedSize || 'nosize'}-${item.selectedAgeGroup || 'noage'}-${idx}`} className="bg-white/80 backdrop-blur-xl p-4 sm:p-6 rounded-2xl sm:rounded-[24px] shadow-card border border-rose-100/60 flex gap-4 sm:gap-6 items-center group">
                                 <div className="w-20 h-20 sm:w-24 sm:h-24 bg-rose-50/50 rounded-xl overflow-hidden flex-shrink-0">
                                     <img src={getFullUrl(item.image)} alt={item.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110" />
                                 </div>
@@ -289,14 +289,14 @@ const CartPage = () => {
                                             {/* Quantity Selector */}
                                             <div className="flex items-center gap-2 mt-2">
                                                 <button
-                                                    onClick={() => updateQty(item.product, item.qty - 1, item.selectedSize)}
+                                                    onClick={() => updateQty(item.product, item.qty - 1, item.selectedSize, item.selectedAgeGroup)}
                                                     className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 flex items-center justify-center transition-colors active:scale-95 border border-rose-200"
                                                 >
                                                     <Minus size={14} className="text-rose-500" />
                                                 </button>
                                                 <span className="text-sm font-bold text-gray-900 w-8 text-center">{item.qty}</span>
                                                 <button
-                                                    onClick={() => updateQty(item.product, item.qty + 1, item.selectedSize)}
+                                                    onClick={() => updateQty(item.product, item.qty + 1, item.selectedSize, item.selectedAgeGroup)}
                                                     disabled={item.qty >= item.stock}
                                                     className={`w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center transition-colors active:scale-95 border border-rose-200 ${item.qty >= item.stock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-rose-100'}`}
                                                 >
@@ -312,8 +312,13 @@ const CartPage = () => {
                                                 Size: {item.selectedSize}
                                             </span>
                                         )}
+                                        {item.selectedAgeGroup && (
+                                            <span className="text-xs font-bold text-violet-500 bg-violet-50 px-2.5 py-1 rounded-full border border-violet-200">
+                                                Age: {item.selectedAgeGroup}
+                                            </span>
+                                        )}
                                         <button
-                                            onClick={() => removeFromCart(item.product, item.selectedSize)}
+                                            onClick={() => removeFromCart(item.product, item.selectedSize, item.selectedAgeGroup)}
                                             className="text-gray-400 hover:text-red-500 text-sm font-semibold flex items-center gap-1 transition-colors"
                                         >
                                             <Trash2 size={14} /> Remove
@@ -327,9 +332,16 @@ const CartPage = () => {
                     {/* Summary & Checkout */}
                     <div className="lg:col-span-4">
                         <div className="bg-white/80 backdrop-blur-xl p-5 sm:p-6 rounded-2xl shadow-soft border border-rose-100/60 sticky top-24">
-                            <h2 className="text-lg sm:text-xl font-bold mb-5 sm:mb-6 text-gray-900">Shipping Details</h2>
-
-                            {/* Use Profile Address Button */}
+                            <div className="flex items-center justify-between mb-5 sm:mb-6">
+                                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Shipping Details</h2>
+                                <button
+                                    type="button"
+                                    onClick={useProfileAddress}
+                                    className="text-[10px] font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-all border border-rose-100"
+                                >
+                                    USE PROFILE ADDRESS
+                                </button>
+                            </div>
                             <form onSubmit={(e) => { e.preventDefault(); checkoutHandler(); }} className="space-y-6">
                                 <div className="space-y-4">
                                     <div className="relative group">

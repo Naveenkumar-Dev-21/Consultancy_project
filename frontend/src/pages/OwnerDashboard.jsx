@@ -691,7 +691,20 @@ const OwnerDashboard = () => {
                                             ) : (Array.isArray(filteredOrders) && filteredOrders.map(order => (
                                                 <tr key={order._id} style={order.status === 'Cancelled' ? { backgroundColor: '#fef2f2' } : {}}>
                                                     <td><strong style={order.status === 'Cancelled' ? { color: '#dc3545', textDecoration: 'line-through' } : {}}>{order._id.substring(0, 8)}</strong></td>
-                                                    <td style={order.status === 'Cancelled' ? { color: '#dc3545' } : {}}>{order.user?.name || 'Unknown'}</td>
+                                                    <td style={order.status === 'Cancelled' ? { color: '#dc3545' } : {}}>
+                                                        <div>{order.user?.name || 'Unknown'}</div>
+                                                        <div className="small text-muted" style={{ fontSize: '0.7rem', lineHeight: '1.2' }}>
+                                                            {order.orderItems?.map((item, idx) => (
+                                                                <div key={idx} className="mb-1">
+                                                                    • {item.name} 
+                                                                    <span className="ms-1 fw-bold">
+                                                                        [{item.size || item.selectedSize || '-'}] 
+                                                                        [{item.ageGroup || item.selectedAgeGroup || '-'}]
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </td>
                                                     <td style={order.status === 'Cancelled' ? { color: '#dc3545', textDecoration: 'line-through' } : {}} className="fw-bold">₹{order.totalPrice?.toLocaleString()}</td>
                                                     <td><span className={`badge-status badge-${order.status?.toLowerCase()}`}>{order.status?.toUpperCase() || 'PENDING'}</span></td>
                                                     <td style={order.status === 'Cancelled' ? { color: '#dc3545' } : {}}>{new Date(order.createdAt).toLocaleDateString()}</td>
@@ -1436,71 +1449,45 @@ const OwnerDashboard = () => {
                                         <div className="col-md-5 mb-3">
                                             <label className="form-label">Age Group</label>
                                             <div className="d-flex flex-wrap gap-2">
-                                                {['0-3M','3-6M','6-9M','9-12M','12-18M','1-2Y','2-3Y','3-4Y','4-5Y','5-6Y','7-8Y','9-10Y'].map(ag => (
+                                                {['0-3M','3-6M','6-9M','9-12M','12-18M','1-2Y','2-3Y','3-4Y','4-5Y','5-6Y','7-8Y','9-10Y'].map(ag => {
+                                                    const isSelected = (productForm.ageGroup || []).some(a => (typeof a === 'object' ? a.ageGroup : a) === ag);
+                                                    return (
                                                     <button
                                                         key={ag}
                                                         type="button"
-                                                        className={`btn btn-sm ${(productForm.ageGroup || []).includes(ag) ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                                        className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-secondary'}`}
                                                         onClick={() => {
                                                             const current = productForm.ageGroup || [];
-                                                            const updated = current.includes(ag)
-                                                                ? current.filter(a => a !== ag)
-                                                                : [...current, ag];
+                                                            const exists = current.some(a => (typeof a === 'object' ? a.ageGroup : a) === ag);
+                                                            const updated = exists
+                                                                ? current.filter(a => (typeof a === 'object' ? a.ageGroup : a) !== ag)
+                                                                : [...current, { ageGroup: ag, price: productForm.price || 0 }];
                                                             setProductForm({ ...productForm, ageGroup: updated });
                                                         }}
                                                     >
                                                         {ag}
                                                     </button>
-                                                ))}
-                                            </div>
-                                            {(productForm.ageGroup || []).length > 0 && (
-                                                <small className="text-muted mt-1 d-block">
-                                                    Selected: {(productForm.ageGroup || []).join(', ')}
-                                                </small>
-                                            )}
-                                        </div>
-                                        <div className="col-md-3 mb-3">
-                                            <label className="form-label">Available Sizes</label>
-                                            <div className="d-flex flex-wrap gap-2">
-                                                {['XS','S','M','L','XL','1-2','2-3','3-4','4-5','5-6','7-8','9-10','Small','Medium','Large'].map(sz => {
-                                                    const isSelected = (productForm.sizes || []).some(s => (typeof s === 'object' ? s.size : s) === sz);
-                                                    return (
-                                                    <button
-                                                        key={sz}
-                                                        type="button"
-                                                        className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-secondary'}`}
-                                                        onClick={() => {
-                                                            const current = productForm.sizes || [];
-                                                            const exists = current.some(s => (typeof s === 'object' ? s.size : s) === sz);
-                                                            const updated = exists
-                                                                ? current.filter(s => (typeof s === 'object' ? s.size : s) !== sz)
-                                                                : [...current, { size: sz, price: productForm.price || 0 }];
-                                                            setProductForm({ ...productForm, sizes: updated });
-                                                        }}
-                                                    >
-                                                        {sz}
-                                                    </button>
                                                 )})}
                                             </div>
-                                            {(productForm.sizes || []).length > 0 && (
+                                            {(productForm.ageGroup || []).length > 0 && (
                                                 <div className="mt-3 bg-light p-2 rounded">
-                                                    <label className="form-label text-muted small fw-bold mb-2">Size Pricing</label>
-                                                    {productForm.sizes.map((s, idx) => {
-                                                        const sizeName = typeof s === 'object' ? s.size : s;
-                                                        const sizePrice = typeof s === 'object' ? s.price : (productForm.price || 0);
+                                                    <label className="form-label text-muted small fw-bold mb-2">Age Group Pricing</label>
+                                                    {productForm.ageGroup.map((a, idx) => {
+                                                        const ageGroupName = typeof a === 'object' ? a.ageGroup : a;
+                                                        const ageGroupPrice = typeof a === 'object' ? a.price : (productForm.price || 0);
                                                         return (
                                                             <div key={idx} className="d-flex align-items-center mb-2 gap-2">
-                                                                <span className="badge bg-secondary" style={{ width: '60px' }}>{sizeName}</span>
+                                                                <span className="badge bg-secondary" style={{ width: '70px' }}>{ageGroupName}</span>
                                                                 <div className="input-group input-group-sm">
                                                                     <span className="input-group-text">₹</span>
                                                                     <input 
                                                                         type="number" 
                                                                         className="form-control" 
-                                                                        value={sizePrice}
+                                                                        value={ageGroupPrice}
                                                                         onChange={(e) => {
-                                                                            const newSizes = [...productForm.sizes];
-                                                                            newSizes[idx] = { size: sizeName, price: Number(e.target.value) };
-                                                                            setProductForm({ ...productForm, sizes: newSizes });
+                                                                            const newAgeGroups = [...productForm.ageGroup];
+                                                                            newAgeGroups[idx] = { ageGroup: ageGroupName, price: Number(e.target.value) };
+                                                                            setProductForm({ ...productForm, ageGroup: newAgeGroups });
                                                                         }}
                                                                     />
                                                                 </div>
@@ -1508,6 +1495,32 @@ const OwnerDashboard = () => {
                                                         );
                                                     })}
                                                 </div>
+                                            )}
+                                        </div>
+                                        <div className="col-md-3 mb-3">
+                                            <label className="form-label">Available Sizes</label>
+                                            <div className="d-flex flex-wrap gap-2">
+                                                {['XS','S','M','L','XL','1-2','2-3','3-4','4-5','5-6','7-8','9-10','Small','Medium','Large'].map(sz => (
+                                                    <button
+                                                        key={sz}
+                                                        type="button"
+                                                        className={`btn btn-sm ${(productForm.sizes || []).includes(sz) ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                                        onClick={() => {
+                                                            const current = productForm.sizes || [];
+                                                            const updated = current.includes(sz)
+                                                                ? current.filter(s => s !== sz)
+                                                                : [...current, sz];
+                                                            setProductForm({ ...productForm, sizes: updated });
+                                                        }}
+                                                    >
+                                                        {sz}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {(productForm.sizes || []).length > 0 && (
+                                                <small className="text-muted mt-1 d-block">
+                                                    Selected: {(productForm.sizes || []).join(', ')}
+                                                </small>
                                             )}
                                         </div>
                                     </div>
@@ -1578,7 +1591,10 @@ const OwnerDashboard = () => {
                                                         <strong>{item.name}</strong>
                                                         <div className="small text-muted">{item.qty} x ₹{item.price}</div>
                                                         {(item.size || item.selectedSize) && (
-                                                            <span className="badge bg-info text-dark mt-1">Size: {item.size || item.selectedSize}</span>
+                                                            <span className="badge bg-info text-dark mt-1 me-1">Size: {item.size || item.selectedSize}</span>
+                                                        )}
+                                                        {(item.ageGroup || item.selectedAgeGroup) && (
+                                                            <span className="badge bg-primary text-white mt-1">Age: {item.ageGroup || item.selectedAgeGroup}</span>
                                                         )}
                                                     </div>
                                                     <span>₹{item.qty * item.price}</span>
