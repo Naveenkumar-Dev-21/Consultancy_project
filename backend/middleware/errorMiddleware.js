@@ -9,11 +9,13 @@ export const notFound = (req, res, next) => {
 
 // Centralized error handler — formats all errors consistently
 export const errorHandler = (err, req, res, next) => {
-    // Ensure CORS headers are present even on errors
+    // Ensure CORS headers are present even on errors to prevent preflight failures
     const origin = req.get('origin');
     if (origin) {
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Access-Control-Allow-Credentials', 'true');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     }
 
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;

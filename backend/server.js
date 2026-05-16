@@ -33,20 +33,19 @@ const allowedOrigins = [
   'https://www.aadhirankidscollections.com',
   'https://aadhirankidscollections.com',
   process.env.FRONTEND_URL,
-].filter(Boolean).map(o => o.replace(/\/$/, "")); // Remove trailing slashes
+].filter(Boolean).map(o => o.replace(/\/$/, ""));
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
+    // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
     
     const normalizedOrigin = origin.replace(/\/$/, "");
+    const isAllowed = allowedOrigins.includes(normalizedOrigin) || 
+                      normalizedOrigin.endsWith(".vercel.app") ||
+                      process.env.NODE_ENV === 'development';
     
-    // Check if origin is in whitelist or is a Vercel deployment URL
-    const isAllowedOrigin = allowedOrigins.includes(normalizedOrigin);
-    const isVercelDeployment = normalizedOrigin.endsWith(".vercel.app");
-    
-    if (isAllowedOrigin || isVercelDeployment || process.env.NODE_ENV === 'development') {
+    if (isAllowed) {
       callback(null, true);
     } else {
       console.warn(`CORS blocked for origin: ${origin}`);
@@ -54,7 +53,22 @@ app.use(cors({
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With', 
+    'Accept', 
+    'Origin',
+    'Access-Control-Allow-Headers',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers'
+  ],
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
 }));
+
+// Explicitly handle OPTIONS preflight requests for all routes
+app.options('*', cors());
 
 // Set security HTTP headers
 app.use(helmet({
