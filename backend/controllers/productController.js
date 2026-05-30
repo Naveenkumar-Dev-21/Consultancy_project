@@ -60,14 +60,16 @@ export const createProduct = async (req, res) => {
         const product = new Product({
             name: req.body.name,
             price: req.body.price,
+            originalPrice: req.body.originalPrice || 0,
             user: req.user._id,
             image: encryptedImage,
             descriptionImages: encryptedDescImages,
             brand: req.body.brand || 'Generic',
             category: req.body.category,
+            subCategory: req.body.subCategory || '',
             stock: req.body.stock || 0,
             description: req.body.description,
-            ageGroup: req.body.ageGroup,
+            ageGroup: req.body.ageGroup || [],
             sizes: req.body.sizes || [],
             gender: req.body.gender || 'Unisex'
         });
@@ -104,8 +106,10 @@ export const updateProduct = async (req, res) => {
 
         product.brand = req.body.brand || product.brand;
         product.category = req.body.category || product.category;
+        product.subCategory = req.body.subCategory !== undefined ? req.body.subCategory : product.subCategory;
         product.stock = req.body.stock !== undefined ? req.body.stock : product.stock;
         product.ageGroup = req.body.ageGroup !== undefined ? req.body.ageGroup : product.ageGroup;
+        product.markModified('ageGroup');
         product.sizes = req.body.sizes !== undefined ? req.body.sizes : product.sizes;
         product.gender = req.body.gender || product.gender;
         product.originalPrice = req.body.originalPrice !== undefined ? req.body.originalPrice : product.originalPrice;

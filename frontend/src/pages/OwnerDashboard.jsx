@@ -543,7 +543,7 @@ const OwnerDashboard = () => {
                 descriptionImages: descImagePaths,
                 description: productForm.description,
                 category: productForm.category,
-                stock: Number(productForm.stock),
+                stock: (productForm.ageGroup && productForm.ageGroup.length > 0) ? 0 : (Number(productForm.stock) || 0),
                 material: productForm.material,
                 sizes: productForm.sizes || [],
                 ageGroup: productForm.ageGroup,
@@ -1465,7 +1465,7 @@ const OwnerDashboard = () => {
                                                             const exists = current.some(a => (typeof a === 'object' ? a.ageGroup : a) === ag);
                                                             const updated = exists
                                                                 ? current.filter(a => (typeof a === 'object' ? a.ageGroup : a) !== ag)
-                                                                : [...current, { ageGroup: ag, price: productForm.price || 0 }];
+                                                                : [...current, { ageGroup: ag, price: productForm.price || 0, stock: 0 }];
                                                             setProductForm({ ...productForm, ageGroup: updated });
                                                         }}
                                                     >
