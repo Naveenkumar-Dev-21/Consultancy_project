@@ -1600,7 +1600,8 @@ const OwnerDashboard = () => {
                                         <address className="text-muted">
                                             {selectedOrder.shippingAddress?.address}<br />
                                             {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.postalCode}<br />
-                                            {selectedOrder.shippingAddress?.country}
+                                            {selectedOrder.shippingAddress?.country}<br />
+                                            {selectedOrder.shippingAddress?.phone && <strong>Phone: {selectedOrder.shippingAddress.phone}</strong>}
                                         </address>
                                     </div>
                                     <div className="col-md-6">
