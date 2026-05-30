@@ -204,10 +204,13 @@ const CategoryProductDetailPage = () => {
         ? (normalizedAgeGroups.find(a => a.ageGroup === selectedAgeGroup)?.price || product.price)
         : product.price;
 
-    // Calculate stock for selected size
-    const currentStock = selectedSize && availableSizes.length > 0
-        ? (availableSizes.find(s => (typeof s === 'object' ? s.size : s) === selectedSize)?.stock || 0)
-        : product.stock;
+    // Calculate stock for selected age group
+    let currentStock = product.stock;
+    if (normalizedAgeGroups.length > 0) {
+        currentStock = selectedAgeGroup 
+            ? (normalizedAgeGroups.find(a => a.ageGroup === selectedAgeGroup)?.stock || 0)
+            : 0; // Force 0 if age groups exist but none is selected
+    }
 
     const wishlisted = isInWishlist(product._id);
 
@@ -490,11 +493,12 @@ const CategoryProductDetailPage = () => {
                             <div className="flex items-center justify-between mb-3">
                                 <label className="text-sm font-black text-gray-900 uppercase tracking-wider">Quantity</label>
                                 <span className={`text-sm font-bold px-3 py-1 rounded-full ${
+                                    !selectedAgeGroup && normalizedAgeGroups.length > 0 ? 'bg-violet-50 text-violet-500 border border-violet-100' :
                                     currentStock > 10 ? 'bg-green-50 text-green-600 border border-green-100'
                                     : currentStock > 0 ? 'bg-orange-50 text-orange-500 border border-orange-100'
                                     : 'bg-red-50 text-red-500 border border-red-100'
                                 }`}>
-                                    {currentStock > 0 ? `${currentStock} in stock` : 'Out of stock'}
+                                    {!selectedAgeGroup && normalizedAgeGroups.length > 0 ? 'Select Age Group' : (currentStock > 0 ? `${currentStock} in stock` : 'Out of stock')}
                                 </span>
                             </div>
                             <div className="flex items-center gap-3 bg-rose-50/40 rounded-2xl p-1 w-fit border border-rose-100">
