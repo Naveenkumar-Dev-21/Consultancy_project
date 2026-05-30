@@ -189,6 +189,7 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                         <div className="flex items-center justify-center h-full text-gray-400">No revenue data available</div>
                     )}
                 </div>
+                </div>
 
                 <div className="admin-card">
                     <div className="admin-card-header">
@@ -217,6 +218,7 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                     ) : (
                         <div className="flex items-center justify-center h-full text-gray-400">No category data available</div>
                     )}
+                </div>
                 </div>
             </div>
 
