@@ -32,9 +32,20 @@ export const createOrder = async (req, res) => {
                 return;
             }
 
-            if (product.stock < item.qty) {
+            const ageStr = item.selectedAgeGroup || item.ageGroup;
+            let currentStock = product.stock;
+            let ageObj = null;
+
+            if (ageStr && product.ageGroup && product.ageGroup.length > 0) {
+                ageObj = product.ageGroup.find(a => (typeof a === 'object' ? a.ageGroup : a) === ageStr);
+                if (ageObj && typeof ageObj === 'object') {
+                    currentStock = ageObj.stock || product.stock;
+                }
+            }
+
+            if (currentStock < item.qty) {
                 res.status(400).json({
-                    message: `Insufficient stock for ${item.name}. Only ${product.stock} available.`
+                    message: `Insufficient stock for ${item.name}${ageStr ? ` (Age Group: ${ageStr})` : ''}. Only ${currentStock} available.`
                 });
                 return;
             }
@@ -53,7 +64,18 @@ export const createOrder = async (req, res) => {
             calculatedItemsPrice += finalPrice * item.qty;
 
             // Decrement stock
-            product.stock -= item.qty;
+            const targetAgeStr = item.selectedAgeGroup || item.ageGroup;
+            let targetAgeObj = null;
+            if (targetAgeStr && product.ageGroup && product.ageGroup.length > 0) {
+                targetAgeObj = product.ageGroup.find(a => (typeof a === 'object' ? a.ageGroup : a) === targetAgeStr);
+            }
+
+            if (targetAgeObj && typeof targetAgeObj === 'object') {
+                targetAgeObj.stock = (targetAgeObj.stock || 0) - item.qty;
+                product.markModified('ageGroup'); // important for Mixed types
+            } else {
+                product.stock -= item.qty;
+            }
             await product.save();
         }
 
@@ -198,7 +220,17 @@ export const updateOrderStatus = async (req, res) => {
             for (const item of order.orderItems) {
                 const product = await Product.findById(item.product);
                 if (product) {
-                    product.stock += item.qty;
+                    const itemAgeStr = item.selectedAgeGroup || item.ageGroup;
+                    let itemAgeObj = null;
+                    if (itemAgeStr && product.ageGroup && product.ageGroup.length > 0) {
+                        itemAgeObj = product.ageGroup.find(a => (typeof a === 'object' ? a.ageGroup : a) === itemAgeStr);
+                    }
+                    if (itemAgeObj && typeof itemAgeObj === 'object') {
+                        itemAgeObj.stock = (itemAgeObj.stock || 0) + item.qty;
+                        product.markModified('ageGroup');
+                    } else {
+                        product.stock += item.qty;
+                    }
                     await product.save();
                 }
             }
@@ -249,7 +281,17 @@ export const deleteOrder = async (req, res) => {
         for (const item of order.orderItems) {
             const product = await Product.findById(item.product);
             if (product) {
-                product.stock += item.qty;
+                const itemAgeStr = item.selectedAgeGroup || item.ageGroup;
+                let itemAgeObj = null;
+                if (itemAgeStr && product.ageGroup && product.ageGroup.length > 0) {
+                    itemAgeObj = product.ageGroup.find(a => (typeof a === 'object' ? a.ageGroup : a) === itemAgeStr);
+                }
+                if (itemAgeObj && typeof itemAgeObj === 'object') {
+                    itemAgeObj.stock = (itemAgeObj.stock || 0) + item.qty;
+                    product.markModified('ageGroup');
+                } else {
+                    product.stock += item.qty;
+                }
                 await product.save();
             }
         }
@@ -286,7 +328,17 @@ export const cancelOrder = async (req, res) => {
         for (const item of order.orderItems) {
             const product = await Product.findById(item.product);
             if (product) {
-                product.stock += item.qty;
+                const itemAgeStr = item.selectedAgeGroup || item.ageGroup;
+                let itemAgeObj = null;
+                if (itemAgeStr && product.ageGroup && product.ageGroup.length > 0) {
+                    itemAgeObj = product.ageGroup.find(a => (typeof a === 'object' ? a.ageGroup : a) === itemAgeStr);
+                }
+                if (itemAgeObj && typeof itemAgeObj === 'object') {
+                    itemAgeObj.stock = (itemAgeObj.stock || 0) + item.qty;
+                    product.markModified('ageGroup');
+                } else {
+                    product.stock += item.qty;
+                }
                 await product.save();
             }
         }

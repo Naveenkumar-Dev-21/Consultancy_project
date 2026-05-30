@@ -163,8 +163,10 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                     <div className="admin-card-header">
                         <h3 className="admin-card-title">Revenue Overview</h3>
                     </div>
-                    <div className="p-6 h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="p-6 h-[300px] min-w-0" style={{ minHeight: '300px' }}>
+                        {revenueData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+
                             <LineChart data={revenueData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
@@ -183,15 +185,19 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                                 />
                             </LineChart>
                         </ResponsiveContainer>
-                    </div>
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-gray-400">No revenue data available</div>
+                    )}
                 </div>
 
                 <div className="admin-card">
                     <div className="admin-card-header">
                         <h3 className="admin-card-title">Product Categories</h3>
                     </div>
-                    <div className="p-6 h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="p-6 h-[300px] min-w-0" style={{ minHeight: '300px' }}>
+                        {categoryData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+
                             <PieChart>
                                 <Pie
                                     data={categoryData}
@@ -208,7 +214,9 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                                 <Legend verticalAlign="bottom" height={36}/>
                             </PieChart>
                         </ResponsiveContainer>
-                    </div>
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-gray-400">No category data available</div>
+                    )}
                 </div>
             </div>
 
@@ -216,8 +224,10 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                 <div className="admin-card-header">
                     <h3 className="admin-card-title">Order Status Distribution</h3>
                 </div>
-                <div className="p-6 h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="p-6 h-[300px] min-w-0" style={{ minHeight: '300px' }}>
+                    {statusData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+
                         <BarChart data={statusData}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                             <XAxis dataKey="status" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
@@ -228,7 +238,10 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                             />
                             <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} barSize={40} />
                         </BarChart>
-                    </ResponsiveContainer>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="flex items-center justify-center h-full text-gray-400">No status data available</div>
+                    )}
                 </div>
             </div>
         </div>

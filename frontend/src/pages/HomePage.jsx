@@ -84,7 +84,7 @@ const HomePage = () => {
         if (selectedAgeGroup) {
             result = result.filter(p =>
                 Array.isArray(p.ageGroup)
-                    ? p.ageGroup.includes(selectedAgeGroup)
+                    ? p.ageGroup.some(a => (typeof a === 'object' ? a.ageGroup : a) === selectedAgeGroup)
                     : p.ageGroup === selectedAgeGroup
             );
         }

@@ -34,7 +34,14 @@ export const CartProvider = ({ children }) => {
             const existing = prev.find(item => item.product === product._id && item.selectedSize === incomingSize && item.selectedAgeGroup === incomingAgeGroup);
             const currentQty = existing ? existing.qty : 0;
             const requestedQty = currentQty + 1;
-            const availableStock = product.stock;
+            
+            let availableStock = product.stock;
+            if (incomingAgeGroup && product.ageGroup && product.ageGroup.length > 0) {
+                const ageObj = product.ageGroup.find(a => (typeof a === 'object' ? a.ageGroup : a) === incomingAgeGroup);
+                if (ageObj && typeof ageObj === 'object') {
+                    availableStock = ageObj.stock !== undefined ? ageObj.stock : product.stock;
+                }
+            }
 
             if (requestedQty > availableStock) {
                 Swal.fire({
@@ -74,7 +81,7 @@ export const CartProvider = ({ children }) => {
                 image: product.image,
                 price: product.price,
                 qty: product.quantity || product.qty || 1,
-                stock: product.stock,
+                stock: availableStock,
                 selectedSize: incomingSize,
                 selectedAgeGroup: incomingAgeGroup,
                 category: product.category || 'Other'

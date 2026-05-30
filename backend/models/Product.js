@@ -83,6 +83,14 @@ const productSchema = mongoose.Schema(
     }
 );
 
+productSchema.pre('save', function (next) {
+    if (this.ageGroup && this.ageGroup.length > 0) {
+        // Calculate global stock as the sum of all age group stocks
+        this.stock = this.ageGroup.reduce((total, a) => total + (a.stock || 0), 0);
+    }
+    next();
+});
+
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;

@@ -204,10 +204,15 @@ const CategoryProductDetailPage = () => {
         ? (normalizedAgeGroups.find(a => a.ageGroup === selectedAgeGroup)?.price || product.price)
         : product.price;
 
+    // Calculate stock for selected size
+    const currentStock = selectedSize && availableSizes.length > 0
+        ? (availableSizes.find(s => (typeof s === 'object' ? s.size : s) === selectedSize)?.stock || 0)
+        : product.stock;
+
     const wishlisted = isInWishlist(product._id);
 
     const addToCartHandler = () => {
-        if (quantity > product.stock) return;
+        if (quantity > currentStock) return;
         
         if (availableAgeGroups.length > 0 && !selectedAgeGroup) {
             Swal.fire({
@@ -252,7 +257,7 @@ const CategoryProductDetailPage = () => {
     };
 
     const handleQuantityChange = (newQty) => {
-        if (newQty < 1 || newQty > product.stock) return;
+        if (newQty < 1 || newQty > currentStock) return;
         setQuantity(newQty);
     };
 
@@ -422,13 +427,17 @@ const CategoryProductDetailPage = () => {
                                     <label className="text-sm font-black text-gray-900 uppercase tracking-wider">Select Age Group</label>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
-                                    {normalizedAgeGroups.map((a) => (
+                                    {normalizedAgeGroups.map((a) => {
+                                        const ageStock = a.stock !== undefined ? a.stock : (product.stock || 0);
+                                        const isOutOfStock = ageStock <= 0;
+                                        return (
                                         <motion.button
                                             key={a.ageGroup}
-                                            onClick={() => setSelectedAgeGroup(a.ageGroup)}
-                                            whileHover={{ scale: 1.06 }}
-                                            whileTap={{ scale: 0.93 }}
+                                            onClick={() => !isOutOfStock && setSelectedAgeGroup(a.ageGroup)}
+                                            whileHover={!isOutOfStock ? { scale: 1.06 } : {}}
+                                            whileTap={!isOutOfStock ? { scale: 0.93 } : {}}
                                             className={`min-w-[4rem] py-3 px-4 text-sm font-bold border-2 transition-all rounded-2xl ${
+                                                isOutOfStock ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' :
                                                 selectedAgeGroup === a.ageGroup
                                                     ? 'bg-gradient-to-br from-violet-400 to-indigo-500 text-white border-violet-400 shadow-glow'
                                                     : 'bg-white text-gray-700 border-violet-100 hover:border-violet-300 hover:bg-violet-50'
@@ -436,7 +445,7 @@ const CategoryProductDetailPage = () => {
                                         >
                                             {a.ageGroup}
                                         </motion.button>
-                                    ))}
+                                    )})}
                                 </div>
                                 {normalizedAgeGroups.length > 0 && !selectedAgeGroup && (
                                     <p className="text-xs text-violet-400 mt-2 font-medium">← Please select an age group to see the specific price</p>
@@ -481,11 +490,11 @@ const CategoryProductDetailPage = () => {
                             <div className="flex items-center justify-between mb-3">
                                 <label className="text-sm font-black text-gray-900 uppercase tracking-wider">Quantity</label>
                                 <span className={`text-sm font-bold px-3 py-1 rounded-full ${
-                                    product.stock > 10 ? 'bg-green-50 text-green-600 border border-green-100'
-                                    : product.stock > 0 ? 'bg-orange-50 text-orange-500 border border-orange-100'
+                                    currentStock > 10 ? 'bg-green-50 text-green-600 border border-green-100'
+                                    : currentStock > 0 ? 'bg-orange-50 text-orange-500 border border-orange-100'
                                     : 'bg-red-50 text-red-500 border border-red-100'
                                 }`}>
-                                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                                    {currentStock > 0 ? `${currentStock} in stock` : 'Out of stock'}
                                 </span>
                             </div>
                             <div className="flex items-center gap-3 bg-rose-50/40 rounded-2xl p-1 w-fit border border-rose-100">
@@ -500,7 +509,7 @@ const CategoryProductDetailPage = () => {
                                 <span className="w-10 text-center font-black text-lg text-gray-900">{quantity}</span>
                                 <motion.button
                                     onClick={() => handleQuantityChange(quantity + 1)}
-                                    disabled={quantity >= product.stock}
+                                    disabled={quantity >= currentStock}
                                     whileTap={{ scale: 0.88 }}
                                     className="w-11 h-11 bg-white flex items-center justify-center rounded-xl border border-rose-100 hover:border-rose-300 hover:bg-rose-50 transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
@@ -510,14 +519,14 @@ const CategoryProductDetailPage = () => {
                         </div>
 
                         {/* Low stock warning */}
-                        {product.stock > 0 && product.stock <= 5 && (
+                        {currentStock > 0 && currentStock <= 5 && (
                             <motion.div
                                 initial={{ opacity: 0, y: -6 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="flex items-center gap-2.5 bg-orange-50 text-orange-600 text-sm font-bold px-4 py-3 rounded-2xl border border-orange-200"
                             >
                                 <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
-                                Only {product.stock} left — order soon!
+                                Only {currentStock} left — order soon!
                             </motion.div>
                         )}
 
@@ -525,11 +534,11 @@ const CategoryProductDetailPage = () => {
                         <div className="flex gap-3">
                             <motion.button
                                 onClick={addToCartHandler}
-                                disabled={product.stock === 0}
-                                whileHover={product.stock > 0 ? { scale: 1.02 } : {}}
-                                whileTap={product.stock > 0 ? { scale: 0.96 } : {}}
+                                disabled={currentStock === 0}
+                                whileHover={currentStock > 0 ? { scale: 1.02 } : {}}
+                                whileTap={currentStock > 0 ? { scale: 0.96 } : {}}
                                 className={`flex-1 py-4 font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all rounded-2xl shadow-xl ${
-                                    product.stock === 0
+                                    currentStock === 0
                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
                                         : addedToCart
                                             ? 'bg-green-500 text-white shadow-lg shadow-green-500/25'
@@ -544,7 +553,7 @@ const CategoryProductDetailPage = () => {
                                     ) : (
                                         <motion.span key="add" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
                                             <ShoppingCart size={20} />
-                                            {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                                            {currentStock === 0 ? 'Out of Stock' : 'Add to Cart'}
                                         </motion.span>
                                     )}
                                 </AnimatePresence>

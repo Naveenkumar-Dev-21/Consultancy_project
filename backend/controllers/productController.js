@@ -171,7 +171,7 @@ export const deleteProduct = async (req, res) => {
 // @access  Public
 export const searchProducts = async (req, res) => {
     try {
-        const { q, category, minPrice, maxPrice, size, ageGroup } = req.query;
+        const { q, category, subCategory, minPrice, maxPrice, size, ageGroup } = req.query;
 
         const filter = {};
 
@@ -181,16 +181,19 @@ export const searchProducts = async (req, res) => {
         if (category && category !== 'All') {
             filter.category = category;
         }
+        if (subCategory) {
+            filter.subCategory = subCategory;
+        }
         if (minPrice || maxPrice) {
             filter.price = {};
             if (minPrice) filter.price.$gte = Number(minPrice);
             if (maxPrice) filter.price.$lte = Number(maxPrice);
         }
         if (size) {
-            filter.size = size;
+            filter.sizes = size;
         }
         if (ageGroup) {
-            filter.ageGroup = ageGroup;
+            filter.ageGroup = { $elemMatch: { ageGroup: ageGroup } };
         }
         if (req.query.gender) {
             filter.gender = req.query.gender;

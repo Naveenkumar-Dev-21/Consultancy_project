@@ -1479,6 +1479,7 @@ const OwnerDashboard = () => {
                                                     {productForm.ageGroup.map((a, idx) => {
                                                         const ageGroupName = typeof a === 'object' ? a.ageGroup : a;
                                                         const ageGroupPrice = typeof a === 'object' ? a.price : (productForm.price || 0);
+                                                        const ageGroupStock = typeof a === 'object' ? (a.stock || 0) : (productForm.stock || 0);
                                                         return (
                                                             <div key={idx} className="d-flex align-items-center mb-2 gap-2">
                                                                 <span className="badge bg-secondary" style={{ width: '70px' }}>{ageGroupName}</span>
@@ -1490,7 +1491,21 @@ const OwnerDashboard = () => {
                                                                         value={ageGroupPrice}
                                                                         onChange={(e) => {
                                                                             const newAgeGroups = [...productForm.ageGroup];
-                                                                            newAgeGroups[idx] = { ageGroup: ageGroupName, price: Number(e.target.value) };
+                                                                            newAgeGroups[idx] = { ageGroup: ageGroupName, price: Number(e.target.value), stock: ageGroupStock };
+                                                                            setProductForm({ ...productForm, ageGroup: newAgeGroups });
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <div className="input-group input-group-sm">
+                                                                    <span className="input-group-text">Stock</span>
+                                                                    <input 
+                                                                        type="number" 
+                                                                        className="form-control" 
+                                                                        value={ageGroupStock}
+                                                                        min="0"
+                                                                        onChange={(e) => {
+                                                                            const newAgeGroups = [...productForm.ageGroup];
+                                                                            newAgeGroups[idx] = { ageGroup: ageGroupName, price: ageGroupPrice, stock: Number(e.target.value) };
                                                                             setProductForm({ ...productForm, ageGroup: newAgeGroups });
                                                                         }}
                                                                     />
@@ -1528,16 +1543,18 @@ const OwnerDashboard = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="row">
-                                        <div className="col-md-6 mb-3">
-                                            <label className="form-label">Stock Count</label>
-                                            <input type="number" className="form-control" min="0" required
-                                                value={productForm.stock}
-                                                onChange={e => setProductForm({ ...productForm, stock: e.target.value })}
-                                                placeholder="Enter available stock quantity" />
-                                            <small className="text-muted">Set to 0 if out of stock</small>
+                                    {(!productForm.ageGroup || productForm.ageGroup.length === 0) && (
+                                        <div className="row">
+                                            <div className="col-md-6 mb-3">
+                                                <label className="form-label">Stock Count</label>
+                                                <input type="number" className="form-control" min="0" required
+                                                    value={productForm.stock}
+                                                    onChange={e => setProductForm({ ...productForm, stock: e.target.value })}
+                                                    placeholder="Enter available stock quantity" />
+                                                <small className="text-muted">Set to 0 if out of stock</small>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                     <div className="modal-footer px-0 pb-0">
                                         <button type="button" className="btn btn-secondary" onClick={() => setShowProductModal(false)}>Cancel</button>
                                         <button type="submit" className="btn btn-primary-custom">Save Product</button>
