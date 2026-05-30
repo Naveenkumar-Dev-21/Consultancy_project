@@ -77,7 +77,11 @@ export const createProduct = async (req, res) => {
         const createdProduct = await product.save();
         res.status(201).json(decryptProduct(createdProduct));
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        console.error('createProduct error:', error.message, error);
+        res.status(400).json({ 
+            message: error.message, 
+            details: error.errors ? Object.keys(error.errors).map(k => error.errors[k].message) : null 
+        });
     }
 };
 
