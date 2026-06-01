@@ -144,7 +144,10 @@ export const googleAuth = async (req, res) => {
     try {
       const ticket = await googleClient.verifyIdToken({
         idToken: credential,
-        audience: process.env.GOOGLE_CLIENT_ID,
+        audience: [
+            process.env.GOOGLE_CLIENT_ID,
+            "361521861568-cibr1ba5k55h0tk3pfo6qvfdcr7rrmmj.apps.googleusercontent.com"
+        ],
       });
       payload = ticket.getPayload();
     } catch (verifyError) {
