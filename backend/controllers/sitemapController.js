@@ -1,4 +1,4 @@
-import Product from '../models/productModel.js';
+import Product from '../models/Product.js';
 
 export const generateSitemap = async (req, res) => {
     try {
