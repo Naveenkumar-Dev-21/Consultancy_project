@@ -65,11 +65,10 @@ export const signup = async (req, res) => {
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     // Upsert pending user (replace if they re-submit the form)
-    await PendingUser.findOneAndUpdate(
-      { email },
-      { name, email, password, otp, otpExpires, attempts: 0, createdAt: new Date() },
-      { upsert: true, new: true }
-    );
+    // Delete any existing pending registration for this email, then create new
+    await PendingUser.deleteOne({ email });
+    const pendingUser = new PendingUser({ name, email, password, otp, otpExpires });
+    await pendingUser.save(); // pre-save hook hashes the password
 
     // Send OTP email
     await sendOtpEmail(email, otp, name);
@@ -134,13 +133,16 @@ export const verifyOtp = async (req, res) => {
       });
     }
 
-    // OTP is valid — create the real user
-    const user = await User.create({
+    // OTP is valid — create the real user with pre-hashed password
+    const user = new User({
       name: pendingUser.name,
       email: pendingUser.email,
-      password: pendingUser.password,
+      password: pendingUser.password, // Already hashed in PendingUser
       authProvider: 'local'
     });
+    // Mark password as NOT modified so User's pre-save hook doesn't double-hash
+    user.$skipPasswordHash = true;
+    await user.save();
 
     // Check if admin email (supports comma-separated list)
     const adminEmails = (process.env.ADMIN_EMAIL || '').split(',').map(e => e.trim().toLowerCase());

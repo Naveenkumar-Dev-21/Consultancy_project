@@ -60,8 +60,16 @@ const signupLimiter = rateLimit({
 app.use('/api/auth/signup', signupLimiter);
 app.use('/api/auth/resend-otp', signupLimiter);
 
-app.use(express.json({ limit: '100mb' })); // Body limit — increased to 100mb for large uploads
-app.use(express.urlencoded({ limit: '100mb', extended: true }));
+// Rate limit contact form to prevent spam
+const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 3, // Only 3 contact submissions per 15 minutes per IP
+  message: 'Too many messages sent, please try again later'
+});
+app.use('/api/contact', contactLimiter);
+
+app.use(express.json({ limit: '10mb' })); // Body limit (file uploads use multer, not body parser)
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Data sanitization against NoSQL query injection
 app.use((req, res, next) => {

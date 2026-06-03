@@ -43,6 +43,7 @@ export const updateProfile = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        // Only allow updating safe fields — password, email, and role cannot be changed here
         if (name) user.name = name;
         if (address) user.address = address;
         if (babyDetails) user.babyDetails = babyDetails;

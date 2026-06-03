@@ -2,6 +2,7 @@ import path from 'path';
 import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
+import { protect, admin } from '../middleware/authMiddleware.js';
 
 
 const router = express.Router();
@@ -59,7 +60,7 @@ function checkFileType(file, cb) {
 
 const upload = multer({
     storage,
-    limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB max per file
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max per file
     fileFilter: function (req, file, cb) {
         checkFileType(file, cb);
     },
@@ -67,13 +68,13 @@ const upload = multer({
 
 const uploadCategory = multer({
     storage: categoryStorage,
-    limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB max per file
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max per file
     fileFilter: function (req, file, cb) {
         checkFileType(file, cb);
     },
 });
 
-router.post('/', upload.single('image'), (req, res) => {
+router.post('/', protect, admin, upload.single('image'), (req, res) => {
     if (!req.file) {
         return res.status(400).send({ message: 'No image uploaded' });
     }
@@ -81,7 +82,7 @@ router.post('/', upload.single('image'), (req, res) => {
     res.send(`/${req.file.path.replace(/\\/g, '/')}`);
 });
 
-router.post('/category', uploadCategory.single('image'), (req, res) => {
+router.post('/category', protect, admin, uploadCategory.single('image'), (req, res) => {
     if (!req.file) {
         return res.status(400).send({ message: 'No image uploaded' });
     }
@@ -89,7 +90,7 @@ router.post('/category', uploadCategory.single('image'), (req, res) => {
 });
 
 // Multiple images upload endpoint (for description images)
-router.post('/multiple', upload.array('images', 3), (req, res) => {
+router.post('/multiple', protect, admin, upload.array('images', 3), (req, res) => {
     const paths = req.files.map(file => `/${file.path.replace(/\\/g, '/')}`);
     res.json(paths);
 });

@@ -38,7 +38,8 @@ const userSchema = new mongoose.Schema({
 
 // Hash password before saving
 userSchema.pre("save", async function () {
-  if (!this.isModified("password") || !this.password) {
+  // Skip if password hasn't changed, is empty, or was pre-hashed (from PendingUser promotion)
+  if (!this.isModified("password") || !this.password || this.$skipPasswordHash) {
     return;
   }
   const salt = await bcrypt.genSalt(10);

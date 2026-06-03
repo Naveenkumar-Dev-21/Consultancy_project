@@ -37,7 +37,16 @@ export const createRazorpayOrder = async (req, res) => {
             if (!product) {
                 return res.status(404).json({ message: `Product ${item.name} not found` });
             }
-            calculatedItemsPrice += product.price * item.qty;
+
+            // Use age-group-specific price if applicable (same logic as createOrder)
+            let finalPrice = product.price;
+            if (item.ageGroup && product.ageGroup && product.ageGroup.length > 0) {
+                const ageObj = product.ageGroup.find(a => (typeof a === 'object' ? a.ageGroup : a) === item.ageGroup);
+                if (ageObj && typeof ageObj === 'object' && ageObj.price) {
+                    finalPrice = ageObj.price;
+                }
+            }
+            calculatedItemsPrice += finalPrice * item.qty;
         }
 
         let calculatedDiscount = 0;
@@ -126,6 +135,11 @@ export const verifyPayment = async (req, res) => {
             const order = await Order.findById(orderId);
 
             if (order) {
+                // Verify the order belongs to the authenticated user
+                if (order.user.toString() !== req.user._id.toString()) {
+                    return res.status(403).json({ success: false, message: 'Not authorized to verify this payment' });
+                }
+
                 order.isPaid = true;
                 order.paidAt = Date.now();
                 order.paymentResult = {

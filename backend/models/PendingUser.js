@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 /**
  * PendingUser Model
@@ -42,6 +43,15 @@ const pendingUserSchema = new mongoose.Schema({
     default: Date.now,
     expires: 600 // TTL: automatically delete after 10 minutes (600 seconds)
   }
+});
+
+// Hash password before saving (same as User model)
+pendingUserSchema.pre("save", async function () {
+  if (!this.isModified("password") || !this.password) {
+    return;
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 export default mongoose.model("PendingUser", pendingUserSchema);

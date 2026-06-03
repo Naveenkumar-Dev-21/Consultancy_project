@@ -68,8 +68,8 @@ router.route('/:id')
     .put(protect, admin, uploadCategory.single('image'), updateCategory)
     .delete(protect, admin, deleteCategory);
 
-// Debug endpoint to check uploaded files
-router.get('/debug/files', (req, res) => {
+// Debug endpoint to check uploaded files (admin only)
+router.get('/debug/files', protect, admin, (req, res) => {
     try {
         const uploadsDir = 'uploads/';
         if (!fs.existsSync(uploadsDir)) {

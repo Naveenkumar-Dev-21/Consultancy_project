@@ -1,5 +1,18 @@
 import nodemailer from 'nodemailer';
 
+/**
+ * Escapes HTML special characters to prevent HTML injection in emails.
+ */
+const escapeHtml = (str) => {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+};
+
 // @desc    Send contact email
 // @route   POST /api/contact
 // @access  Public
@@ -21,18 +34,25 @@ export const sendContactEmail = async (req, res) => {
             },
         });
 
+        // Sanitize all user inputs before using in HTML
+        const safeName = escapeHtml(name);
+        const safeEmail = escapeHtml(email);
+        const safeSubject = escapeHtml(subject);
+        const safeMessage = escapeHtml(message);
+
         const mailOptions = {
-            from: `"${name}" <${email}>`,
+            // Always send FROM our own email — never let user control the "from" field
+            from: `"Aadhiran Contact Form" <${process.env.EMAIL_USER}>`,
             to: 'aadhiranbabyproducts@gmail.com',
-            subject: `Contact Form: ${subject}`,
+            subject: `Contact Form: ${safeSubject}`,
             text: `You have a new contact form submission:\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject}\nMessage: ${message}`,
             html: `
                 <h3>New Contact Form Submission</h3>
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Subject:</strong> ${subject}</p>
+                <p><strong>Name:</strong> ${safeName}</p>
+                <p><strong>Email:</strong> ${safeEmail}</p>
+                <p><strong>Subject:</strong> ${safeSubject}</p>
                 <p><strong>Message:</strong></p>
-                <p>${message}</p>
+                <p>${safeMessage}</p>
             `,
             replyTo: email
         };

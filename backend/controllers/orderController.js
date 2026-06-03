@@ -128,9 +128,8 @@ export const createOrder = async (req, res) => {
             totalPrice: calculatedTotalPrice,
             couponCode: couponCode || undefined,
             discountAmount: validDiscount,
-            paymentResult: req.body.paymentResult,
-            isPaid: req.body.paymentResult ? true : false,
-            paidAt: req.body.paymentResult ? Date.now() : undefined,
+            // isPaid is always false at creation — only verifyPayment can set it true
+            isPaid: false,
         });
 
         const createdOrder = await order.save();
