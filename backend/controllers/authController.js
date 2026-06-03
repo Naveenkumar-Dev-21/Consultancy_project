@@ -1,13 +1,23 @@
 import User from "../models/User.js";
+import PendingUser from "../models/PendingUser.js";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { OAuth2Client } from 'google-auth-library';
+import { sendOtpEmail } from "../utils/sendEmail.js";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateToken = (id, role) =>
   jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-// @desc    Register new user with email/password
+/**
+ * Generate a 6-digit numeric OTP
+ */
+const generateOtp = () => {
+  return crypto.randomInt(100000, 999999).toString();
+};
+
+// @desc    Register new user — Step 1: Send OTP to email
 // @route   POST /api/auth/signup
 // @access  Public
 export const signup = async (req, res) => {
@@ -19,7 +29,11 @@ export const signup = async (req, res) => {
       return res.status(400).json({ error: "Please provide all required fields (name, email, password)" });
     }
 
-    // Check if user exists
+    if (password.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters" });
+    }
+
+    // Check if user already exists in the main User collection
     let user = await User.findOne({ email });
     
     if (user) {
@@ -46,11 +60,85 @@ export const signup = async (req, res) => {
       }
     }
 
-    // Create new user with local auth
-    user = await User.create({ 
-      name, 
-      email, 
-      password,
+    // Generate OTP
+    const otp = generateOtp();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Upsert pending user (replace if they re-submit the form)
+    await PendingUser.findOneAndUpdate(
+      { email },
+      { name, email, password, otp, otpExpires, attempts: 0, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    // Send OTP email
+    await sendOtpEmail(email, otp, name);
+
+    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] OTP sent to: ${email}`);
+    res.status(200).json({ 
+      message: "Verification code sent to your email",
+      email // Send back email so frontend knows which email to verify
+    });
+  } catch (error) {
+    console.error("Signup error details:", error);
+    res.status(500).json({ error: `Error during registration: ${error.message}` });
+  }
+};
+
+// @desc    Verify OTP and create user — Step 2
+// @route   POST /api/auth/verify-otp
+// @access  Public
+export const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ error: "Please provide email and verification code" });
+    }
+
+    // Find the pending user
+    const pendingUser = await PendingUser.findOne({ email });
+
+    if (!pendingUser) {
+      return res.status(400).json({ 
+        error: "Verification code expired or not found. Please register again.",
+        expired: true
+      });
+    }
+
+    // Check max attempts (prevent brute-force OTP guessing)
+    if (pendingUser.attempts >= 5) {
+      await PendingUser.deleteOne({ email });
+      return res.status(400).json({ 
+        error: "Too many failed attempts. Please register again.",
+        expired: true
+      });
+    }
+
+    // Check if OTP has expired
+    if (pendingUser.otpExpires < new Date()) {
+      await PendingUser.deleteOne({ email });
+      return res.status(400).json({ 
+        error: "Verification code has expired. Please register again.",
+        expired: true
+      });
+    }
+
+    // Verify OTP
+    if (pendingUser.otp !== otp.trim()) {
+      pendingUser.attempts += 1;
+      await pendingUser.save();
+      const remaining = 5 - pendingUser.attempts;
+      return res.status(400).json({ 
+        error: `Invalid verification code. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`
+      });
+    }
+
+    // OTP is valid — create the real user
+    const user = await User.create({
+      name: pendingUser.name,
+      email: pendingUser.email,
+      password: pendingUser.password,
       authProvider: 'local'
     });
 
@@ -61,7 +149,10 @@ export const signup = async (req, res) => {
       await user.save();
     }
 
-    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] Signup successful for: ${email}`);
+    // Delete the pending user
+    await PendingUser.deleteOne({ email });
+
+    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] Email verified & user created: ${email}`);
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -71,8 +162,49 @@ export const signup = async (req, res) => {
       token: generateToken(user._id, user.role)
     });
   } catch (error) {
-    console.error("Signup error details:", error);
-    res.status(500).json({ error: `Error creating user: ${error.message}` });
+    console.error("OTP verification error:", error);
+    res.status(500).json({ error: "Error verifying code. Please try again." });
+  }
+};
+
+// @desc    Resend OTP
+// @route   POST /api/auth/resend-otp
+// @access  Public
+export const resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const pendingUser = await PendingUser.findOne({ email });
+
+    if (!pendingUser) {
+      return res.status(400).json({ 
+        error: "No pending registration found. Please register again.",
+        expired: true
+      });
+    }
+
+    // Generate new OTP
+    const otp = generateOtp();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+    pendingUser.otp = otp;
+    pendingUser.otpExpires = otpExpires;
+    pendingUser.attempts = 0;
+    pendingUser.createdAt = new Date(); // Reset TTL
+    await pendingUser.save();
+
+    // Send new OTP
+    await sendOtpEmail(email, otp, pendingUser.name);
+
+    if (process.env.NODE_ENV !== 'production') console.log(`[AUTH] OTP resent to: ${email}`);
+    res.status(200).json({ message: "New verification code sent to your email" });
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    res.status(500).json({ error: "Error resending code. Please try again." });
   }
 };
 

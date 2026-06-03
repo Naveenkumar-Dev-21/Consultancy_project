@@ -51,6 +51,15 @@ const authLimiter = rateLimit({
 });
 app.use('/api/auth', authLimiter);
 
+// Extra tight limiter specifically for signup & OTP routes (prevent bulk registration)
+const signupLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Only 5 signup attempts per 15 minutes per IP
+  message: 'Too many registration attempts, please try again after 15 minutes'
+});
+app.use('/api/auth/signup', signupLimiter);
+app.use('/api/auth/resend-otp', signupLimiter);
+
 app.use(express.json({ limit: '100mb' })); // Body limit — increased to 100mb for large uploads
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
