@@ -8,6 +8,7 @@ import HeroCarousel from '../components/common/HeroCarousel';
 import MarqueeBanner from '../components/common/MarqueeBanner';
 import ProductCard from '../components/common/ProductCard';
 import { getFullUrl } from '../utils/urlUtils';
+import { Helmet } from 'react-helmet-async';
 
 const HomePage = () => {
     const { addToCart } = useCart();
@@ -125,6 +126,10 @@ const HomePage = () => {
 
     return (
         <div className="min-h-screen font-sans relative overflow-hidden">
+            <Helmet>
+                <title>Aadhiran Kids Collections | Premium Kids Wear</title>
+                <meta name="description" content="Shop the finest and most comfortable kids clothing at Aadhiran Kids Collections. Explore our exclusive collections of Night Wear, Infant Clothing, and more." />
+            </Helmet>
             {/* Background Blobs */}
             <div className="blob-1 top-0 right-0 opacity-50 blob-animated" />
             <div className="blob-2 bottom-0 left-0 opacity-30 blob-animated-reverse" />

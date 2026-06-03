@@ -4,4 +4,4 @@ Disallow: /login/
 Disallow: /register/
 Allow: /
 
-Sitemap: https://aadhirankidscollections.com/sitemap.xml
+Sitemap: https://api.aadhirankidscollections.com/api/sitemap

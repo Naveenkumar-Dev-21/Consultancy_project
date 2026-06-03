@@ -12,6 +12,7 @@ import wishlistRoutes from "./routes/wishlistRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import sitemapRoutes from "./routes/sitemapRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import path from 'path';
 import helmet from 'helmet';
@@ -83,6 +84,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/sitemap", sitemapRoutes);
 
 // Make uploads folder static
 const __dirname = path.resolve();
