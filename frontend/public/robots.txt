@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /login/
+Disallow: /register/
+Allow: /
+
+Sitemap: https://aadhirankidscollections.com/sitemap.xml

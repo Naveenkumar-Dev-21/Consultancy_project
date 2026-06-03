@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ShoppingCart, Star, X, Check, Minus, Plus, ZoomIn, ChevronLeft, ChevronRight, Heart, Shield, Truck, RotateCcw, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import ProductCard from '../components/common/ProductCard';
@@ -282,6 +283,13 @@ const CategoryProductDetailPage = () => {
 
     return (
         <div className="min-h-screen bg-white">
+            <Helmet>
+                <title>{product.name} | Aadhiran Kids Collections</title>
+                <meta name="description" content={product.description || `Buy ${product.name} at Aadhiran Kids Collections. Premium quality kids wear.`} />
+                <meta property="og:title" content={`${product.name} | Aadhiran Kids Collections`} />
+                <meta property="og:description" content={product.description || `Buy ${product.name} at Aadhiran Kids Collections. Premium quality kids wear.`} />
+                {productImages.length > 0 && <meta property="og:image" content={getFullUrl(productImages[0])} />}
+            </Helmet>
             {/* Back button — floating */}
             <motion.button
                 onClick={() => navigate(-1)}
