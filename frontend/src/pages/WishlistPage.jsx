@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, ShoppingBag } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '../context/WishlistContext';
 import ProductCard from '../components/common/ProductCard';
 import { useCart } from '../context/CartContext';
@@ -46,13 +46,15 @@ const WishlistPage = () => {
                         </div>
                     ) : wishlistProducts.length > 0 ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
-                            {Array.isArray(wishlistProducts) && wishlistProducts.map((product) => (
-                                <ProductCard
-                                    key={product._id}
-                                    product={product}
-                                    addToCartHandler={addToCartHandler}
-                                />
-                            ))}
+                            <AnimatePresence>
+                                {Array.isArray(wishlistProducts) && wishlistProducts.map((product) => (
+                                    <ProductCard
+                                        key={product._id}
+                                        product={product}
+                                        addToCartHandler={addToCartHandler}
+                                    />
+                                ))}
+                            </AnimatePresence>
                         </div>
                     ) : (
                         <div className="text-center py-20 sm:py-32 bg-white rounded-3xl border border-dashed border-rose-200">

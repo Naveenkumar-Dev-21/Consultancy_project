@@ -46,6 +46,9 @@ const ProductCard = ({ product, addToCartHandler }) => {
     return (
         <motion.div
             variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
             className="group relative bg-white overflow-hidden rounded-2xl shadow-card hover:shadow-glow transition-shadow duration-300 cursor-pointer flex flex-col h-full border border-rose-100/60"
             whileHover={{ y: -4 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}

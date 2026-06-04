@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
@@ -351,14 +351,16 @@ const HomePage = () => {
                         whileInView="visible"
                         viewport={{ once: true, margin: '-50px' }}
                     >
-                        {Array.isArray(filteredProducts) && filteredProducts.map((product) => (
-                            <ProductCard
-                                key={product._id}
-                                product={product}
-                                addToCartHandler={addToCartHandler}
-                                addedToCartId={addedToCartId}
-                            />
-                        ))}
+                        <AnimatePresence>
+                            {Array.isArray(filteredProducts) && filteredProducts.map((product) => (
+                                <ProductCard
+                                    key={product._id}
+                                    product={product}
+                                    addToCartHandler={addToCartHandler}
+                                    addedToCartId={addedToCartId}
+                                />
+                            ))}
+                        </AnimatePresence>
                     </motion.div>
                 )}
 
