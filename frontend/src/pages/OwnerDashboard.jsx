@@ -61,7 +61,8 @@ const OwnerDashboard = () => {
         descriptionImages: [], // existing URLs
         descriptionImageFiles: [], // new files to upload
         isCustomCategory: false,
-        customCategory: ''
+        customCategory: '',
+        code: ''
     });
     const [categoryForm, setCategoryForm] = useState({
         name: '', image: '', subtitle: '', gradient: 'from-rose-50 to-pink-50',
@@ -450,7 +451,8 @@ const OwnerDashboard = () => {
                 descriptionImages: product.descriptionImages || [],
                 descriptionImageFiles: [],
                 isCustomCategory: isCustom,
-                customCategory: ''
+                customCategory: '',
+                code: product.code || ''
             });
         } else {
             setEditingProduct(null);
@@ -461,7 +463,8 @@ const OwnerDashboard = () => {
                 gender: 'Unisex', subCategory: '',
                 descriptionImages: [], descriptionImageFiles: [],
                 isCustomCategory: false,
-                customCategory: ''
+                customCategory: '',
+                code: ''
             });
         }
         setShowProductModal(true);
@@ -555,7 +558,8 @@ const OwnerDashboard = () => {
                 },
                 featured: productForm.featured,
                 gender: productForm.gender,
-                subCategory: productForm.subCategory
+                subCategory: productForm.subCategory,
+                code: productForm.code || undefined
             };
 
             if (editingProduct) {
@@ -586,7 +590,8 @@ const OwnerDashboard = () => {
     const filteredProducts = allProducts.filter(p => 
         searchTerm 
             ? (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-               p.category.toLowerCase().includes(searchTerm.toLowerCase()))
+               p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               (p.code && p.code.toLowerCase().includes(searchTerm.toLowerCase())))
             : true
     );
 
@@ -759,6 +764,7 @@ const OwnerDashboard = () => {
                                         <thead>
                                             <tr>
                                                 <th>Image</th>
+                                                <th>Code</th>
                                                 <th>Name</th>
                                                 <th>Category</th>
                                                 <th>Age Group</th>
@@ -769,7 +775,7 @@ const OwnerDashboard = () => {
                                         </thead>
                                         <tbody>
                                             {filteredProducts.length === 0 ? (
-                                                <tr><td colSpan="7" className="text-center py-4">No products found</td></tr>
+                                                <tr><td colSpan="8" className="text-center py-4">No products found</td></tr>
                                             ) : (Array.isArray(filteredProducts) && filteredProducts.map(product => (
                                                 <tr key={product._id}>
                                                     <td>
@@ -781,6 +787,7 @@ const OwnerDashboard = () => {
                                                             onClick={() => setPreviewImage(getFullUrl(product.image))}
                                                         />
                                                     </td>
+                                                    <td><code style={{ fontSize: '0.8rem', color: '#6f42c1' }}>{product.code || '—'}</code></td>
                                                     <td><strong>{product.name}</strong></td>
                                                     <td>{product.category}</td>
                                                     <td>
@@ -1295,6 +1302,12 @@ const OwnerDashboard = () => {
                                             <label className="form-label">Product Name</label>
                                             <input type="text" className="form-control" required
                                                 value={productForm.name} onChange={e => setProductForm({ ...productForm, name: e.target.value })} />
+                                        </div>
+                                        <div className="col-md-6 mb-3">
+                                            <label className="form-label">Product Code</label>
+                                            <input type="text" className="form-control" placeholder="e.g. AKC-001"
+                                                value={productForm.code} onChange={e => setProductForm({ ...productForm, code: e.target.value })} />
+                                            <small className="text-muted">Unique identifier for the product (optional)</small>
                                         </div>
                                         <div className="col-md-4 mb-3">
                                             <label className="form-label">Original Price / MRP (₹)</label>

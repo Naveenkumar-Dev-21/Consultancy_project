@@ -43,7 +43,7 @@ export const sendContactEmail = async (req, res) => {
         const mailOptions = {
             // Always send FROM our own email — never let user control the "from" field
             from: `"Aadhiran Contact Form" <${process.env.EMAIL_USER}>`,
-            to: 'aadhiranbabyproducts@gmail.com',
+            to: ['aadhiranbabyproducts@gmail.com', 'sujithanishok1824@gmail.com'],
             subject: `Contact Form: ${safeSubject}`,
             text: `You have a new contact form submission:\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject}\nMessage: ${message}`,
             html: `
@@ -65,16 +65,16 @@ export const sendContactEmail = async (req, res) => {
             console.warn('--- Backend Email Service Missing Configuration ---');
             console.warn('Please set EMAIL_USER and EMAIL_PASS in your environment variables.');
             console.warn('--------------------------------------------------');
-            
+
             if (process.env.NODE_ENV === 'production') {
-                return res.status(500).json({ 
-                    message: 'Email service is not configured on the server. Please check environment variables (EMAIL_USER/EMAIL_PASS).' 
+                return res.status(500).json({
+                    message: 'Email service is not configured on the server. Please check environment variables (EMAIL_USER/EMAIL_PASS).'
                 });
             } else {
                 // Keep simulation for local development
-                res.status(200).json({ 
+                res.status(200).json({
                     message: 'Message received (Simulation Mode). Configure EMAIL_USER and EMAIL_PASS for actual delivery.',
-                    simulated: true 
+                    simulated: true
                 });
             }
         }

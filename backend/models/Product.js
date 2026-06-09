@@ -19,7 +19,7 @@ const productSchema = mongoose.Schema(
             type: [String],
             default: [],
             validate: {
-                validator: function(arr) {
+                validator: function (arr) {
                     return arr.length <= 3;
                 },
                 message: 'Maximum 3 description images allowed'
@@ -76,6 +76,12 @@ const productSchema = mongoose.Schema(
             type: String,
             enum: ['Boy', 'Girl', 'Unisex'],
             default: 'Unisex',
+        },
+        code: {
+            type: String,
+            unique: true,
+            sparse: true,
+            trim: true,
         }
     },
     {

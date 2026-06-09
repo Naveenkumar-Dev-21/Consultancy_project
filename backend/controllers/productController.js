@@ -71,7 +71,8 @@ export const createProduct = async (req, res) => {
             description: req.body.description,
             ageGroup: req.body.ageGroup || [],
             sizes: req.body.sizes || [],
-            gender: req.body.gender || 'Unisex'
+            gender: req.body.gender || 'Unisex',
+            code: req.body.code || undefined
         });
 
         const createdProduct = await product.save();
@@ -117,6 +118,7 @@ export const updateProduct = async (req, res) => {
         product.sizes = req.body.sizes !== undefined ? req.body.sizes : product.sizes;
         product.gender = req.body.gender || product.gender;
         product.originalPrice = req.body.originalPrice !== undefined ? req.body.originalPrice : product.originalPrice;
+        product.code = req.body.code !== undefined ? req.body.code : product.code;
 
         const updatedProduct = await product.save();
         res.json(decryptProduct(updatedProduct));
