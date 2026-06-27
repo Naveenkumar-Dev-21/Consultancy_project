@@ -258,62 +258,62 @@ const CartPage = () => {
 
     if (cartItems.length === 0) {
         return (
-            <div className="section-container min-h-[70vh] flex flex-col items-center justify-center text-center px-4">
-                <div className="w-20 h-20 bg-rose-50 rounded-3xl flex items-center justify-center mb-6">
-                    <Package className="text-rose-300" size={32} />
+            <div className="section-container min-h-[70vh] flex flex-col items-center justify-center text-center px-4" style={{ background: 'var(--bg-primary)' }}>
+                <div className="w-20 h-20 bg-rose-50 dark:bg-rose-500/10 rounded-full flex items-center justify-center mb-6 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)]">
+                    <Package className="text-rose-300 animate-bounce-soft" size={32} />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Your bag is empty.</h2>
-                <p className="text-gray-400 mb-8 max-w-sm text-base">Every baby deserves something special. Start exploring our collections today.</p>
-                <button onClick={() => navigate('/')} className="premium-btn btn-primary px-8 py-3.5">Continue Shopping</button>
+                <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white mb-4">Your bag is empty.</h2>
+                <p className="text-gray-400 dark:text-gray-500 mb-8 max-w-sm text-base">Every baby deserves something special. Start exploring our collections today.</p>
+                <button onClick={() => navigate('/')} className="btn-primary py-3.5 px-8 rounded-full">Continue Shopping</button>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen py-10 sm:py-16">
+        <div className="min-h-screen py-10 sm:py-16" style={{ background: 'var(--bg-primary)' }}>
             <div className="section-container">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-8 sm:mb-12 tracking-tight">Review your bag.</h1>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-8 sm:mb-12 tracking-tight">Review your bag.</h1>
 
                 <div className="grid lg:grid-cols-12 gap-8 sm:gap-12">
                     {/* Items List */}
                     <div className="lg:col-span-8 space-y-4 sm:space-y-6">
                         {Array.isArray(cartItems) && cartItems.map((item, idx) => (
-                            <div key={`${item.product}-${item.selectedSize || 'nosize'}-${item.selectedAgeGroup || 'noage'}-${idx}`} className="bg-white/80 backdrop-blur-xl p-4 sm:p-6 rounded-2xl sm:rounded-[24px] shadow-card border border-rose-100/60 flex gap-4 sm:gap-6 items-center group">
-                                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-rose-50/50 rounded-xl overflow-hidden flex-shrink-0">
-                                    <img src={getFullUrl(item.image)} alt={item.name} className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110" />
+                            <div key={`${item.product}-${item.selectedSize || 'nosize'}-${item.selectedAgeGroup || 'noage'}-${idx}`} className="clay-card p-4 sm:p-6 flex gap-4 sm:gap-6 items-center group">
+                                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-rose-50/50 dark:bg-charcoal-700/50 rounded-[18px] overflow-hidden flex-shrink-0 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50">
+                                    <img src={getFullUrl(item.image)} alt={item.name} className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-500 group-hover:scale-110" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start gap-2">
                                         <div className="min-w-0">
-                                            <h3 className="text-base sm:text-lg font-bold text-gray-900 group-hover:text-rose-500 transition-all truncate">{item.name}</h3>
+                                            <h3 className="text-base sm:text-lg font-black text-gray-900 dark:text-white group-hover:text-rose-500 transition-all truncate">{item.name}</h3>
                                             {/* Quantity Selector */}
                                             <div className="flex items-center gap-2 mt-2">
                                                 <button
                                                     onClick={() => updateQty(item.product, item.qty - 1, item.selectedSize, item.selectedAgeGroup)}
-                                                    className="w-8 h-8 rounded-full bg-rose-50 hover:bg-rose-100 flex items-center justify-center transition-colors active:scale-95 border border-rose-200"
+                                                    className="w-8 h-8 rounded-full bg-white dark:bg-charcoal-700 hover:bg-rose-50 flex items-center justify-center transition-colors active:scale-95 border border-white/50 dark:border-white/5 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)]"
                                                 >
                                                     <Minus size={14} className="text-rose-500" />
                                                 </button>
-                                                <span className="text-sm font-bold text-gray-900 w-8 text-center">{item.qty}</span>
+                                                <span className="text-sm font-black text-gray-900 dark:text-white w-8 text-center">{item.qty}</span>
                                                 <button
                                                     onClick={() => updateQty(item.product, item.qty + 1, item.selectedSize, item.selectedAgeGroup)}
                                                     disabled={item.qty >= item.stock}
-                                                    className={`w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center transition-colors active:scale-95 border border-rose-200 ${item.qty >= item.stock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-rose-100'}`}
+                                                    className={`w-8 h-8 rounded-full bg-white dark:bg-charcoal-700 flex items-center justify-center transition-colors active:scale-95 border border-white/50 dark:border-white/5 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] ${item.qty >= item.stock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-rose-50'}`}
                                                 >
                                                     <Plus size={14} className="text-rose-500" />
                                                 </button>
                                             </div>
                                         </div>
-                                        <p className="text-lg sm:text-xl font-bold text-gray-900 flex-shrink-0">₹{item.price * item.qty}</p>
+                                        <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-white flex-shrink-0">₹{item.price * item.qty}</p>
                                     </div>
                                     <div className="mt-3 flex items-center gap-3">
                                         {item.selectedSize && (
-                                            <span className="text-xs font-bold text-rose-500 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+                                            <span className="text-xs font-black text-rose-500 bg-rose-50 dark:bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-200 dark:border-rose-500/25">
                                                 Size: {item.selectedSize}
                                             </span>
                                         )}
                                         {item.selectedAgeGroup && (
-                                            <span className="text-xs font-bold text-violet-500 bg-violet-50 px-2.5 py-1 rounded-full border border-violet-200">
+                                            <span className="text-xs font-black text-violet-500 bg-violet-50 dark:bg-violet-500/10 px-2.5 py-1 rounded-full border border-violet-200 dark:border-violet-500/25">
                                                 Age: {typeof item.selectedAgeGroup === 'object' ? item.selectedAgeGroup.ageGroup : item.selectedAgeGroup}
                                             </span>
                                         )}
@@ -331,13 +331,13 @@ const CartPage = () => {
 
                     {/* Summary & Checkout */}
                     <div className="lg:col-span-4">
-                        <div className="bg-white/80 backdrop-blur-xl p-5 sm:p-6 rounded-2xl shadow-soft border border-rose-100/60 sticky top-24">
+                        <div className="clay-card p-5 sm:p-6 sticky top-24">
                             <div className="flex items-center justify-between mb-5 sm:mb-6">
-                                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Shipping Details</h2>
+                                <h2 className="text-lg sm:text-xl font-black text-gray-900 dark:text-white">Shipping Details</h2>
                                 <button
                                     type="button"
                                     onClick={useProfileAddress}
-                                    className="text-[10px] font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition-all border border-rose-100"
+                                    className="text-[10px] font-black text-rose-500 bg-white dark:bg-charcoal-700 px-3 py-1.5 rounded-full transition-all border border-white/50 dark:border-white/5 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)]"
                                 >
                                     USE PROFILE ADDRESS
                                 </button>
@@ -345,14 +345,14 @@ const CartPage = () => {
                             <form onSubmit={(e) => { e.preventDefault(); checkoutHandler(); }} className="space-y-6">
                                 <div className="space-y-4">
                                     <div className="relative group">
-                                        <div className="absolute left-4 top-4 text-rose-300 group-focus-within:text-rose-500 transition-colors">
+                                        <div className="absolute left-4 top-4 text-rose-300 dark:text-rose-400/80 group-focus-within:text-rose-500 transition-colors">
                                             <MapPin size={18} />
                                         </div>
                                         <textarea
                                             required id="address"
                                             value={shippingDetails.address}
                                             onChange={handleInputChange}
-                                            className="w-full pl-11 pr-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400 resize-none"
+                                            className="clay-input pl-11 pr-4 py-3.5 resize-none"
                                             placeholder="Street Address" rows="2"
                                         ></textarea>
                                     </div>
@@ -361,29 +361,29 @@ const CartPage = () => {
                                         <input
                                             required id="city" type="text" placeholder="City"
                                             value={shippingDetails.city} onChange={handleInputChange}
-                                            className="w-full px-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                            className="clay-input px-4 py-3.5"
                                         />
                                         <input
                                             required id="postalCode" type="text" placeholder="Zip Code"
                                             value={shippingDetails.postalCode} onChange={handleInputChange}
-                                            className="w-full px-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                            className="clay-input px-4 py-3.5"
                                         />
                                     </div>
 
                                     <input
                                         required id="country" type="text" placeholder="Country"
                                         value={shippingDetails.country} onChange={handleInputChange}
-                                        className="w-full px-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                        className="clay-input px-4 py-3.5"
                                     />
 
                                     <div className="relative group">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-300 group-focus-within:text-rose-500 transition-colors">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-300 dark:text-rose-400/80 group-focus-within:text-rose-500 transition-colors">
                                             <Phone size={18} />
                                         </div>
                                         <input
                                             required id="phone" type="tel" placeholder="Phone Number"
                                             value={shippingDetails.phone} onChange={handleInputChange}
-                                            className="w-full pl-11 pr-4 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                            className="clay-input pl-11 pr-4 py-3.5"
                                         />
                                     </div>
                                 </div>
@@ -418,7 +418,7 @@ const CartPage = () => {
                                                 placeholder="ENTER CODE"
                                                 value={couponCode}
                                                 onChange={(e) => { setCouponCode(e.target.value); setCouponError(''); }}
-                                                className="w-full pl-4 pr-24 py-3.5 bg-rose-50/30 border border-rose-100 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-sm font-bold transition-all placeholder:text-gray-300 uppercase tracking-widest"
+                                                className="clay-input pl-4 pr-24 py-3.5 text-xs font-bold uppercase tracking-widest"
                                             />
                                             <button
                                                 type="button"
@@ -437,30 +437,30 @@ const CartPage = () => {
                                     )}
                                 </div>
 
-                                <div className="border-t border-rose-100 pt-6 mt-8 space-y-4">
-                                    <div className="flex justify-between text-gray-500 text-sm sm:text-base font-medium">
+                                <div className="border-t border-rose-100 dark:border-white/10 pt-6 mt-8 space-y-4">
+                                    <div className="flex justify-between text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium">
                                         <span>Subtotal</span>
-                                        <span className="text-gray-900">₹{cartTotal.toFixed(2)}</span>
+                                        <span className="text-gray-900 dark:text-white">₹{cartTotal.toFixed(2)}</span>
                                     </div>
                                     {discountAmount > 0 && (
-                                        <div className="flex justify-between text-green-600 text-sm sm:text-base font-bold bg-green-50/50 p-3 rounded-xl border border-green-100/50">
+                                        <div className="flex justify-between text-green-600 text-sm sm:text-base font-bold bg-green-50/50 dark:bg-green-500/10 p-3 rounded-xl border border-green-100/50 dark:border-green-500/20">
                                             <span className="flex items-center gap-2">
                                                 <Tag size={14} /> Discount
                                             </span>
                                             <span>-₹{discountAmount.toFixed(2)}</span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between text-gray-500 text-sm sm:text-base font-medium">
+                                    <div className="flex justify-between text-gray-500 dark:text-gray-400 text-sm sm:text-base font-medium">
                                         <span>Shipping</span>
                                         <span className="text-green-500 font-bold text-xs uppercase tracking-widest">Free</span>
                                     </div>
-                                    <div className="flex justify-between font-bold text-2xl sm:text-3xl text-gray-900 mt-2 tracking-tight">
+                                    <div className="flex justify-between font-black text-2xl sm:text-3xl text-gray-900 dark:text-white mt-2 tracking-tight">
                                         <span>Total</span>
                                         <span>₹{finalTotal.toFixed(2)}</span>
                                     </div>
                                     <button
                                         type="submit"
-                                        className="w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white py-4.5 rounded-[22px] font-bold flex items-center justify-center gap-3 hover:from-rose-500 hover:to-pink-600 transition-all shadow-xl shadow-rose-500/25 active:scale-95 text-base sm:text-lg mt-4 group"
+                                        className="w-full btn-primary py-4 rounded-full text-base sm:text-lg flex items-center justify-center gap-3 group mt-4"
                                     >
                                         <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
                                             <CreditCard size={18} />

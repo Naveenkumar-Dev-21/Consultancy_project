@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Truck, Leaf } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Truck, Leaf, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const slides = [
     {
@@ -9,21 +10,24 @@ const slides = [
         image: "/Images/Carousel/boy_linen_1.png",
         title: "The Linen Edit",
         subtitle: "Timeless, breathable linen for your little gentleman.",
-        position: "center 20%"
+        position: "center 20%",
+        accent: "from-rose-500/80 to-pink-600/80",
     },
     {
         id: 2,
         image: "/Images/Carousel/boy_linen_2.png",
         title: "Garden Adventures",
         subtitle: "Soft-as-air sage linen rompers for outdoor play.",
-        position: "75% 15%"
+        position: "75% 15%",
+        accent: "from-emerald-500/80 to-teal-600/80",
     },
     {
         id: 3,
         image: "/Images/Carousel/boy_linen_3.png",
         title: "Pure Comfort",
         subtitle: "Minimalist cream linen sets for cozy moments.",
-        position: "center 25%"
+        position: "center 25%",
+        accent: "from-amber-500/80 to-orange-600/80",
     }
 ];
 
@@ -32,6 +36,7 @@ const SLIDE_INTERVAL = 5000;
 const HeroCarousel = () => {
     const [current, setCurrent] = useState(0);
     const [progressKey, setProgressKey] = useState(0);
+    const navigate = useNavigate();
 
     const goNext = useCallback(() => {
         setCurrent((prev) => (prev + 1) % slides.length);
@@ -56,22 +61,22 @@ const HeroCarousel = () => {
     // Staggered text variants
     const containerVariants = {
         hidden: {},
-        visible: { transition: { staggerChildren: 0.18, delayChildren: 0.25 } }
+        visible: { transition: { staggerChildren: 0.15, delayChildren: 0.2 } }
     };
     const itemVariants = {
-        hidden: { y: 32, opacity: 0 },
-        visible: { y: 0, opacity: 1, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } }
+        hidden: { y: 40, opacity: 0, filter: 'blur(8px)' },
+        visible: { y: 0, opacity: 1, filter: 'blur(0px)', transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
     };
 
     return (
-        <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden bg-rose-50">
+        <div className="relative w-full h-[340px] sm:h-[440px] md:h-[540px] lg:h-[640px] overflow-hidden bg-charcoal-900">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={current}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.7 }}
+                    transition={{ duration: 0.8 }}
                     className="absolute inset-0"
                 >
                     <div className="w-full h-full relative overflow-hidden">
@@ -82,44 +87,63 @@ const HeroCarousel = () => {
                             alt={slides[current].title}
                             className="w-full h-full object-cover"
                             style={{ objectPosition: slides[current].position }}
-                            initial={{ scale: 1.08 }}
+                            initial={{ scale: 1.12 }}
                             animate={{ scale: 1 }}
-                            transition={{ duration: 6.5, ease: 'easeOut' }}
+                            transition={{ duration: 7, ease: 'easeOut' }}
                         />
 
-                        {/* Gradient overlays */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-rose-900/25 to-transparent" />
+                        {/* Multi-layer gradient overlays */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-black/5" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
+                        <div className={`absolute inset-0 bg-gradient-to-br ${slides[current].accent} opacity-10`} />
 
-                        {/* Content with stagger */}
-                        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
+                        {/* Content with stagger and blur reveal */}
+                        <div className="absolute inset-0 flex items-end sm:items-center justify-start">
                             <motion.div
-                                className="max-w-4xl"
+                                className="section-container pb-20 sm:pb-0 max-w-4xl"
                                 variants={containerVariants}
                                 initial="hidden"
                                 animate="visible"
                             >
                                 <motion.div variants={itemVariants}>
-                                    <span className="inline-block bg-white/20 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-[0.25em] px-4 py-1.5 rounded-full mb-4 border border-white/30">
+                                    <span className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-white text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] px-4 py-2 rounded-full mb-4 sm:mb-5 border border-white/20">
+                                        <span className="w-1.5 h-1.5 bg-rose-400 rounded-full animate-pulse" />
                                         New Collection
                                     </span>
                                 </motion.div>
                                 <motion.h1
                                     variants={itemVariants}
-                                    className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-white mb-4 sm:mb-6 tracking-tighter drop-shadow-2xl"
+                                    className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-white mb-3 sm:mb-5 tracking-tighter leading-[0.9] drop-shadow-2xl"
+                                    style={{ fontFamily: '"Migra", "Cormorant Garamond", serif' }}
                                 >
-                                    {slides[current].title}
+                                    {slides[current].title.split(' ').map((word, i) => (
+                                        <span key={i}>
+                                            {i > 0 && ' '}
+                                            {i === slides[current].title.split(' ').length - 1 ? (
+                                                <span className="text-rose-300">{word}</span>
+                                            ) : word}
+                                        </span>
+                                    ))}
                                 </motion.h1>
                                 <motion.p
                                     variants={itemVariants}
-                                    className="text-lg sm:text-xl md:text-2xl text-white/95 font-medium mb-8 sm:mb-10 tracking-wide max-w-2xl mx-auto drop-shadow-md"
+                                    className="text-base sm:text-lg md:text-xl text-white/80 font-medium mb-6 sm:mb-8 tracking-wide max-w-xl"
                                 >
                                     {slides[current].subtitle}
                                 </motion.p>
-                                <motion.div variants={itemVariants}>
-                                    <button className="shimmer-btn btn-primary px-10 sm:px-14 py-4 sm:py-5 rounded-2xl text-sm sm:text-lg font-black uppercase tracking-[0.2em] shadow-2xl inline-flex items-center gap-3">
-                                        Shop Collection
-                                        <ChevronRight size={20} />
+                                <motion.div variants={itemVariants} className="flex items-center gap-3 sm:gap-4">
+                                    <button 
+                                        onClick={() => navigate('/')}
+                                        className="shimmer-btn btn-primary px-8 sm:px-10 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold tracking-wider inline-flex items-center gap-2.5 group"
+                                    >
+                                        Shop Now
+                                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                    </button>
+                                    <button 
+                                        onClick={() => navigate('/about')}
+                                        className="px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-bold text-white border-2 border-white/25 hover:bg-white/10 hover:border-white/40 transition-all backdrop-blur-sm"
+                                    >
+                                        Our Story
                                     </button>
                                 </motion.div>
                             </motion.div>
@@ -130,10 +154,10 @@ const HeroCarousel = () => {
 
             {/* Floating Badges */}
             <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8, duration: 0.6 }}
-                className="floating-badge left-4 sm:left-8 top-6 sm:top-10 animate-float hidden sm:flex"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9, duration: 0.6 }}
+                className="floating-badge right-4 sm:right-8 top-6 sm:top-10 animate-float hidden lg:flex"
             >
                 <div className="w-8 h-8 bg-rose-50 rounded-xl flex items-center justify-center">
                     <Truck size={16} className="text-rose-400" />
@@ -145,10 +169,10 @@ const HeroCarousel = () => {
             </motion.div>
 
             <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.1, duration: 0.6 }}
-                className="floating-badge right-4 sm:right-8 top-6 sm:top-10 animate-float-delay hidden sm:flex"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2, duration: 0.6 }}
+                className="floating-badge right-4 sm:right-8 top-24 sm:top-28 animate-float-delay hidden lg:flex"
             >
                 <div className="w-8 h-8 bg-green-50 rounded-xl flex items-center justify-center">
                     <Leaf size={16} className="text-green-500" />
@@ -162,37 +186,41 @@ const HeroCarousel = () => {
             {/* Prev/Next Controls */}
             <button
                 onClick={goPrev}
-                className="absolute left-3 sm:left-6 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/40 hover:scale-110 transition-all"
+                className="absolute left-3 sm:left-6 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/25 hover:scale-110 transition-all border border-white/10 hover:border-white/25"
             >
-                <ChevronLeft size={24} strokeWidth={2} />
+                <ChevronLeft size={22} strokeWidth={2.5} />
             </button>
             <button
                 onClick={goNext}
-                className="absolute right-3 sm:right-6 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/40 hover:scale-110 transition-all"
+                className="absolute right-3 sm:right-6 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-white/25 hover:scale-110 transition-all border border-white/10 hover:border-white/25"
             >
-                <ChevronRight size={24} strokeWidth={2} />
+                <ChevronRight size={22} strokeWidth={2.5} />
             </button>
 
-            {/* Pagination Dots + Progress */}
-            <div className="absolute bottom-5 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
-                <div className="flex gap-2.5">
+            {/* ─── Pagination: Glass Pill with Progress ─── */}
+            <div className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-full border border-white/10">
                     {slides.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => handleDotClick(index)}
-                            className={`rounded-full transition-all duration-300 ${current === index
-                                ? "bg-gradient-to-r from-rose-400 to-pink-500 w-8 h-3 shadow-lg"
-                                : "bg-white/50 w-3 h-3 hover:bg-white/70"
-                            }`}
-                        />
+                            className="relative"
+                        >
+                            <div className={`rounded-full transition-all duration-500 ${current === index
+                                ? 'w-8 h-2 bg-white shadow-lg'
+                                : 'w-2 h-2 bg-white/40 hover:bg-white/60'
+                            }`} />
+                            {/* Progress bar overlay on active dot */}
+                            {current === index && (
+                                <div className="absolute inset-0 rounded-full overflow-hidden">
+                                    <div
+                                        key={progressKey}
+                                        className="h-full bg-gradient-to-r from-rose-400 to-pink-500 rounded-full animate-progress"
+                                    />
+                                </div>
+                            )}
+                        </button>
                     ))}
-                </div>
-                {/* Progress bar */}
-                <div className="w-24 h-0.5 bg-white/20 rounded-full overflow-hidden">
-                    <div
-                        key={progressKey}
-                        className="h-full bg-white/80 rounded-full animate-progress"
-                    />
                 </div>
             </div>
         </div>

@@ -148,14 +148,14 @@ const CheckoutPage = () => {
 
     if (isSuccess && lastOrder) {
         return (
-            <div className="min-h-screen py-20 sm:py-32 font-sans">
+            <div className="min-h-screen py-20 sm:py-32 font-sans" style={{ background: 'var(--bg-primary)' }}>
                 <div className="section-container max-w-2xl">
-                    <div className="bg-white/80 backdrop-blur-xl rounded-3xl sm:rounded-[40px] p-8 sm:p-12 text-center shadow-soft border border-rose-100/60">
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-inner">
-                            <CheckCircle2 className="text-green-500" size={48} />
+                    <div className="clay-card p-8 sm:p-12 text-center">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-rose-50 dark:bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)]">
+                            <CheckCircle2 className="text-green-500 animate-bounce-soft" size={48} />
                         </div>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 tracking-tight">Order Confirmed!</h2>
-                        <p className="text-gray-400 text-base sm:text-lg mb-10 sm:mb-12">Thank you for your purchase. Your order <span className="font-mono text-gray-900 font-bold">#{lastOrder._id.substring(0, 8).toUpperCase()}</span> is being processed.</p>
+                        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">Order Confirmed!</h2>
+                        <p className="text-gray-400 dark:text-gray-500 text-base sm:text-lg mb-10 sm:mb-12">Thank you for your purchase. Your order <span className="font-mono text-gray-900 dark:text-white font-bold">#{lastOrder._id.substring(0, 8).toUpperCase()}</span> is being processed.</p>
 
                         <div className="grid sm:grid-cols-2 gap-4 mb-10 sm:mb-12">
                             <button
@@ -163,13 +163,13 @@ const CheckoutPage = () => {
                                     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
                                     generateInvoice(lastOrder, userInfo?.name);
                                 }}
-                                className="flex items-center justify-center gap-3 bg-rose-50 hover:bg-rose-100 py-4 sm:py-5 rounded-2xl sm:rounded-3xl font-bold text-rose-500 transition-all border border-rose-200 text-base"
+                                className="flex items-center justify-center gap-3 bg-white dark:bg-charcoal-700 py-4 sm:py-5 rounded-full font-black text-rose-500 transition-all shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50 dark:border-white/5 text-base"
                             >
                                 <FileText size={20} /> Download Invoice
                             </button>
                             <button
                                 onClick={() => navigate('/myorders')}
-                                className="flex items-center justify-center gap-3 bg-gradient-to-r from-rose-400 to-pink-500 hover:from-rose-500 hover:to-pink-600 py-4 sm:py-5 rounded-2xl sm:rounded-3xl font-bold text-white transition-all shadow-lg shadow-rose-500/20 text-base"
+                                className="flex items-center justify-center gap-3 btn-primary py-4 sm:py-5 rounded-full text-base"
                             >
                                 Track Order <ArrowRight size={20} />
                             </button>
@@ -184,35 +184,35 @@ const CheckoutPage = () => {
         );
     }
 
-    const inputClass = "w-full px-5 py-4 bg-rose-50/50 border border-rose-200 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400";
+    const inputClass = "clay-input";
 
     return (
-        <div className="min-h-screen py-12 sm:py-20 font-sans">
+        <div className="min-h-screen py-12 sm:py-20 font-sans" style={{ background: 'var(--bg-primary)' }}>
             <div className="section-container max-w-5xl">
                 <button
                     onClick={() => navigate('/cart')}
-                    className="flex items-center gap-2 text-gray-400 hover:text-gray-900 mb-6 sm:mb-8 transition-colors font-medium text-base"
+                    className="flex items-center gap-2 text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 sm:mb-8 transition-colors font-bold text-base"
                 >
                     <ChevronLeft size={20} /> Back to Bag
                 </button>
 
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-8 sm:mb-12 tracking-tight">Checkout.</h1>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-8 sm:mb-12 tracking-tight">Checkout.</h1>
 
                 <div className="grid lg:grid-cols-12 gap-8 sm:gap-12">
                     {/* Shipping Form */}
                     <div className="lg:col-span-7">
-                        <div className="bg-white/80 backdrop-blur-xl p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-[40px] shadow-soft border border-rose-100/60">
+                        <div className="clay-card p-6 sm:p-8 md:p-10">
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center">
+                                    <div className="w-12 h-12 bg-rose-50 dark:bg-rose-500/10 rounded-full flex items-center justify-center shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)]">
                                         <Truck className="text-rose-400" size={24} />
                                     </div>
-                                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Shipping Address</h2>
+                                    <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">Shipping Address</h2>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={useProfileAddress}
-                                    className="flex items-center gap-2 text-xs font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 px-4 py-2.5 rounded-xl transition-all border border-rose-100 self-start sm:self-center"
+                                    className="flex items-center gap-2 text-xs font-black text-rose-500 bg-white dark:bg-charcoal-700 px-4 py-2.5 rounded-full transition-all border border-white/50 dark:border-white/5 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] self-start sm:self-center"
                                 >
                                     <MapPin size={14} /> USE PROFILE ADDRESS
                                 </button>
@@ -221,14 +221,14 @@ const CheckoutPage = () => {
                             <form id="checkout-form" onSubmit={(e) => { e.preventDefault(); checkoutHandler(); }} className="space-y-5">
                                 <div className="space-y-4">
                                     <div className="relative group">
-                                        <div className="absolute left-5 top-4 text-gray-400 group-focus-within:text-rose-400 transition-colors">
+                                        <div className="absolute left-5 top-4 text-gray-400 dark:text-gray-500 group-focus-within:text-rose-400 transition-colors">
                                             <MapPin size={18} />
                                         </div>
                                         <textarea
                                             required id="address"
                                             value={shippingDetails.address}
                                             onChange={handleInputChange}
-                                            className="w-full pl-12 pr-5 py-4 bg-rose-50/50 border border-rose-200 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base resize-none transition-all placeholder:text-gray-400"
+                                            className="clay-input pl-12 pr-5 py-4 resize-none"
                                             placeholder="Street Address, Area" rows="3"
                                         ></textarea>
                                     </div>
@@ -241,13 +241,13 @@ const CheckoutPage = () => {
                                     <input required id="country" type="text" placeholder="Country" value={shippingDetails.country} onChange={handleInputChange} className={inputClass} />
 
                                     <div className="relative group">
-                                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-rose-400 transition-colors">
+                                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 group-focus-within:text-rose-400 transition-colors">
                                             <Phone size={18} />
                                         </div>
                                         <input
                                             required id="phone" type="tel" placeholder="Phone Number"
                                             value={shippingDetails.phone} onChange={handleInputChange}
-                                            className="w-full pl-12 pr-5 py-4 bg-rose-50/50 border border-rose-200 rounded-2xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                            className="clay-input pl-12 pr-5 py-4"
                                         />
                                     </div>
                                 </div>
@@ -257,14 +257,14 @@ const CheckoutPage = () => {
 
                     {/* Order Summary */}
                     <div className="lg:col-span-5">
-                        <div className="bg-white/80 backdrop-blur-xl p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-[40px] shadow-soft border border-rose-100/60 sticky top-24">
-                            <h2 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-gray-900 tracking-tight">Order Summary</h2>
+                        <div className="clay-card p-6 sm:p-8 md:p-10 sticky top-24">
+                            <h2 className="text-xl sm:text-2xl font-black mb-6 sm:mb-8 text-gray-900 dark:text-white tracking-tight">Order Summary</h2>
 
                             <div className="space-y-4 mb-6 sm:mb-8 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
                                 {cartItems.map((item, idx) => (
                                     <div key={idx} className="flex gap-4 items-center">
-                                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-rose-50/50 rounded-xl overflow-hidden flex-shrink-0">
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" />
+                                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-rose-50/50 dark:bg-charcoal-700/50 rounded-[16px] overflow-hidden flex-shrink-0 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50">
+                                            <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="text-sm sm:text-base font-bold text-gray-900 truncate">{item.name}</h4>
@@ -345,7 +345,7 @@ const CheckoutPage = () => {
                                     <span>Shipping</span>
                                     <span className="text-green-500 font-bold text-xs uppercase tracking-widest px-2 py-0.5 bg-green-50 rounded">Free</span>
                                 </div>
-                                <div className="flex justify-between font-bold text-2xl sm:text-3xl text-gray-900 pt-2 tracking-tight">
+                                <div className="flex justify-between font-black text-2xl sm:text-3xl text-gray-900 dark:text-white pt-2 tracking-tight">
                                     <span>Total</span>
                                     <span>₹{finalTotal.toFixed(2)}</span>
                                 </div>
@@ -353,7 +353,7 @@ const CheckoutPage = () => {
                                 <button
                                     form="checkout-form"
                                     type="submit"
-                                    className="w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white py-4.5 rounded-[22px] font-bold text-base sm:text-lg flex items-center justify-center gap-3 hover:from-rose-500 hover:to-pink-600 shadow-xl shadow-rose-500/25 hover:shadow-2xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 group"
+                                    className="w-full btn-primary py-4 rounded-full text-base sm:text-lg flex items-center justify-center gap-3 group"
                                 >
                                     <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
                                         <CreditCard size={18} />

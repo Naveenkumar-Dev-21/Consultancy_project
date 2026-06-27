@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import { User, Lock, Mail, ArrowRight } from 'lucide-react';
+import { User, Lock, Mail, ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { GoogleLogin } from '@react-oauth/google';
 
@@ -70,12 +70,13 @@ const LoginPage = () => {
 
     return (
         <div className="min-h-[90vh] flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
-            {/* Animated blobs */}
-            <div className="blob-1 -top-32 -left-32 blob-animated" />
-            <div className="blob-2 -bottom-32 -right-32 blob-animated-reverse" />
-
-            {/* Extra ambient orb */}
-            <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-pink-200/20 rounded-full blur-3xl pointer-events-none animate-float-slow" />
+            {/* Animated mesh background */}
+            <div className="absolute inset-0 -z-10">
+                <div className="absolute top-0 left-0 w-full h-full bg-gradient-mesh dark:bg-gradient-mesh-dark" />
+                <div className="blob-1 -top-32 -left-32 blob-animated opacity-60" />
+                <div className="blob-2 -bottom-32 -right-32 blob-animated-reverse opacity-40" />
+                <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-violet-200/15 dark:bg-violet-500/5 rounded-full blur-3xl pointer-events-none animate-float-slow" />
+            </div>
 
             <motion.div
                 initial={{ opacity: 0, y: 30, scale: 0.97 }}
@@ -83,27 +84,27 @@ const LoginPage = () => {
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 className="w-full max-w-[460px] relative z-10"
             >
-                <div className="bg-white/85 backdrop-blur-xl rounded-3xl sm:rounded-[32px] shadow-soft border border-rose-100/60 p-6 sm:p-10 md:p-12">
+                <div className="glass-card p-6 sm:p-10 md:p-12">
                     <div className="text-center mb-8 sm:mb-10">
                         <motion.div
                             initial={{ scale: 0.5, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.15 }}
-                            className="w-16 h-16 sm:w-18 sm:h-18 bg-gradient-to-br from-rose-100 to-pink-100 rounded-2xl flex items-center justify-center mx-auto mb-5 sm:mb-6"
+                            className="w-16 h-16 sm:w-18 sm:h-18 bg-gradient-to-br from-rose-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-5 sm:mb-6 shadow-lg shadow-rose-500/25"
                         >
-                            <User className="text-rose-400" size={32} />
+                            <Sparkles className="text-white" size={28} />
                         </motion.div>
-                        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">Sign in for checkout.</h1>
-                        <p className="text-gray-400 text-sm sm:text-base mt-2">Manage your orders and favorites.</p>
+                        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Welcome back.</h1>
+                        <p className="text-gray-400 dark:text-gray-500 text-sm sm:text-base mt-2">Sign in to manage your orders and favorites.</p>
                     </div>
 
                     {error && (
                         <motion.div
-                            initial={{ opacity: 0, y: -8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm font-semibold flex items-center gap-2 border border-red-100"
+                            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            className="bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 p-4 rounded-2xl mb-6 text-sm font-semibold flex items-center gap-2 border border-red-100 dark:border-red-500/20"
                         >
-                            <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0" />
+                            <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 animate-pulse" />
                             {error}
                         </motion.div>
                     )}
@@ -112,11 +113,11 @@ const LoginPage = () => {
                         <div className="space-y-4">
                             {/* Email */}
                             <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-300 group-focus-within:text-rose-400 transition-colors" size={18} />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-500 group-focus-within:text-rose-400 transition-colors" size={18} />
                                 <input
                                     type="email"
                                     required
-                                    className="w-full pl-12 pr-4 py-3.5 sm:py-4 bg-rose-50/50 border border-rose-200 rounded-xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                    className="premium-input pl-12"
                                     placeholder="Email Address"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -125,11 +126,11 @@ const LoginPage = () => {
 
                             {/* Password */}
                             <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-300 group-focus-within:text-rose-400 transition-colors" size={18} />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 dark:text-gray-500 group-focus-within:text-rose-400 transition-colors" size={18} />
                                 <input
                                     type="password"
                                     required
-                                    className="w-full pl-12 pr-4 py-3.5 sm:py-4 bg-rose-50/50 border border-rose-200 rounded-xl focus:bg-white focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none text-base transition-all placeholder:text-gray-400"
+                                    className="premium-input pl-12"
                                     placeholder="Password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -158,9 +159,9 @@ const LoginPage = () => {
                         </motion.button>
 
                         <div className="relative py-3 sm:py-4 flex items-center">
-                            <div className="flex-grow border-t border-rose-100" />
-                            <span className="flex-shrink mx-4 text-xs font-bold text-gray-300 uppercase tracking-widest">Or</span>
-                            <div className="flex-grow border-t border-rose-100" />
+                            <div className="flex-grow border-t border-rose-100/60 dark:border-white/10" />
+                            <span className="flex-shrink mx-4 text-xs font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest">Or</span>
+                            <div className="flex-grow border-t border-rose-100/60 dark:border-white/10" />
                         </div>
 
                         <div className="flex justify-center">
@@ -177,7 +178,7 @@ const LoginPage = () => {
                     </form>
 
                     <div className="mt-8 sm:mt-10 text-center">
-                        <p className="text-gray-400 text-sm sm:text-base">
+                        <p className="text-gray-400 dark:text-gray-500 text-sm sm:text-base">
                             Don't have an ID?{' '}
                             <Link to="/register" className="text-rose-500 font-bold hover:underline hover:text-rose-600">
                                 Create one now.
@@ -186,7 +187,7 @@ const LoginPage = () => {
                     </div>
                 </div>
 
-                <p className="text-center mt-6 sm:mt-8 text-xs sm:text-sm text-gray-400 px-6 leading-relaxed">
+                <p className="text-center mt-6 sm:mt-8 text-xs sm:text-sm text-gray-400 dark:text-gray-600 px-6 leading-relaxed">
                     By signing in, you agree to our Terms of Service and Privacy Policy.
                 </p>
             </motion.div>

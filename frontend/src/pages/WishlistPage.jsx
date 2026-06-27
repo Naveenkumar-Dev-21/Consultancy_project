@@ -17,7 +17,7 @@ const WishlistPage = () => {
     };
 
     return (
-        <div className="min-h-screen py-12 sm:py-20 font-sans">
+        <div className="min-h-screen py-12 sm:py-20 font-sans" style={{ background: 'var(--bg-primary)' }}>
             <div className="section-container">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -25,14 +25,14 @@ const WishlistPage = () => {
                     transition={{ duration: 0.5 }}
                 >
                     <div className="flex items-center gap-4 mb-8 sm:mb-12">
-                        <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center">
+                        <div className="w-14 h-14 bg-rose-50 dark:bg-rose-500/10 rounded-full flex items-center justify-center shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50">
                             <Heart className="text-rose-400 fill-rose-400" size={28} />
                         </div>
                         <div>
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
                                 My Wishlist
                             </h1>
-                            <p className="text-gray-400 text-sm sm:text-base mt-1">
+                            <p className="text-gray-400 dark:text-gray-500 text-sm sm:text-base mt-1">
                                 {wishlistProducts.length} {wishlistProducts.length === 1 ? 'item' : 'items'} saved
                             </p>
                         </div>
@@ -41,7 +41,7 @@ const WishlistPage = () => {
                     {loading ? (
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
                             {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="h-64 sm:h-80 bg-rose-100/50 animate-pulse rounded-2xl"></div>
+                                <div key={i} className="h-64 sm:h-80 bg-rose-100/30 animate-pulse rounded-[32px] clay-card"></div>
                             ))}
                         </div>
                     ) : wishlistProducts.length > 0 ? (
@@ -57,19 +57,19 @@ const WishlistPage = () => {
                             </AnimatePresence>
                         </div>
                     ) : (
-                        <div className="text-center py-20 sm:py-32 bg-white rounded-3xl border border-dashed border-rose-200">
-                            <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Heart className="text-rose-300" size={32} />
+                        <div className="text-center py-20 sm:py-32 glass-card border border-dashed border-rose-200">
+                            <div className="w-20 h-20 bg-rose-50 dark:bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50">
+                                <Heart className="text-rose-300 dark:text-rose-400 animate-bounce-soft" size={32} />
                             </div>
-                            <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                            <h3 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white mb-2">
                                 Your wishlist is empty
                             </h3>
-                            <p className="text-gray-400 mb-8 text-base">
+                            <p className="text-gray-400 dark:text-gray-500 mb-8 text-base">
                                 Save items you love by tapping the heart icon
                             </p>
                             <button
                                 onClick={() => navigate('/')}
-                                className="px-8 py-3.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-full text-base font-bold shadow-lg shadow-rose-500/20 hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 inline-flex items-center gap-2"
+                                className="btn-primary py-3.5 px-8 rounded-full inline-flex items-center gap-2"
                             >
                                 <ShoppingBag size={18} /> Start Shopping
                             </button>

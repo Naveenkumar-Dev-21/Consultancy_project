@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: 'class',
     content: [
         "./index.html",
         "./src/**/*.{js,ts,jsx,tsx}",
@@ -14,13 +15,60 @@ export default {
                 secondary: '#E9F5DB',
                 accent: '#C5D3E8',
                 dark: '#1F2937',
+                // New premium palette
+                cream: {
+                    50: '#FEFCF9',
+                    100: '#FAF8F5',
+                    200: '#F5F0EB',
+                    300: '#EDE5DC',
+                    400: '#DDD2C4',
+                    500: '#C7B9A8',
+                },
+                charcoal: {
+                    50: '#F5F5F7',
+                    100: '#E8E8ED',
+                    200: '#D1D1DB',
+                    300: '#9D9DAF',
+                    400: '#6B6B80',
+                    500: '#4A4A5A',
+                    600: '#2D2D3A',
+                    700: '#1E1E2A',
+                    800: '#16161F',
+                    900: '#0D0D14',
+                },
+                gold: {
+                    50: '#FFF8F0',
+                    100: '#FDEBD0',
+                    200: '#F5D0A9',
+                    300: '#E8B87A',
+                    400: '#D4A054',
+                    500: '#B8860B',
+                },
+                sage: {
+                    50: '#F5F7F4',
+                    100: '#E8ECE6',
+                    200: '#D1D9CC',
+                    300: '#A8B69F',
+                    400: '#7F9375',
+                    500: '#5F7355',
+                },
+                rosegold: {
+                    50: '#FFF5F5',
+                    100: '#FFE8E8',
+                    200: '#F5C6C6',
+                    300: '#E8A0A0',
+                    400: '#D4787A',
+                    500: '#B76E79',
+                    600: '#9A5A63',
+                },
                 rose: {
                     25: '#fff9f9',
                     975: '#2d0a12',
-                }
+                },
             },
             fontFamily: {
-                sans: ['Poppins', 'system-ui', '-apple-system', 'sans-serif'],
+                sans: ['Migra', 'Cormorant Garamond', 'serif'],
+                display: ['Migra', 'Cormorant Garamond', 'serif'],
             },
             fontSize: {
                 'xs': ['0.8rem', { lineHeight: '1.2rem' }],
@@ -54,11 +102,27 @@ export default {
                 'card-hover': '0 8px 32px rgba(248,113,113,0.14), 0 2px 8px rgba(0,0,0,0.06)',
                 'inner-rose': 'inset 0 2px 8px rgba(248,113,133,0.08)',
                 'xl-rose': '0 20px 60px -10px rgba(248,113,133,0.25)',
+                // New premium shadows
+                'premium': '0 4px 6px -1px rgba(0,0,0,0.03), 0 10px 30px -5px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.03)',
+                'premium-lg': '0 10px 40px -10px rgba(0,0,0,0.08), 0 25px 60px -15px rgba(0,0,0,0.05)',
+                'glass': '0 8px 32px rgba(0,0,0,0.04), inset 0 0 0 1px rgba(255,255,255,0.3)',
+                'card-lift': '0 14px 44px -8px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.06)',
+                'glow-rose': '0 0 30px rgba(251,113,133,0.15), 0 0 60px rgba(251,113,133,0.08)',
+                'glow-gold': '0 0 30px rgba(212,160,84,0.15), 0 0 60px rgba(212,160,84,0.08)',
+                'btn-glow': '0 4px 15px rgba(251,113,133,0.35), 0 1px 3px rgba(0,0,0,0.08)',
+                'dark-card': '0 4px 24px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2)',
             },
             backgroundImage: {
                 'gradient-rose': 'linear-gradient(135deg, #f43f5e 0%, #fb7185 50%, #ec4899 100%)',
                 'gradient-peach': 'linear-gradient(135deg, #fda4af 0%, #fb7185 100%)',
                 'gradient-warm': 'linear-gradient(135deg, #fff1f2 0%, #fce7f3 100%)',
+                // New premium gradients
+                'gradient-premium': 'linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #8b5cf6 100%)',
+                'gradient-cream': 'linear-gradient(135deg, #FAF8F5 0%, #FFF1F2 50%, #FAF8F5 100%)',
+                'gradient-dark': 'linear-gradient(135deg, #1E1E2A 0%, #16161F 50%, #0D0D14 100%)',
+                'gradient-glass': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                'gradient-mesh': 'radial-gradient(at 40% 20%, hsla(348,100%,90%,0.3) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(340,100%,85%,0.2) 0px, transparent 50%), radial-gradient(at 0% 50%, hsla(355,100%,90%,0.15) 0px, transparent 50%)',
+                'gradient-mesh-dark': 'radial-gradient(at 40% 20%, hsla(348,80%,20%,0.3) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(340,80%,15%,0.2) 0px, transparent 50%)',
             },
             animation: {
                 'float': 'float 6s ease-in-out infinite',
@@ -66,6 +130,13 @@ export default {
                 'slide-up': 'slideUp 0.5s ease-out',
                 'fade-in': 'fadeIn 0.6s ease-out',
                 'spin-slow': 'spin 3s linear infinite',
+                // New animations
+                'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+                'card-lift': 'cardLift 0.3s ease-out forwards',
+                'gradient-shift': 'gradientShift 8s ease-in-out infinite',
+                'text-reveal': 'textReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                'slide-in-right': 'slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                'ripple-out': 'rippleOut 0.6s ease-out forwards',
             },
             keyframes: {
                 float: {
@@ -84,6 +155,34 @@ export default {
                     '0%': { opacity: '0' },
                     '100%': { opacity: '1' },
                 },
+                glowPulse: {
+                    '0%, 100%': { boxShadow: '0 0 20px rgba(251,113,133,0.15)' },
+                    '50%': { boxShadow: '0 0 40px rgba(251,113,133,0.3)' },
+                },
+                cardLift: {
+                    '0%': { transform: 'translateY(0)', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' },
+                    '100%': { transform: 'translateY(-6px)', boxShadow: '0 14px 44px -8px rgba(0,0,0,0.12)' },
+                },
+                gradientShift: {
+                    '0%, 100%': { backgroundPosition: '0% 50%' },
+                    '50%': { backgroundPosition: '100% 50%' },
+                },
+                textReveal: {
+                    '0%': { opacity: '0', transform: 'translateY(20px)', filter: 'blur(8px)' },
+                    '100%': { opacity: '1', transform: 'translateY(0)', filter: 'blur(0)' },
+                },
+                slideInRight: {
+                    '0%': { transform: 'translateX(30px)', opacity: '0' },
+                    '100%': { transform: 'translateX(0)', opacity: '1' },
+                },
+                rippleOut: {
+                    '0%': { transform: 'scale(0)', opacity: '0.5' },
+                    '100%': { transform: 'scale(4)', opacity: '0' },
+                },
+            },
+            backdropBlur: {
+                'xs': '2px',
+                '3xl': '64px',
             },
         },
     },

@@ -125,7 +125,7 @@ const ProfilePage = () => {
         window.location.reload();
     };
 
-    const inputClass = "w-full mt-1.5 p-3.5 bg-rose-50/50 border border-rose-200 rounded-xl focus:ring-2 focus:ring-rose-200 focus:border-rose-400 outline-none transition-all disabled:opacity-50 disabled:bg-gray-50 text-base";
+    const inputClass = "clay-input mt-1.5";
 
     if (loading) return (
         <div className="flex justify-center py-20 min-h-screen">
@@ -136,23 +136,23 @@ const ProfilePage = () => {
     if (!user) return null;
 
     return (
-        <div className="min-h-screen py-10 sm:py-20">
+        <div className="min-h-screen py-10 sm:py-20" style={{ background: 'var(--bg-primary)' }}>
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
                 <header className="mb-8 sm:mb-10 text-center">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">My Profile</h1>
-                    <p className="text-gray-400 text-base">Manage your account and preferences.</p>
+                    <h1 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-2">My Profile</h1>
+                    <p className="text-gray-400 dark:text-gray-500 text-base">Manage your account and preferences.</p>
                 </header>
 
-                <div className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-soft border border-rose-100/60 relative">
+                <div className="clay-card p-5 sm:p-8 relative">
                     {/* Header Section with Edit Button */}
                     <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 mb-8 sm:mb-10">
                         <div className="flex items-center gap-4 sm:gap-6">
-                            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full flex items-center justify-center shadow-md text-rose-400 border-2 border-rose-200">
-                                <User size={32} />
+                            <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center shadow-lg text-white border-2 border-white/50">
+                                <span className="text-xl sm:text-3xl font-black">{user.name.charAt(0).toUpperCase()}</span>
                             </div>
                             <div>
-                                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{user.name}</h2>
-                                <span className="bg-rose-50 text-rose-500 text-xs px-3 py-1 rounded-full mt-2 inline-block font-bold uppercase tracking-wider border border-rose-200">
+                                <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">{user.name}</h2>
+                                <span className="bg-rose-50 dark:bg-rose-500/10 text-rose-500 text-xs px-3 py-1 rounded-full mt-2 inline-block font-black uppercase tracking-wider border border-rose-200 dark:border-rose-500/25">
                                     {user.role === 'admin' ? 'Administrator' : 'Customer'}
                                 </span>
                             </div>
@@ -160,7 +160,7 @@ const ProfilePage = () => {
                         <button
                             type="button"
                             onClick={() => setIsEditing(!isEditing)}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white rounded-xl text-sm font-bold hover:from-rose-500 hover:to-pink-600 transition-all shadow-lg shadow-rose-500/20 active:scale-95"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-charcoal-700 text-rose-500 rounded-full text-sm font-black transition-all border border-white/50 dark:border-white/5 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] active:scale-95"
                         >
                             {isEditing ? 'Cancel Edit' : <><Edit2 size={14} /> Edit Profile</>}
                         </button>
@@ -250,11 +250,11 @@ const ProfilePage = () => {
 
                         {/* Action Buttons */}
                         {isEditing && (
-                            <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 border-t border-rose-100">
-                                <button type="button" onClick={() => setIsEditing(false)} className="px-6 py-3.5 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors text-base">
+                            <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-6 border-t border-rose-100 dark:border-white/10">
+                                <button type="button" onClick={() => setIsEditing(false)} className="px-6 py-3.5 bg-gray-100 dark:bg-charcoal-700 text-gray-600 dark:text-gray-300 font-black rounded-full hover:bg-gray-200 transition-colors text-base shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50 dark:border-white/5">
                                     Cancel
                                 </button>
-                                <button type="submit" className="px-6 py-3.5 bg-gradient-to-r from-rose-400 to-pink-500 text-white font-bold rounded-xl hover:from-rose-500 hover:to-pink-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 text-base">
+                                <button type="submit" className="px-6 py-3.5 btn-primary rounded-full text-base flex items-center justify-center gap-2">
                                     <Save size={18} /> Save Changes
                                 </button>
                             </div>
@@ -262,11 +262,11 @@ const ProfilePage = () => {
 
                         {/* Nav Buttons */}
                         {!isEditing && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-rose-100">
-                                <button type="button" onClick={() => navigate('/myorders')} className="bg-gradient-to-r from-rose-400 to-pink-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:from-rose-500 hover:to-pink-600 transition-all shadow-lg shadow-rose-500/20 text-base">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-rose-100 dark:border-white/10">
+                                <button type="button" onClick={() => navigate('/myorders')} className="btn-primary py-4 rounded-full flex items-center justify-center gap-2 text-base">
                                     <Package size={18} /> View My Orders
                                 </button>
-                                <button type="button" onClick={logoutHandler} className="bg-red-50 text-red-500 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-red-100 transition-colors border border-red-200 text-base">
+                                <button type="button" onClick={logoutHandler} className="bg-red-500 text-white font-black py-4 rounded-full flex items-center justify-center gap-2 hover:bg-red-600 transition-colors border border-red-400/25 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.15),inset_2px_2px_4px_rgba(255,255,255,0.25)] text-base">
                                     <LogOut size={18} /> Sign Out
                                 </button>
                             </div>

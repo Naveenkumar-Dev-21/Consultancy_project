@@ -282,7 +282,7 @@ const CategoryProductDetailPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
             <Helmet>
                 <title>{product.name} | Aadhiran Kids Collections</title>
                 <meta name="description" content={product.description || `Buy ${product.name} at Aadhiran Kids Collections. Premium quality kids wear.`} />
@@ -315,7 +315,7 @@ const CategoryProductDetailPage = () => {
                     >
                         {/* Main Image */}
                         <div
-                            className="relative bg-gradient-to-br from-rose-50 to-pink-50 aspect-[3/4] overflow-hidden rounded-3xl cursor-zoom-in group border border-rose-100/40 shadow-card"
+                            className="relative aspect-[3/4] overflow-hidden cursor-zoom-in group clay-card bg-gradient-to-br from-rose-50/50 to-pink-50/20"
                             onClick={() => setLightboxOpen(true)}
                         >
                             <motion.img
@@ -447,11 +447,11 @@ const CategoryProductDetailPage = () => {
                                             onClick={() => !isOutOfStock && setSelectedAgeGroup(a.ageGroup)}
                                             whileHover={!isOutOfStock ? { scale: 1.06 } : {}}
                                             whileTap={!isOutOfStock ? { scale: 0.93 } : {}}
-                                            className={`min-w-[4rem] py-3 px-4 text-sm font-bold border-2 transition-all rounded-2xl ${
-                                                isOutOfStock ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60' :
+                                            className={`min-w-[4rem] py-3 px-4 text-sm font-black transition-all rounded-full ${
+                                                isOutOfStock ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60' :
                                                 selectedAgeGroup === a.ageGroup
-                                                    ? 'bg-gradient-to-br from-violet-400 to-indigo-500 text-white border-violet-400 shadow-glow'
-                                                    : 'bg-white text-gray-700 border-violet-100 hover:border-violet-300 hover:bg-violet-50'
+                                                    ? 'bg-gradient-to-br from-rose-500 to-pink-500 text-white shadow-[0_4px_10px_rgba(244,63,94,0.3),inset_-3px_-3px_6px_rgba(0,0,0,0.15),inset_3px_3px_6px_rgba(255,255,255,0.2)]'
+                                                    : 'bg-white dark:bg-charcoal-700 text-gray-700 dark:text-gray-300 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50 dark:border-white/5'
                                             }`}
                                         >
                                             {a.ageGroup}
@@ -480,10 +480,10 @@ const CategoryProductDetailPage = () => {
                                             onClick={() => setSelectedSize(size)}
                                             whileHover={{ scale: 1.06 }}
                                             whileTap={{ scale: 0.93 }}
-                                            className={`min-w-[3.5rem] py-3 px-4 text-sm font-bold border-2 transition-all rounded-2xl ${
+                                            className={`min-w-[3.5rem] py-3 px-4 text-sm font-black transition-all rounded-full ${
                                                 selectedSize === size
-                                                    ? 'bg-gradient-to-br from-rose-400 to-pink-500 text-white border-rose-400 shadow-glow'
-                                                    : 'bg-white text-gray-700 border-rose-100 hover:border-rose-300 hover:bg-rose-50'
+                                                    ? 'bg-gradient-to-br from-rose-500 to-pink-500 text-white shadow-[0_4px_10px_rgba(244,63,94,0.3),inset_-3px_-3px_6px_rgba(0,0,0,0.15),inset_3px_3px_6px_rgba(255,255,255,0.2)]'
+                                                    : 'bg-white dark:bg-charcoal-700 text-gray-700 dark:text-gray-300 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50 dark:border-white/5'
                                             }`}
                                         >
                                             {size}
@@ -509,21 +509,21 @@ const CategoryProductDetailPage = () => {
                                     {!selectedAgeGroup && normalizedAgeGroups.length > 0 ? 'Select Age Group' : (currentStock > 0 ? `${currentStock} in stock` : 'Out of stock')}
                                 </span>
                             </div>
-                            <div className="flex items-center gap-3 bg-rose-50/40 rounded-2xl p-1 w-fit border border-rose-100">
+                            <div className="flex items-center gap-3 bg-rose-50/40 rounded-full p-1 w-fit border border-rose-100/40">
                                 <motion.button
                                     onClick={() => handleQuantityChange(quantity - 1)}
                                     disabled={quantity <= 1}
                                     whileTap={{ scale: 0.88 }}
-                                    className="w-11 h-11 bg-white flex items-center justify-center rounded-xl border border-rose-100 hover:border-rose-300 hover:bg-rose-50 transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="w-11 h-11 bg-white dark:bg-charcoal-700 flex items-center justify-center rounded-full border border-white/50 dark:border-white/5 hover:bg-rose-50 transition-all shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     <Minus size={16} className="text-rose-500" />
                                 </motion.button>
-                                <span className="w-10 text-center font-black text-lg text-gray-900">{quantity}</span>
+                                <span className="w-10 text-center font-black text-lg text-gray-900 dark:text-white">{quantity}</span>
                                 <motion.button
                                     onClick={() => handleQuantityChange(quantity + 1)}
                                     disabled={quantity >= currentStock}
                                     whileTap={{ scale: 0.88 }}
-                                    className="w-11 h-11 bg-white flex items-center justify-center rounded-xl border border-rose-100 hover:border-rose-300 hover:bg-rose-50 transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="w-11 h-11 bg-white dark:bg-charcoal-700 flex items-center justify-center rounded-full border border-white/50 dark:border-white/5 hover:bg-rose-50 transition-all shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] disabled:opacity-40 disabled:cursor-not-allowed"
                                 >
                                     <Plus size={16} className="text-rose-500" />
                                 </motion.button>
@@ -549,12 +549,12 @@ const CategoryProductDetailPage = () => {
                                 disabled={currentStock === 0}
                                 whileHover={currentStock > 0 ? { scale: 1.02 } : {}}
                                 whileTap={currentStock > 0 ? { scale: 0.96 } : {}}
-                                className={`flex-1 py-4 font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all rounded-2xl shadow-xl ${
+                                className={`flex-1 py-4 font-black text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition-all rounded-full ${
                                     currentStock === 0
                                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
                                         : addedToCart
-                                            ? 'bg-green-500 text-white shadow-lg shadow-green-500/25'
-                                            : 'bg-gradient-to-r from-rose-400 via-pink-500 to-rose-500 text-white shadow-rose-500/30 shimmer-btn'
+                                            ? 'bg-green-500 text-white shadow-lg shadow-green-500/25 border border-green-400/25'
+                                            : 'btn-primary'
                                 }`}
                             >
                                 <AnimatePresence mode="wait">
@@ -575,17 +575,17 @@ const CategoryProductDetailPage = () => {
                             <motion.button
                                 onClick={handleWishlistToggle}
                                 whileTap={{ scale: 0.85 }}
-                                className={`w-14 h-14 flex items-center justify-center rounded-2xl border-2 transition-all ${
+                                className={`w-14 h-14 flex items-center justify-center rounded-full transition-all ${
                                     wishlisted
-                                        ? 'bg-rose-50 border-rose-400 shadow-glow'
-                                        : 'border-rose-200 hover:border-rose-400 hover:bg-rose-50'
+                                        ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/25 border border-rose-400/25'
+                                        : 'bg-white dark:bg-charcoal-700 text-rose-500 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50 dark:border-white/5'
                                 }`}
                             >
                                 <motion.div
                                     animate={heartPop ? { scale: [1, 1.6, 0.85, 1], rotate: [0, -15, 10, 0] } : { scale: 1 }}
                                     transition={{ duration: 0.4 }}
                                 >
-                                    <Heart size={22} className={wishlisted ? 'text-rose-500 fill-rose-500' : 'text-rose-400'} />
+                                    <Heart size={22} className={wishlisted ? 'text-white fill-white' : 'text-rose-500'} />
                                 </motion.div>
                             </motion.button>
                         </div>
@@ -633,22 +633,22 @@ const CategoryProductDetailPage = () => {
             {/* ─── Details & Reviews Tabs ─────────────────────────────────── */}
             <div className="max-w-7xl mx-auto px-4 pb-12 border-t border-rose-100/60 mt-4">
                 {/* Tab buttons */}
-                <div className="flex gap-1 mb-10 bg-rose-50/50 p-1.5 rounded-2xl w-fit mt-10 border border-rose-100/60">
+                <div className="flex gap-1.5 mb-10 bg-rose-50/40 p-1.5 rounded-full w-fit mt-10 border border-rose-100/40 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.8)]">
                     {['details', 'reviews'].map((tab) => (
                         <motion.button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             whileTap={{ scale: 0.95 }}
-                            className={`relative px-8 py-3 rounded-xl text-sm font-black uppercase tracking-widest transition-all duration-300 ${
+                            className={`relative px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all duration-300 ${
                                 activeTab === tab
-                                    ? 'bg-white text-gray-900 shadow-card'
+                                    ? 'bg-white text-gray-900 shadow-[0_4px_10px_rgba(244,63,94,0.08),inset_-2px_-2px_4px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.8)]'
                                     : 'text-gray-400 hover:text-gray-600'
                             }`}
                         >
                             {tab === 'reviews' ? (
                                 <span className="flex items-center gap-2">
                                     Reviews
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${activeTab === 'reviews' ? 'bg-rose-500 text-white' : 'bg-rose-100 text-rose-400'}`}>
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${activeTab === 'reviews' ? 'bg-rose-500 text-white shadow-sm' : 'bg-rose-100 text-rose-400'}`}>
                                         {reviews.length}
                                     </span>
                                 </span>

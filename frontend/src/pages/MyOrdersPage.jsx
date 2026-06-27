@@ -128,34 +128,34 @@ const MyOrdersPage = () => {
     }
 
     return (
-        <div className="min-h-screen py-10 sm:py-16">
+        <div className="min-h-screen py-10 sm:py-16" style={{ background: 'var(--bg-primary)' }}>
             <div className="section-container">
                 <header className="mb-8 sm:mb-12">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tight mb-3 sm:mb-4">Your Orders.</h1>
-                    <p className="text-gray-400 font-medium text-base">Keep track of your favorites on their way to you.</p>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tight mb-3 sm:mb-4">Your Orders.</h1>
+                    <p className="text-gray-400 dark:text-gray-500 font-medium text-base">Keep track of your favorites on their way to you.</p>
                 </header>
 
                 {orders.length === 0 ? (
-                    <div className="text-center py-20 sm:py-32 bg-white/80 backdrop-blur-xl rounded-3xl sm:rounded-[32px] border border-rose-100/60 shadow-soft">
-                        <div className="w-20 h-20 bg-rose-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                            <Clock className="text-rose-300" size={32} />
+                    <div className="text-center py-20 sm:py-32 glass-card">
+                        <div className="w-20 h-20 bg-rose-50 dark:bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50">
+                            <Clock className="text-rose-300 dark:text-rose-400 animate-bounce-soft" size={32} />
                         </div>
-                        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">No orders yet.</h2>
-                        <p className="text-gray-400 text-base">When you buy something, it will appear here.</p>
+                        <h2 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white mb-2">No orders yet.</h2>
+                        <p className="text-gray-400 dark:text-gray-500 text-base">When you buy something, it will appear here.</p>
                     </div>
                 ) : (
                     <div className="space-y-6 sm:space-y-8">
                         {Array.isArray(orders) && orders.map((order) => (
-                            <div key={order._id} className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-[32px] shadow-card border border-rose-100/60 overflow-hidden group hover:shadow-soft transition-all">
+                            <div key={order._id} className="clay-card overflow-hidden group">
                                 <div className="p-5 sm:p-8 md:p-10">
-                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6 mb-8 sm:mb-10 pb-6 sm:pb-10 border-b border-rose-100">
+                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6 mb-8 sm:mb-10 pb-6 sm:pb-10 border-b border-rose-100 dark:border-white/10">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110">
+                                            <div className="w-12 h-12 bg-rose-50 dark:bg-rose-500/10 rounded-full flex items-center justify-center shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50 transition-transform group-hover:scale-110">
                                                 <Package className="text-rose-400" size={20} />
                                             </div>
                                             <div>
-                                                <p className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-gray-400 mb-0.5">Order Number</p>
-                                                <p className="text-sm sm:text-base font-mono font-bold text-gray-900">{order._id.slice(-8).toUpperCase()}</p>
+                                                <p className="text-[10px] sm:text-xs uppercase tracking-widest font-black text-gray-400 mb-0.5">Order Number</p>
+                                                <p className="text-sm sm:text-base font-mono font-bold text-gray-900 dark:text-white">{order._id.slice(-8).toUpperCase()}</p>
                                             </div>
                                         </div>
                                         <div className="flex flex-wrap items-center gap-4 sm:gap-6 md:gap-10">
@@ -164,7 +164,7 @@ const MyOrdersPage = () => {
                                                     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
                                                     generateInvoice(order, userInfo?.name);
                                                 }}
-                                                className="flex items-center gap-2 text-xs sm:text-sm font-bold text-rose-500 hover:bg-rose-50 px-4 py-2 rounded-xl transition-all"
+                                                className="flex items-center gap-2 text-xs sm:text-sm font-black text-rose-500 bg-white dark:bg-charcoal-700 px-4 py-2 rounded-full border border-white/50 dark:border-white/5 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)]"
                                             >
                                                 <FileText size={16} /> INVOICE
                                             </button>
@@ -174,7 +174,7 @@ const MyOrdersPage = () => {
                                                 <button
                                                     onClick={() => openCancelModal(order._id)}
                                                     disabled={cancellingId === order._id}
-                                                    className="flex items-center gap-2 text-xs sm:text-sm font-bold text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all disabled:opacity-50"
+                                                    className="flex items-center gap-2 text-xs sm:text-sm font-black text-red-500 bg-white dark:bg-charcoal-700 px-4 py-2 rounded-full border border-white/50 dark:border-white/5 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] disabled:opacity-50"
                                                 >
                                                     <XCircle size={16} />
                                                     {cancellingId === order._id ? 'CANCELLING...' : 'CANCEL'}
@@ -182,11 +182,11 @@ const MyOrdersPage = () => {
                                             )}
 
                                             <div className="text-right">
-                                                <p className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-gray-400 mb-0.5">Date</p>
-                                                <p className="text-sm sm:text-base font-bold text-gray-900">{new Date(order.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                                <p className="text-[10px] sm:text-xs uppercase tracking-widest font-black text-gray-400 mb-0.5">Date</p>
+                                                <p className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">{new Date(order.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-gray-400 mb-0.5">Status</p>
+                                                <p className="text-[10px] sm:text-xs uppercase tracking-widest font-black text-gray-400 mb-0.5">Status</p>
                                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider ${getStatusStyle(order.status)}`}>
                                                     {order.status || 'Processing'}
                                                 </span>
@@ -249,45 +249,45 @@ const MyOrdersPage = () => {
             {showCancelModal && (
                 <>
                     <div
-                        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/45 backdrop-blur-md z-50 animate-fade-in"
                         onClick={() => setShowCancelModal(false)}
                     />
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-3xl shadow-2xl border border-rose-100 w-full max-w-md p-6 sm:p-8 relative">
+                        <div className="clay-card w-full max-w-md p-6 sm:p-8 relative">
                             <button
                                 onClick={() => setShowCancelModal(false)}
-                                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+                                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-charcoal-700 transition-colors"
                             >
                                 <X size={18} className="text-gray-400" />
                             </button>
 
-                            <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <div className="w-14 h-14 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)]">
                                 <XCircle className="text-red-400" size={28} />
                             </div>
 
-                            <h3 className="text-xl font-bold text-gray-900 text-center mb-2">Cancel Order</h3>
-                            <p className="text-sm text-gray-400 text-center mb-6">Please tell us why you'd like to cancel this order.</p>
+                            <h3 className="text-xl font-black text-gray-900 dark:text-white text-center mb-2">Cancel Order</h3>
+                            <p className="text-sm text-gray-400 dark:text-gray-500 text-center mb-6">Please tell us why you'd like to cancel this order.</p>
 
                             <textarea
                                 value={cancelReason}
                                 onChange={(e) => setCancelReason(e.target.value)}
-                                placeholder="e.g., Changed my mind, found a better option, ordered by mistake..."
+                                placeholder="e.g., Changed my mind, ordered by mistake..."
                                 rows={4}
-                                className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:border-rose-300 focus:ring-2 focus:ring-rose-100 outline-none text-sm text-gray-700 resize-none transition-all"
+                                className="clay-input resize-none w-full px-4 py-3"
                                 autoFocus
                             />
 
                             <div className="flex gap-3 mt-6">
                                 <button
                                     onClick={() => setShowCancelModal(false)}
-                                    className="flex-1 px-5 py-3 rounded-2xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all"
+                                    className="flex-1 px-5 py-3 rounded-full text-sm font-black text-gray-600 bg-white dark:bg-charcoal-700 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.06),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50 dark:border-white/5"
                                 >
                                     Keep Order
                                 </button>
                                 <button
                                     onClick={confirmCancelOrder}
                                     disabled={!cancelReason.trim()}
-                                    className="flex-1 px-5 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-rose-500 text-white text-sm font-bold shadow-lg shadow-red-500/20 hover:shadow-xl hover:shadow-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex-1 px-5 py-3 rounded-full bg-gradient-to-r from-red-500 to-rose-500 text-white text-sm font-black shadow-lg shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Cancel Order
                                 </button>

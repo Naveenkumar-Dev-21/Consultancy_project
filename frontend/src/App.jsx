@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
@@ -27,11 +27,21 @@ function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/owner-dashboard');
 
+  // Initialize dark mode from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
   return (
     <ToastProvider>
     <CartProvider>
     <WishlistProvider>
-      <div className="min-h-screen text-apple-text font-sans selection:bg-beelittle-coral/20 bg-[#f5f5f7]">
+      <div className="min-h-screen font-sans selection:bg-rose-500/20" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
         {!isAdminRoute && <Header />}
         <main className={!isAdminRoute ? "min-h-[calc(100vh-64px)]" : ""}>
           <Routes>
