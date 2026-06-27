@@ -117,7 +117,7 @@ const LoginPage = () => {
                                 <input
                                     type="email"
                                     required
-                                    className="premium-input pl-12"
+                                    className="premium-input !pl-12"
                                     placeholder="Email Address"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -130,7 +130,7 @@ const LoginPage = () => {
                                 <input
                                     type="password"
                                     required
-                                    className="premium-input pl-12"
+                                    className="premium-input !pl-12"
                                     placeholder="Password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}

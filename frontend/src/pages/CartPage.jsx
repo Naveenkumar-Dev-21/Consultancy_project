@@ -352,7 +352,7 @@ const CartPage = () => {
                                             required id="address"
                                             value={shippingDetails.address}
                                             onChange={handleInputChange}
-                                            className="clay-input pl-11 pr-4 py-3.5 resize-none"
+                                            className="clay-input !pl-11 pr-4 py-3.5 resize-none"
                                             placeholder="Street Address" rows="2"
                                         ></textarea>
                                     </div>
@@ -383,7 +383,7 @@ const CartPage = () => {
                                         <input
                                             required id="phone" type="tel" placeholder="Phone Number"
                                             value={shippingDetails.phone} onChange={handleInputChange}
-                                            className="clay-input pl-11 pr-4 py-3.5"
+                                            className="clay-input !pl-11 pr-4 py-3.5"
                                         />
                                     </div>
                                 </div>

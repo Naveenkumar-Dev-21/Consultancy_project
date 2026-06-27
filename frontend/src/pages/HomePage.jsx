@@ -167,7 +167,7 @@ const HomePage = () => {
                         <input
                             type="text"
                             placeholder="Search products..."
-                            className="clay-input pl-11 pr-4 py-2.5 text-xs font-bold"
+                            className="clay-input !pl-11 pr-4 py-2.5 text-xs font-bold"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />

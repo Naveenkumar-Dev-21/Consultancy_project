@@ -137,7 +137,7 @@ const Header = () => {
                                 whileHover={{ scale: 1.06, rotate: 2 }}
                                 transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                             />
-                            <div className="hidden xs:block">
+                            <div className="hidden sm:block">
                                 <span className="text-lg sm:text-xl font-extrabold tracking-tight text-gray-900 dark:text-white leading-tight">
                                     Aadhiran
                                 </span>
