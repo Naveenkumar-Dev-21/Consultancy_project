@@ -15,16 +15,21 @@
   --glass-border: rgba(255, 255, 255, 0.3);
 }
 
+.dark {
+  --admin-bg: #1A131F;
+  --admin-sidebar: #130E17;
+  --admin-card: #201726;
+  --admin-text-main: #FAF5FC;
+  --admin-text-muted: #8E7B92;
+  --admin-border: rgba(255, 255, 255, 0.08);
+}
+
 .admin-dashboard-layout {
   display: flex;
   min-height: 100vh;
   background-color: var(--admin-bg);
   color: var(--admin-text-main);
-  font-family:
-    "Poppins",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: "Migra", "Cormorant Garamond", serif;
 }
 
 /* Sidebar Styling */
@@ -96,7 +101,7 @@
 
 .admin-header {
   height: 64px;
-  background-color: white;
+  background-color: var(--admin-card);
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
@@ -114,7 +119,7 @@
 
 /* Card Styling */
 .admin-card {
-  background: white;
+  background: var(--admin-card);
   border-radius: 1.25rem;
   border: 1px solid var(--admin-border);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -153,7 +158,7 @@
 }
 
 .admin-table th {
-  background-color: #f8fafc;
+  background-color: var(--admin-bg);
   padding: 0.75rem 1.5rem;
   text-align: left;
   font-size: 0.8rem;
@@ -171,7 +176,7 @@
 }
 
 .admin-table tr:hover {
-  background-color: #f8fafc;
+  background-color: var(--admin-bg);
 }
 
 /* Stat Cards */
@@ -195,7 +200,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--admin-card);
   padding: 1.5rem;
   border-radius: 1rem;
   border: 1px solid var(--admin-border);
@@ -386,7 +391,7 @@
   justify-content: center;
   border-radius: 0.5rem;
   border: 1px solid var(--admin-border);
-  background: white;
+  background: var(--admin-card);
   color: var(--admin-text-main);
   transition: all 0.2s ease;
   cursor: pointer;
@@ -413,3 +418,94 @@
 .btn-action i {
   font-size: 0.9rem;
 }
+
+/* Modal and Form overrides for Dark Mode */
+.dark .modal-content, .dark .modal-content-custom {
+  background-color: var(--admin-card) !important;
+  color: var(--admin-text-main) !important;
+  border-color: var(--admin-border) !important;
+}
+
+.dark .modal-header, .dark .modal-header-custom {
+  border-bottom-color: var(--admin-border) !important;
+  background-color: var(--admin-sidebar) !important;
+  color: var(--admin-text-main) !important;
+}
+
+.dark .modal-footer {
+  border-top-color: var(--admin-border) !important;
+  background-color: var(--admin-sidebar) !important;
+}
+
+.dark .modal-title {
+  color: var(--admin-text-main) !important;
+}
+
+.dark .btn-close {
+  filter: invert(1) grayscale(1) brightness(2);
+}
+
+.dark input, .dark select, .dark textarea {
+  background-color: var(--admin-bg) !important;
+  color: var(--admin-text-main) !important;
+  border-color: var(--admin-border) !important;
+}
+
+.dark input::placeholder, .dark textarea::placeholder {
+  color: var(--admin-text-muted) !important;
+}
+
+.dark .form-label, .dark label {
+  color: var(--admin-text-main) !important;
+}
+
+.dark .admin-table th {
+  color: var(--admin-text-main) !important;
+}
+
+.dark .admin-table td {
+  color: var(--admin-text-main) !important;
+}
+
+.dark .card, .dark .list-group-item {
+  background-color: var(--admin-card) !important;
+  color: var(--admin-text-main) !important;
+  border-color: var(--admin-border) !important;
+}
+
+.dark .text-slate-800, .dark .text-slate-700 {
+  color: var(--admin-text-main) !important;
+}
+
+.dark .text-slate-600 {
+  color: var(--admin-text-muted) !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: var(--admin-bg) !important;
+}
+
+.dark .border-slate-200 {
+  border-color: var(--admin-border) !important;
+}
+
+.dark .stat-icon-wrapper.bg-indigo-50 {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+.dark .stat-icon-wrapper.bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+.dark .stat-icon-wrapper.bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+.dark .stat-icon-wrapper.bg-rose-50 {
+  background-color: rgba(244, 63, 148, 0.1) !important;
+}
+
+.dark .stat-icon-wrapper.bg-sky-50 {
+  background-color: rgba(14, 165, 233, 0.1) !important;
+}
+
