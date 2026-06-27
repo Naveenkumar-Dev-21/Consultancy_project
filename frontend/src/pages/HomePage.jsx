@@ -381,8 +381,8 @@ const HomePage = () => {
             >
                 <div className="flex items-end justify-between mb-10">
                     <div>
-                        <span className="text-rose-400 font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs mb-2 block flex items-center gap-1.5">
-                            <Sparkles size={12} /> Handpicked
+                        <span className="text-rose-400 font-black uppercase tracking-[0.2em] text-xs sm:text-sm mb-2 block flex items-center gap-1.5">
+                            <Sparkles size={14} /> Handpicked
                         </span>
                         <div className="flex items-center gap-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">Featured Products</h2>
@@ -391,7 +391,7 @@ const HomePage = () => {
                                     initial={{ opacity: 0, scale: 0.7 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                                    className="text-[10px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-3 py-1 rounded-full"
+                                    className="text-xs sm:text-sm font-black text-rose-500 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 px-4 py-1.5 rounded-full"
                                 >
                                     {filteredProducts.length} items
                                 </motion.span>
