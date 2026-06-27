@@ -1,7 +1,25 @@
-import React from 'react';
-import { Bell, Search, User, Menu } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bell, Search, User, Menu, Sun, Moon, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardHeader = ({ title, userName, searchTerm, setSearchTerm, toggleSidebar }) => {
+    const navigate = useNavigate();
+    const [darkMode, setDarkMode] = useState(() => {
+        return document.documentElement.classList.contains('dark');
+    });
+
+    const toggleTheme = () => {
+        const newMode = !darkMode;
+        setDarkMode(newMode);
+        if (newMode) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        }
+    };
+
     return (
         <header className="admin-header">
             <div className="flex items-center gap-4">
@@ -27,6 +45,24 @@ const DashboardHeader = ({ title, userName, searchTerm, setSearchTerm, toggleSid
                 </div>
 
                 <div className="flex items-center gap-4">
+                    {/* Home Link */}
+                    <button 
+                        onClick={() => navigate('/')}
+                        className="p-2 text-slate-500 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-charcoal-700 rounded-full transition-all"
+                        title="Go to Customer Site"
+                    >
+                        <Home size={20} />
+                    </button>
+
+                    {/* Theme Toggler */}
+                    <button 
+                        onClick={toggleTheme}
+                        className="p-2 text-slate-500 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-charcoal-700 rounded-full transition-all"
+                        title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                    >
+                        {darkMode ? <Sun size={20} className="text-amber-500 animate-pulse" /> : <Moon size={20} />}
+                    </button>
+
                     <button className="relative p-2 text-slate-500 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-charcoal-700 rounded-full transition-all">
                         <Bell size={20} />
                         <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white dark:border-charcoal-900"></span>
