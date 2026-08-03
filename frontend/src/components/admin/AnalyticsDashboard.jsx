@@ -1,12 +1,45 @@
 import React from 'react';
-import { 
+import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, BarChart, Bar, Legend
 } from 'recharts';
 import StatCard from './StatCard';
 import { getFullUrl } from '../../utils/urlUtils';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
+    const { darkMode } = useDarkMode();
+
+    // Recharts renders to SVG and cannot read Tailwind's `dark:` classes, so
+    // chart chrome has to be themed explicitly.
+    const chartTheme = darkMode
+        ? {
+            grid: 'rgba(255,255,255,0.08)',
+            tick: '#8E7B92',
+            cursor: 'rgba(255,255,255,0.04)',
+            dotStroke: '#201726',
+            tooltip: {
+                borderRadius: '12px',
+                border: '1px solid rgba(255,255,255,0.08)',
+                backgroundColor: '#201726',
+                color: '#FAF5FC',
+                boxShadow: '0 10px 15px -3px rgba(0,0,0,0.5)',
+            },
+        }
+        : {
+            grid: '#f1f5f9',
+            tick: '#94a3b8',
+            cursor: '#f8fafc',
+            dotStroke: '#fff',
+            tooltip: {
+                borderRadius: '12px',
+                border: 'none',
+                backgroundColor: '#ffffff',
+                color: '#1e293b',
+                boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+            },
+        };
+
     // Process REAL data for Revenue Chart (Last 7 days)
     const last7Days = [...Array(7)].map((_, i) => {
         const d = new Date();
@@ -140,7 +173,7 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
         <div className="fade-in">
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
-                    <h2 className="text-2xl font-bold text-gray-800">Realtime Analytics Dashboard</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Realtime Analytics Dashboard</h2>
                     <div className="live-indicator">
                         <span className="live-dot"></span>
                         Live
@@ -196,20 +229,20 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                         {revenueData.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <LineChart data={revenueData}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                                    <Tooltip 
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.grid} />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: chartTheme.tick, fontSize: 12}} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{fill: chartTheme.tick, fontSize: 12}} />
+                                    <Tooltip
+                                        contentStyle={chartTheme.tooltip}
                                         formatter={(value) => [`₹${value.toLocaleString()}`, 'Revenue']}
                                     />
-                                    <Line 
-                                        type="monotone" 
-                                        dataKey="revenue" 
-                                        stroke="#6366f1" 
-                                        strokeWidth={3} 
-                                        dot={{ r: 4, fill: '#6366f1', strokeWidth: 2, stroke: '#fff' }}
-                                        activeDot={{ r: 6 }} 
+                                    <Line
+                                        type="monotone"
+                                        dataKey="revenue"
+                                        stroke="#6366f1"
+                                        strokeWidth={3}
+                                        dot={{ r: 4, fill: '#6366f1', strokeWidth: 2, stroke: chartTheme.dotStroke }}
+                                        activeDot={{ r: 6 }}
                                     />
                                 </LineChart>
                             </ResponsiveContainer>
@@ -227,12 +260,12 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                         {statusData.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={statusData}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis dataKey="status" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
-                                    <Tooltip 
-                                        cursor={{fill: '#f8fafc'}}
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.grid} />
+                                    <XAxis dataKey="status" axisLine={false} tickLine={false} tick={{fill: chartTheme.tick, fontSize: 12}} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{fill: chartTheme.tick, fontSize: 12}} />
+                                    <Tooltip
+                                        cursor={{fill: chartTheme.cursor}}
+                                        contentStyle={chartTheme.tooltip}
                                     />
                                     <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} barSize={40} />
                                 </BarChart>
@@ -261,11 +294,11 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                                         dataKey="value"
                                     >
                                         {categoryData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke={chartTheme.dotStroke} />
                                         ))}
                                     </Pie>
-                                    <Tooltip />
-                                    <Legend verticalAlign="bottom" height={36}/>
+                                    <Tooltip contentStyle={chartTheme.tooltip} itemStyle={{ color: chartTheme.tooltip.color }} />
+                                    <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: chartTheme.tick, fontSize: 12 }} />
                                 </PieChart>
                             </ResponsiveContainer>
                         ) : (
@@ -290,11 +323,11 @@ const AnalyticsDashboard = ({ stats, allOrders, allProducts }) => {
                                         dataKey="value"
                                     >
                                         {genderData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={GENDER_COLORS[index % GENDER_COLORS.length]} />
+                                            <Cell key={`cell-${index}`} fill={GENDER_COLORS[index % GENDER_COLORS.length]} stroke={chartTheme.dotStroke} />
                                         ))}
                                     </Pie>
-                                    <Tooltip />
-                                    <Legend verticalAlign="bottom" height={36}/>
+                                    <Tooltip contentStyle={chartTheme.tooltip} itemStyle={{ color: chartTheme.tooltip.color }} />
+                                    <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: chartTheme.tick, fontSize: 12 }} />
                                 </PieChart>
                             </ResponsiveContainer>
                         ) : (

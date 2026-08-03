@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { Package, Calendar, MapPin, Truck, ChevronRight, Clock, FileText, XCircle, X } from 'lucide-react';
+import { Package, Calendar, MapPin, Truck, ChevronRight, Clock, FileText, XCircle, X, Sparkles } from 'lucide-react';
 import { generateInvoice } from '../utils/pdfGenerator';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../context/ToastContext';
+import { useCart } from '../context/CartContext';
+import ProductCard from '../components/common/ProductCard';
 
 const MyOrdersPage = () => {
     const navigate = useNavigate();
@@ -14,7 +16,10 @@ const MyOrdersPage = () => {
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [cancelOrderId, setCancelOrderId] = useState(null);
     const [cancelReason, setCancelReason] = useState('');
+    const [recommendations, setRecommendations] = useState([]);
+    const [addedToCartId, setAddedToCartId] = useState(null);
     const toast = useToast();
+    const { addToCart } = useCart();
 
     const getAuthConfig = () => {
         const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
@@ -50,6 +55,29 @@ const MyOrdersPage = () => {
         };
         fetchOrders();
     }, [navigate]);
+
+    // Personalised picks from the user's own order history. Non-critical, so a
+    // failure here is swallowed — the row simply doesn't render.
+    useEffect(() => {
+        const fetchRecommendations = async () => {
+            const auth = getAuthConfig();
+            if (!auth) return;
+            try {
+                const { data } = await api.get('/api/products/recommendations', auth.config);
+                setRecommendations(Array.isArray(data) ? data.slice(0, 5) : []);
+            } catch {
+                setRecommendations([]);
+            }
+        };
+        fetchRecommendations();
+    }, []);
+
+    const addToCartHandler = (product, e) => {
+        e.stopPropagation();
+        addToCart(product);
+        setAddedToCartId(product._id);
+        setTimeout(() => setAddedToCartId(null), 2000);
+    };
 
     const openCancelModal = (orderId) => {
         setCancelOrderId(orderId);
@@ -242,6 +270,33 @@ const MyOrdersPage = () => {
                             </div>
                         ))}
                     </div>
+                )}
+
+                {/* ─── Recommended for you ─── */}
+                {recommendations.length > 0 && (
+                    <section className="mt-16 sm:mt-20">
+                        <div className="mb-8">
+                            <span className="text-rose-400 font-black uppercase tracking-[0.2em] text-[10px] sm:text-xs mb-2 flex items-center gap-1.5">
+                                <Sparkles size={14} /> Just for you
+                            </span>
+                            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                                Recommended for You
+                            </h2>
+                            <p className="text-gray-400 dark:text-gray-500 font-medium text-sm mt-1">
+                                Picked based on what you've ordered before.
+                            </p>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
+                            {recommendations.map((product) => (
+                                <ProductCard
+                                    key={product._id}
+                                    product={product}
+                                    addToCartHandler={addToCartHandler}
+                                    addedToCartId={addedToCartId}
+                                />
+                            ))}
+                        </div>
+                    </section>
                 )}
             </div>
 

@@ -205,19 +205,21 @@ const CategoryProductDetailPage = () => {
         ? (normalizedAgeGroups.find(a => a.ageGroup === selectedAgeGroup)?.price || product.price)
         : product.price;
 
-    // Calculate stock for selected age group
+    // Calculate stock for selected age group. Age-group products derive their
+    // aggregate `stock` from the per-group sums (Product pre-save hook), so the
+    // full count is shown upfront and the specific count after selection.
     let currentStock = product.stock;
+    let totalStock = product.stock;
     if (normalizedAgeGroups.length > 0) {
-        currentStock = selectedAgeGroup 
+        totalStock = normalizedAgeGroups.reduce((sum, a) => sum + (Number(a.stock) || 0), 0) || product.stock;
+        currentStock = selectedAgeGroup
             ? (normalizedAgeGroups.find(a => a.ageGroup === selectedAgeGroup)?.stock || 0)
-            : 0; // Force 0 if age groups exist but none is selected
+            : totalStock; // show the full count until an age group is chosen
     }
 
     const wishlisted = isInWishlist(product._id);
 
     const addToCartHandler = () => {
-        if (quantity > currentStock) return;
-        
         if (availableAgeGroups.length > 0 && !selectedAgeGroup) {
             Swal.fire({
                 title: 'Please Select an Age Group',
@@ -239,7 +241,9 @@ const CategoryProductDetailPage = () => {
             });
             return;
         }
-        
+
+        if (currentStock <= 0 || quantity > currentStock) return;
+
         addToCart({ ...product, price: currentPrice, selectedSize, selectedAgeGroup, quantity });
         setAddedToCart(true);
         setTimeout(() => setAddedToCart(false), 2000);
@@ -338,8 +342,8 @@ const CategoryProductDetailPage = () => {
                                 </div>
                             </motion.div>
 
-                            {/* Sold out badge */}
-                            {product.stock <= 0 && (
+                            {/* Sold out badge — only when the entire product (all age groups) is out */}
+                            {totalStock <= 0 && (
                                 <div className="absolute top-4 left-4 bg-gray-900/90 text-white px-4 py-1.5 rounded-full font-bold uppercase tracking-wider text-xs backdrop-blur-sm">
                                     Sold Out
                                 </div>
@@ -444,7 +448,7 @@ const CategoryProductDetailPage = () => {
                                         return (
                                         <motion.button
                                             key={a.ageGroup}
-                                            onClick={() => !isOutOfStock && setSelectedAgeGroup(a.ageGroup)}
+                                            onClick={() => { if (!isOutOfStock) { setSelectedAgeGroup(a.ageGroup); setQuantity(1); } }}
                                             whileHover={!isOutOfStock ? { scale: 1.06 } : {}}
                                             whileTap={!isOutOfStock ? { scale: 0.93 } : {}}
                                             className={`min-w-[4rem] py-3 px-4 text-sm font-black transition-all rounded-full ${
@@ -501,12 +505,13 @@ const CategoryProductDetailPage = () => {
                             <div className="flex items-center justify-between mb-3">
                                 <label className="text-sm font-black text-gray-900 uppercase tracking-wider">Quantity</label>
                                 <span className={`text-sm font-bold px-3 py-1 rounded-full ${
-                                    !selectedAgeGroup && normalizedAgeGroups.length > 0 ? 'bg-violet-50 text-violet-500 border border-violet-100' :
                                     currentStock > 10 ? 'bg-green-50 text-green-600 border border-green-100'
                                     : currentStock > 0 ? 'bg-orange-50 text-orange-500 border border-orange-100'
                                     : 'bg-red-50 text-red-500 border border-red-100'
                                 }`}>
-                                    {!selectedAgeGroup && normalizedAgeGroups.length > 0 ? 'Select Age Group' : (currentStock > 0 ? `${currentStock} in stock` : 'Out of stock')}
+                                    {currentStock > 0
+                                        ? `${currentStock} in stock${selectedAgeGroup ? '' : (normalizedAgeGroups.length > 0 ? ' total' : '')}`
+                                        : 'Out of stock'}
                                 </span>
                             </div>
                             <div className="flex items-center gap-3 bg-rose-50/40 rounded-full p-1 w-fit border border-rose-100/40">

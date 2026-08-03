@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import ScrollToTop from './components/common/ScrollToTop';
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/layout/Header';
@@ -14,6 +14,7 @@ import CategoryPage from './pages/CategoryPage';
 import CategoryProductDetailPage from './pages/CategoryProductDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 import WishlistPage from './pages/WishlistPage';
+import SearchResultsPage from './pages/SearchResultsPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactUsPage from './pages/ContactUsPage';
 import { CartProvider } from './context/CartContext';
@@ -27,16 +28,6 @@ function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/owner-dashboard');
 
-  // Initialize dark mode from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
   return (
     <ToastProvider>
     <CartProvider>
@@ -49,6 +40,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutUsPage />} />
             <Route path="/contact" element={<ContactUsPage />} />
+            <Route path="/search" element={<SearchResultsPage />} />
 
             {/* Category Routes — single dynamic route */}
             <Route path="/category/:slug" element={<CategoryPage />} />

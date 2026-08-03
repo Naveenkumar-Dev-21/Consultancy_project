@@ -4,6 +4,7 @@ import { ShoppingCart, User, LogOut, LayoutDashboard, Menu, X, Heart, Sun, Moon,
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -12,9 +13,19 @@ const Header = () => {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
-    const [darkMode, setDarkMode] = useState(() => {
-        return document.documentElement.classList.contains('dark');
-    });
+    const { darkMode, toggleDarkMode } = useDarkMode();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showSearch, setShowSearch] = useState(false);
+
+    const submitSearch = (e) => {
+        e.preventDefault();
+        const q = searchQuery.trim();
+        if (!q) return;
+        navigate(`/search?q=${encodeURIComponent(q)}`);
+        setSearchQuery('');
+        setShowSearch(false);
+        setIsMobileMenuOpen(false);
+    };
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -31,13 +42,6 @@ const Header = () => {
         }
         return () => { document.body.style.overflow = ''; };
     }, [isMobileMenuOpen]);
-
-    const toggleDarkMode = () => {
-        const newMode = !darkMode;
-        setDarkMode(newMode);
-        document.documentElement.classList.toggle('dark', newMode);
-        localStorage.setItem('theme', newMode ? 'dark' : 'light');
-    };
 
     const logoutHandler = () => {
         localStorage.removeItem('userInfo');
@@ -157,6 +161,29 @@ const Header = () => {
 
                     {/* Right: Actions */}
                     <div className="flex items-center gap-2 sm:gap-3">
+                        {/* Desktop Search */}
+                        <form onSubmit={submitSearch} className="hidden lg:block relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-rose-400/60 pointer-events-none" size={16} />
+                            <input
+                                type="search"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search products..."
+                                aria-label="Search products"
+                                className="w-40 xl:w-56 focus:w-64 xl:focus:w-72 transition-all duration-300 pl-9 pr-3 py-2 rounded-full text-xs font-bold bg-white/70 dark:bg-charcoal-800/70 text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 border border-rose-100/60 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-400/40"
+                            />
+                        </form>
+
+                        {/* Mobile/Tablet Search Toggle */}
+                        <motion.button
+                            onClick={() => setShowSearch((s) => !s)}
+                            whileTap={{ scale: 0.85 }}
+                            className="lg:hidden p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 hover:bg-rose-50/50 dark:hover:bg-rose-500/10 transition-colors"
+                            aria-label="Toggle search"
+                            aria-expanded={showSearch}
+                        >
+                            <Search size={20} />
+                        </motion.button>
                         {/* Dark Mode Toggle */}
                         <motion.button
                             onClick={toggleDarkMode}
@@ -217,6 +244,34 @@ const Header = () => {
                         )}
                     </div>
                 </div>
+
+                {/* Collapsible search bar (mobile / tablet) */}
+                <AnimatePresence>
+                    {showSearch && (
+                        <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                            className="lg:hidden overflow-hidden border-t border-rose-100/40 dark:border-white/10"
+                        >
+                            <form onSubmit={submitSearch} className="section-container py-3">
+                                <div className="relative">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-rose-400/60 pointer-events-none" size={18} />
+                                    <input
+                                        type="search"
+                                        autoFocus
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Search products..."
+                                        aria-label="Search products"
+                                        className="w-full pl-11 pr-4 py-2.5 rounded-full text-sm font-bold bg-white/80 dark:bg-charcoal-800/80 text-gray-700 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-500 border border-rose-100/60 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-rose-400/40"
+                                    />
+                                </div>
+                            </form>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </header>
 
             {/* ─── Mobile Menu Overlay ─── */}

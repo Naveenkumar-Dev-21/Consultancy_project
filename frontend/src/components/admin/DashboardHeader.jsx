@@ -1,24 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Bell, Search, User, Menu, Sun, Moon, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 const DashboardHeader = ({ title, userName, searchTerm, setSearchTerm, toggleSidebar }) => {
     const navigate = useNavigate();
-    const [darkMode, setDarkMode] = useState(() => {
-        return document.documentElement.classList.contains('dark');
-    });
-
-    const toggleTheme = () => {
-        const newMode = !darkMode;
-        setDarkMode(newMode);
-        if (newMode) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    };
+    const { darkMode, toggleDarkMode } = useDarkMode();
 
     return (
         <header className="admin-header">
@@ -56,7 +43,7 @@ const DashboardHeader = ({ title, userName, searchTerm, setSearchTerm, toggleSid
 
                     {/* Theme Toggler */}
                     <button 
-                        onClick={toggleTheme}
+                        onClick={toggleDarkMode}
                         className="p-2 text-slate-500 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-charcoal-700 rounded-full transition-all"
                         title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                     >

@@ -51,6 +51,12 @@ const OwnerDashboard = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
 
+    // Inline stock editing (products tab)
+    const [editingStockId, setEditingStockId] = useState(null);
+    const [stockDraft, setStockDraft] = useState('');
+    const [savingStockId, setSavingStockId] = useState(null);
+    const [showLowStockOnly, setShowLowStockOnly] = useState(false);
+
 
     // Form States
     const [productForm, setProductForm] = useState({
@@ -424,6 +430,36 @@ const OwnerDashboard = () => {
         }
     };
 
+    // Quick stock adjustment straight from the inventory table.
+    // updateProduct treats `stock` as a partial update, so sending only this
+    // field leaves every other product attribute untouched.
+    const saveStock = async (productId) => {
+        const parsed = Number(stockDraft);
+        if (!Number.isInteger(parsed) || parsed < 0) {
+            toast.error('Stock must be a whole number of 0 or more');
+            return;
+        }
+
+        setSavingStockId(productId);
+        try {
+            const { data } = await api.put(
+                `/api/products/${productId}`,
+                { stock: parsed },
+                getAuthConfig()
+            );
+            setAllProducts(prev => prev.map(p =>
+                p._id === productId ? { ...p, stock: data?.stock ?? parsed } : p
+            ));
+            toast.success('Stock updated');
+            setEditingStockId(null);
+            setStockDraft('');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to update stock');
+        } finally {
+            setSavingStockId(null);
+        }
+    };
+
     const openProductModal = (product = null) => {
         const standardCategories = ['Regular wear', 'Infant Clothings', 'New born Essentials', 'Night Wear', 'Casual', 'Frock', 'Towels'];
         if (product) {
@@ -587,13 +623,15 @@ const OwnerDashboard = () => {
         return matchesStatus && matchesSearch;
     });
 
-    const filteredProducts = allProducts.filter(p => 
-        searchTerm 
-            ? (p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const filteredProducts = allProducts.filter(p => {
+        const matchesSearch = searchTerm
+            ? (p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                (p.code && p.code.toLowerCase().includes(searchTerm.toLowerCase())))
-            : true
-    );
+            : true;
+        const matchesStock = showLowStockOnly ? (p.stock ?? 0) <= 5 : true;
+        return matchesSearch && matchesStock;
+    });
 
     const filteredUsers = allUsers.filter(u => 
         searchTerm 
@@ -752,10 +790,32 @@ const OwnerDashboard = () => {
                     {activeTab === 'products' && (
                         <div className="dashboard-card fade-in">
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h4>Product Inventory</h4>
-                                <button className="btn btn-primary-custom" onClick={() => openProductModal()}>
-                                    <i className="fas fa-plus me-2"></i>Add Product
-                                </button>
+                                <div className="d-flex align-items-center gap-2">
+                                    <h4 className="mb-0">Product Inventory</h4>
+                                    {(() => {
+                                        const low = (Array.isArray(allProducts) ? allProducts : []).filter(p => p.stock <= 5).length;
+                                        return low > 0 ? (
+                                            <span className="badge bg-warning text-dark" title="Products with 5 or fewer units left">
+                                                <i className="fas fa-exclamation-triangle me-1"></i>{low} low stock
+                                            </span>
+                                        ) : null;
+                                    })()}
+                                </div>
+                                <div className="d-flex align-items-center gap-2">
+                                    <div className="form-check form-switch mt-2">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            id="lowStockOnly"
+                                            checked={showLowStockOnly}
+                                            onChange={(e) => setShowLowStockOnly(e.target.checked)}
+                                        />
+                                        <label className="form-check-label small" htmlFor="lowStockOnly">Low stock only</label>
+                                    </div>
+                                    <button className="btn btn-primary-custom" onClick={() => openProductModal()}>
+                                        <i className="fas fa-plus me-2"></i>Add Product
+                                    </button>
+                                </div>
                             </div>
 
                             {productsLoading ? <div className="loading"><i className="fas fa-spinner fa-spin fa-2x"></i></div> : (
@@ -803,9 +863,94 @@ const OwnerDashboard = () => {
                                                     </td>
                                                     <td>₹{product.price.toLocaleString()}</td>
                                                     <td>
-                                                        <span className={`badge ${product.stock > 0 ? 'bg-success' : 'bg-danger'}`}>
-                                                            {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                                                        </span>
+                                                        {(() => {
+                                                            // The Product pre-save hook recomputes top-level `stock` as the
+                                                            // sum of per-age-group stock whenever ageGroup is non-empty. For
+                                                            // those products, editing the aggregate directly is a no-op — it
+                                                            // must be managed per age-group via the edit modal.
+                                                            const stockIsDerived = Array.isArray(product.ageGroup) && product.ageGroup.length > 0;
+                                                            const stockBadge = (
+                                                                <span className={`badge ${product.stock > 5 ? 'bg-success' : product.stock > 0 ? 'bg-warning text-dark' : 'bg-danger'}`}>
+                                                                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                                                                </span>
+                                                            );
+
+                                                            if (stockIsDerived) {
+                                                                return (
+                                                                    <div className="d-flex align-items-center gap-2">
+                                                                        {stockBadge}
+                                                                        <button
+                                                                            className="btn btn-sm btn-outline-secondary"
+                                                                            onClick={() => openProductModal(product)}
+                                                                            title="Stock is set per age-group — edit in product details"
+                                                                        >
+                                                                            <i className="fas fa-layer-group"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            if (editingStockId === product._id) {
+                                                                return (
+                                                                    <div className="d-flex align-items-center gap-1">
+                                                                        <input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            step="1"
+                                                                            autoFocus
+                                                                            value={stockDraft}
+                                                                            onChange={(e) => setStockDraft(e.target.value)}
+                                                                            onKeyDown={(e) => {
+                                                                                if (e.key === 'Enter') saveStock(product._id);
+                                                                                if (e.key === 'Escape') {
+                                                                                    setEditingStockId(null);
+                                                                                    setStockDraft('');
+                                                                                }
+                                                                            }}
+                                                                            className="form-control form-control-sm"
+                                                                            style={{ width: '80px' }}
+                                                                            aria-label={`Set stock for ${product.name}`}
+                                                                        />
+                                                                        <button
+                                                                            className="btn btn-sm btn-success"
+                                                                            onClick={() => saveStock(product._id)}
+                                                                            disabled={savingStockId === product._id}
+                                                                            title="Save stock"
+                                                                        >
+                                                                            {savingStockId === product._id
+                                                                                ? <i className="fas fa-spinner fa-spin"></i>
+                                                                                : <i className="fas fa-check"></i>}
+                                                                        </button>
+                                                                        <button
+                                                                            className="btn btn-sm btn-outline-secondary"
+                                                                            onClick={() => {
+                                                                                setEditingStockId(null);
+                                                                                setStockDraft('');
+                                                                            }}
+                                                                            title="Cancel"
+                                                                        >
+                                                                            <i className="fas fa-times"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                );
+                                                            }
+
+                                                            return (
+                                                                <div className="d-flex align-items-center gap-2">
+                                                                    {stockBadge}
+                                                                    <button
+                                                                        className="btn btn-sm btn-outline-primary"
+                                                                        onClick={() => {
+                                                                            setEditingStockId(product._id);
+                                                                            setStockDraft(String(product.stock ?? 0));
+                                                                        }}
+                                                                        title="Update stock"
+                                                                    >
+                                                                        <i className="fas fa-box-open"></i>
+                                                                    </button>
+                                                                </div>
+                                                            );
+                                                        })()}
                                                     </td>
                                                     <td>
                                                         <div className="action-buttons">
