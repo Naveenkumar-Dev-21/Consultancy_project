@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal, X, Sparkles } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import HeroCarousel from '../components/common/HeroCarousel';
 import MarqueeBanner from '../components/common/MarqueeBanner';
@@ -12,6 +12,7 @@ import { Helmet } from 'react-helmet-async';
 
 const HomePage = () => {
     const { addToCart } = useCart();
+    const navigate = useNavigate();
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -19,30 +20,22 @@ const HomePage = () => {
     const [allCategories, setAllCategories] = useState([]);
     const [showFilters, setShowFilters] = useState(false);
 
-    const [searchParams, setSearchParams] = useSearchParams();
-
     // Filter States
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(5000);
     const [selectedAgeGroup, setSelectedAgeGroup] = useState('');
     const [selectedGender, setSelectedGender] = useState('');
-    const [selectedSubCategory, setSelectedSubCategory] = useState('');
 
-    // Sync state with URL
-    useEffect(() => {
-        const cat = searchParams.get('category');
-        if (cat) setSelectedCategory(cat);
-        else setSelectedCategory('All');
-    }, [searchParams]);
-
-    const handleCategoryChange = (cat) => {
-        setSelectedCategory(cat);
-        setSelectedSubCategory('');
-        if (cat === 'All') searchParams.delete('category');
-        else searchParams.set('category', cat);
-        setSearchParams(searchParams);
+    const handleCategoryClick = (categoryName, categorySlug) => {
+        // Navigate to the CategoryPage instead of filtering in place
+        if (categorySlug) {
+            navigate(`/category/${categorySlug}`);
+        } else {
+            // Fallback: convert name to slug (kebab-case, lowercase)
+            const slug = categoryName.toLowerCase().replace(/\s+/g, '-');
+            navigate(`/category/${slug}`);
+        }
     };
 
     useEffect(() => {
@@ -74,14 +67,6 @@ const HomePage = () => {
     useEffect(() => {
         let result = Array.isArray(products) ? products : [];
         if (searchTerm) result = result.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        if (selectedCategory !== 'All') {
-            result = result.filter(p => {
-                if (selectedCategory === 'Night Wear') {
-                    return p.category === 'Night Wear' || p.category === 'Night Dress' || p.category === 'NightWear';
-                }
-                return p.category === selectedCategory;
-            });
-        }
         result = result.filter(p => p.price >= minPrice && p.price <= maxPrice);
         if (selectedAgeGroup) {
             result = result.filter(p =>
@@ -91,9 +76,8 @@ const HomePage = () => {
             );
         }
         if (selectedGender) result = result.filter(p => p.gender === selectedGender);
-        if (selectedSubCategory) result = result.filter(p => p.subCategory === selectedSubCategory);
         setFilteredProducts(result);
-    }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedAgeGroup, selectedGender, selectedSubCategory, products]);
+    }, [searchTerm, minPrice, maxPrice, selectedAgeGroup, selectedGender, products]);
 
     const addToCartHandler = (product, e) => {
         e.stopPropagation();
@@ -102,22 +86,14 @@ const HomePage = () => {
         setTimeout(() => setAddedToCartId(null), 2000);
     };
 
-    const currentCategorySubCategories = selectedCategory !== 'All'
-        ? (allCategories.find(c => c.name === selectedCategory)?.subCategories || [])
-        : [];
-
-    const hasActiveFilters = searchTerm || selectedCategory !== 'All' || minPrice > 0 || maxPrice < 5000 || selectedAgeGroup || selectedGender || selectedSubCategory;
+    const hasActiveFilters = searchTerm || minPrice > 0 || maxPrice < 5000 || selectedAgeGroup || selectedGender;
 
     const clearAllFilters = () => {
         setSearchTerm('');
-        setSelectedCategory('All');
         setMinPrice(0);
         setMaxPrice(5000);
         setSelectedAgeGroup('');
         setSelectedGender('');
-        setSelectedSubCategory('');
-        searchParams.delete('category');
-        setSearchParams(searchParams);
     };
 
     // Card stagger variants
@@ -171,39 +147,6 @@ const HomePage = () => {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                    </div>
-
-                    {/* Category Pills (Desktop) */}
-                    <div className="hidden lg:flex items-center gap-2 flex-wrap">
-                        {['All', ...(Array.isArray(allCategories) ? allCategories.map(c => c.name) : [])].map(cat => (
-                            <motion.button
-                                key={cat}
-                                onClick={() => handleCategoryChange(cat)}
-                                whileTap={{ scale: 0.94 }}
-                                className={`px-5 py-2.5 rounded-full text-xs font-black transition-all ${
-                                    selectedCategory === cat
-                                        ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-[0_4px_10px_rgba(244,63,94,0.3),inset_-3px_-3px_6px_rgba(0,0,0,0.15),inset_3px_3px_6px_rgba(255,255,255,0.2)]'
-                                        : 'bg-white dark:bg-charcoal-700 text-gray-600 dark:text-gray-300 shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,0.8)] border border-white/50 dark:border-white/5 hover:text-rose-500'
-                                }`}
-                            >
-                                {cat === 'All' ? 'All Categories' : cat}
-                            </motion.button>
-                        ))}
-                    </div>
-
-                    {/* Category Select (Mobile) */}
-                    <div className="flex-grow lg:hidden min-w-[150px]">
-                        <select
-                            className={selectClass + " w-full"}
-                            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fb7185'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
-                            value={selectedCategory}
-                            onChange={(e) => handleCategoryChange(e.target.value)}
-                        >
-                            <option value="All">All Categories</option>
-                            {Array.isArray(allCategories) && allCategories.map(cat => (
-                                <option key={cat._id} value={cat.name}>{cat.name}</option>
-                            ))}
-                        </select>
                     </div>
 
                     {/* More Filters Toggle */}
@@ -290,34 +233,6 @@ const HomePage = () => {
                 </AnimatePresence>
             </motion.div>
 
-            {/* ─── Subcategory Filter Chips ─── */}
-            {currentCategorySubCategories.length > 0 && (
-                <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="section-container -mt-4 mb-6 relative z-10"
-                >
-                    <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mr-1">Sub-category:</span>
-                        {['', ...currentCategorySubCategories].map((sub) => (
-                            <motion.button
-                                key={sub || '__all__'}
-                                onClick={() => setSelectedSubCategory(sub)}
-                                whileTap={{ scale: 0.94 }}
-                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 border ${
-                                    selectedSubCategory === sub
-                                        ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white border-transparent shadow-md shadow-rose-500/20'
-                                        : 'bg-white/80 dark:bg-charcoal-700 text-gray-600 dark:text-gray-300 border-rose-100/40 dark:border-charcoal-600 hover:border-rose-300 dark:hover:border-rose-500/30 hover:text-rose-500'
-                                }`}
-                            >
-                                {sub === '' ? 'All' : sub}
-                            </motion.button>
-                        ))}
-                    </div>
-                </motion.div>
-            )}
-
             {/* ─── Shop by Category ─── */}
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -347,11 +262,9 @@ const HomePage = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.45, delay: idx * 0.08 }}
-                            onClick={() => handleCategoryChange(cat.name)}
+                            onClick={() => handleCategoryClick(cat.name, cat.slug)}
                             whileHover={{ y: -6 }}
-                            className={`group relative h-36 sm:h-44 md:h-48 clay-card p-2 cursor-pointer ${
-                                selectedCategory === cat.name ? 'ring-3 ring-rose-400' : ''
-                            }`}
+                            className="group relative h-36 sm:h-44 md:h-48 clay-card p-2 cursor-pointer"
                         >
                             <div className="relative w-full h-full rounded-[24px] overflow-hidden">
                                 <img
@@ -407,7 +320,7 @@ const HomePage = () => {
                     </div>
                 ) : (
                     <motion.div
-                        key={`${selectedCategory}-${selectedSubCategory}-${selectedAgeGroup}-${selectedGender}-${searchTerm}`}
+                        key={`${selectedAgeGroup}-${selectedGender}-${searchTerm}`}
                         className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5"
                         variants={containerVariants}
                         initial="hidden"

@@ -3,10 +3,11 @@
 **Branch:** `feature/local-changes-2026-08`
 **Deploys to:** production (`main`)
 
-This batch adds three customer-facing/admin features, fixes several dark-theme defects,
-and fixes a product-page stock-count display bug. No database schema changes, no data
-migrations. Backend source logic is unchanged — the only backend edit is one added npm
-script.
+This batch adds customer-facing/admin features, fixes several dark-theme defects,
+fixes a product-page stock-count display bug, and changes home-page category
+interaction to navigate to dedicated category pages. No database schema changes, no
+data migrations. Backend source logic is unchanged — the only backend edit is one
+added npm script.
 
 ---
 
@@ -79,7 +80,28 @@ never called.
 
 Frontend-only; the total is derived from per-age stock the backend already stores.
 
-## 6. Backend — One npm Script
+## 6. Home Page — Category Click Navigates to Category Page
+
+`HomePage.jsx` (+ reuses the existing `CategoryPage.jsx` and `/category/:slug` route):
+
+- **Before:** clicking a category (the "Shop by Collections" cards or the filter-bar
+  category pills/select) filtered the product list *in place* on the home page.
+- **Now:** clicking a category **navigates** to a dedicated category page
+  (`/category/:slug`) that lists only that category's products. The old in-place
+  category pills (desktop), category `<select>` (mobile), category URL sync, and the
+  subcategory chip row were removed from the home page — that browsing now lives on the
+  category page, which already has its own subcategory filter.
+- `CategoryPage.jsx` already provides a **"Back to Home" button** and a **fully
+  responsive** layout (2-col on mobile → 3-col `sm` → 4-col `md`, responsive hero and
+  typography). Navigation uses the category's `slug` from the API, with a kebab-case
+  fallback derived from the name for the hardcoded placeholder categories.
+- The home page keeps its other in-place filters (search, price, gender, age group) for
+  the "Featured Products" grid; only category selection now routes away.
+
+No backend calls changed — `CategoryPage` uses the same public `GET /api/products` and
+`GET /api/categories` endpoints already in production.
+
+## 7. Backend — One npm Script
 
 `backend/package.json`: added a `dev:local` script for running the server locally with a
 git-ignored `.env.local` override. `start` (production) and dependencies are unchanged,
