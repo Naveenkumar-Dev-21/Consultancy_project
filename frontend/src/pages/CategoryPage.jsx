@@ -131,9 +131,9 @@ const CategoryPage = () => {
                         initial={{ opacity: 0, x: -12 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4 }}
-                        className="flex items-center gap-2 text-white/80 hover:text-white mb-8 md:mb-10 transition-colors font-semibold text-sm group"
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8 md:mb-10 transition-colors font-semibold text-sm group"
                     >
-                        <span className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-white/30 transition-all">
+                        <span className="w-8 h-8 bg-gray-900/10 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-gray-900/20 transition-all">
                             <ArrowLeft size={16} />
                         </span>
                         Back to Home
@@ -146,15 +146,15 @@ const CategoryPage = () => {
                         transition={{ duration: 0.6, delay: 0.1 }}
                     >
                         <div className="flex items-center gap-2 mb-3">
-                            <Sparkles size={16} className="text-white/70" />
-                            <span className="text-white/70 text-xs font-bold uppercase tracking-[0.25em]">Collection</span>
+                            <Sparkles size={16} className="text-gray-500" />
+                            <span className="text-gray-500 text-xs font-bold uppercase tracking-[0.25em]">Collection</span>
                         </div>
-                        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white mb-4 tracking-tight leading-none drop-shadow-lg">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-gray-900 mb-4 tracking-tight leading-none">
                             {(category.name || '').split(' ').slice(0, 1).join(' ')}
                             <br />
-                            <span className="text-white/80">{(category.name || '').split(' ').slice(1).join(' ')}</span>
+                            <span className="text-gray-500">{(category.name || '').split(' ').slice(1).join(' ')}</span>
                         </h1>
-                        <p className="text-white/75 text-lg sm:text-xl font-medium max-w-lg">{category.subtitle}</p>
+                        <p className="text-gray-600 text-lg sm:text-xl font-medium max-w-lg">{category.subtitle}</p>
                     </motion.div>
 
                     {/* Stats row */}
@@ -164,14 +164,14 @@ const CategoryPage = () => {
                         transition={{ duration: 0.5, delay: 0.3 }}
                         className="flex items-center gap-4 mt-6 flex-wrap"
                     >
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                            <span className="text-white text-sm font-bold">{products.length} Products</span>
+                        <div className="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
+                            <span className="text-gray-800 text-sm font-bold">{products.length} Products</span>
                         </div>
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                            <span className="text-white text-sm font-bold">✨ Free Shipping</span>
+                        <div className="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
+                            <span className="text-gray-800 text-sm font-bold">✨ Free Shipping</span>
                         </div>
-                        <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                            <span className="text-white text-sm font-bold">💯 Pure Cotton</span>
+                        <div className="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 shadow-sm">
+                            <span className="text-gray-800 text-sm font-bold">💯 Pure Cotton</span>
                         </div>
                     </motion.div>
 
@@ -183,7 +183,7 @@ const CategoryPage = () => {
                             transition={{ duration: 0.4, delay: 0.45 }}
                             className="flex flex-wrap items-center gap-2 mt-7"
                         >
-                            <div className="flex items-center gap-1.5 text-white/60 mr-2">
+                            <div className="flex items-center gap-1.5 text-gray-500 mr-2">
                                 <SlidersHorizontal size={14} />
                                 <span className="text-xs font-bold uppercase tracking-wider">Filter</span>
                             </div>
@@ -195,8 +195,8 @@ const CategoryPage = () => {
                                     onClick={() => setSelectedSubCategory(sub)}
                                     className={`px-5 py-2 rounded-full text-sm font-bold transition-all duration-200 border ${
                                         selectedSubCategory === sub
-                                            ? 'bg-white text-gray-900 border-white shadow-lg shadow-black/10'
-                                            : 'bg-white/15 text-white border-white/30 hover:bg-white/25 backdrop-blur-sm'
+                                            ? 'bg-gray-900 text-white border-gray-900 shadow-lg shadow-black/10'
+                                            : 'bg-white/60 text-gray-700 border-gray-200 hover:bg-white/90 backdrop-blur-sm'
                                     }`}
                                 >
                                     {sub === '' ? 'All' : sub}
