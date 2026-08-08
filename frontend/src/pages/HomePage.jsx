@@ -226,6 +226,9 @@ const HomePage = () => {
                                     <option value="5-6Y">5-6Y</option>
                                     <option value="7-8Y">7-8Y</option>
                                     <option value="9-10Y">9-10Y</option>
+                                    <option value="11-12Y">11-12Y</option>
+                                    <option value="13-14Y">13-14Y</option>
+                                    <option value="15-16Y">15-16Y</option>
                                 </select>
                             </div>
                         </motion.div>
